@@ -218,184 +218,186 @@ z-index: 5000;">
 
 </body>
 </html>
+
+
+<script type="text/javascript">
+
+    var all_messages = [], refreshScansTimeout, refreshAdTimeout;
+
+    $(document).ready(function () {
+
+        FastClick.attach(document.body);
+
+//     <% if request.fullpath.starts_with?('/map_view') || request.fullpath == '/my_stops' || request.fullpath == '/web' %>
+//
+//                 refresh_messages();
+//
+//         $(".message-bubble").click(function (e) {
+//             $.post('/set_viewed_alerts', {
+//                 authenticity_token: "<%= form_authenticity_token %>",
+//                 message_ids: all_messages.join(',')
+//             }, function (response) {
+//                 // console.log(response)
+//             });
+//
+//             if($("#overlay").is(':visible'))
+//             {
+//                 $('#overlay').hide();
+//             }
+//             else
+//             {
+//                 $('#overlay').show();
+//             }
+//
+//             if($("#message-empty").is(':visible') || $("#message-filled").is(':visible'))
+//             {
+//                 $("#message-close").show();
+//                 $("#message-empty").hide();
+//                 $("#message-filled").hide();
+//             }
+//             else
+//             {
+//                 $("#message-close").hide();
+//                 $("#message-empty").show();
+//                 $("#message-filled").hide();
+//             }
+//
+//
+//
+// //      $("html, body").animate({scrollTop: 0}, "slow");
+//         })
+//
+//         <% end %>
+
+    })
+
+
+    // <% if request.fullpath.starts_with?('/map_view') || request.fullpath == '/my_stops' || request.fullpath == '/web' %>
+    //
+    //         function refresh_messages() {
+    //
+    //             $.get('/alerts', {
+    //                 authenticity_token: '<%= form_authenticity_token %>'
+    //             }, function (response) {
+    //
+    //                 $("#messages").empty();
+    //
+    //                 if (response.result.unread_messages != '0') {
+    //                     //$(".message").text(response.result.unread_messages);
+    //                     //$(".fa-exclamation").show();
+    //                     $("#message-filled").show();
+    //                     $("#message-close").hide();
+    //                     $("#message-empty").hide();
+    //                 }
+    //
+    //                 for (var x = 0; x < response.result.safe_stop_messages.length; x++) {
+    //
+    //                     if (response.result.safe_stop_messages[x].priority == "info") {
+    //                         $("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#5bc0de; vertical-align: top;'><i class='fa fa-exclamation-circle'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");
+    //                     }
+    //                     else if (response.result.safe_stop_messages[x].priority == "alert") {
+    //                         $("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#d9534f; vertical-align: top;'><i class='fa fa-exclamation-triangle'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");
+    //                     }
+    //                     else if (response.result.safe_stop_messages[x].priority == "audible") {
+    //                         $("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#FCD20A; vertical-align: top;'><i class='fa fa-clock-o'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");
+    //                     }
+    //                     else if (response.result.safe_stop_messages[x].priority == "ad-offer") {
+    //                         $("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#4CB349; vertical-align: top;'><i class='fa fa-tag'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");
+    //                     }
+    //                     else if (response.result.safe_stop_messages[x].priority == "ad-other") {
+    //                         $("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#FCD20A; vertical-align: top;'><i class='fa fa-star'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");
+    //                     }
+    //
+    //                     all_messages.push(response.result.safe_stop_messages[x].id);
+    //                 }
+    //             });
+    //             refreshMessagesTimeout = setTimeout(refresh_messages, 30000);
+    //         }
+    //
+    //         <% end %>
+
+    var a=document.getElementsByTagName("a");
+    for(var i=0;i<a.length;i++)
+    {
+        a[i].onclick=function()
+        {
+            window.location=this.getAttribute("href");
+            return false
+        }
+    }
+
+    $( window ).scroll(function() {
+        $( "#overlay" ).css("top",$(window).scrollTop());
+    });
+
+
+    function refresh_scans() {
+        $.get('/scans', {
+            authenticity_token: "form_authenticity_token"
+        }, function (response) {
+            if (response.length > 0) {
+                for (var x = 0; x < response.length; x++) {
+                    var id = response[x].id
+                    swal({
+                                title: "<%= t('student_scan') %>",
+                                text: response.result.scans[x].name + ' <%= t("was_scanned_at") %> ' + response.result.scans[x].date,
+                                type: "success",
+                                confirmButtonColor: "#A31F2D"
+                            },
+                            function () {
+                                $.post('/dismiss_scan', {
+                                    authenticity_token: "form_authenticity_token",
+                                    id: id
+                                }, function (response) {
+
+                                });
+                            })
+                }
+            }
+            refreshScansTimeout = setTimeout(refresh_scans, 30000);
+        });
+    }
+
+
+    function refresh_ad() {
+        refreshAdTimeout = setTimeout(refresh_ad, 30000);
+        $.post('/next_ad', {
+            authenticity_token: '<%= form_authenticity_token %>'
+        }, function (response) {
+
+            if (response.ad) {
+                $("#ad").show();
+                $("#ad-image").attr("src", response.ad.app_image);
+
+            // <% if request.fullpath == '/my_stops' || request.fullpath == '/web' %>
+            //             $("#ad-link").attr("href", '/adclick/' + response.ad.id);
+            //     $("#my-stops").css("margin-bottom", "156px");
+            //     $("#my-stops").css('height', $(window).height() - $("#bottom-bar").height() - $("#top-bar").height() + 'px');
+            //
+            // <% elsif  request.fullpath.starts_with?('/map_view') %>
+            //             $("#map").css('height', $(window).height() - $("#bottom-bar").height() - $("#top-bar").height() + 'px');
+            //     refresh_map();
+            // <% end %>
+            }
+            else{
+                $("#ad").hide();
+
+            // <% if request.fullpath == '/my_stops' || request.fullpath == '/web' %>
+            //             $("#my-stops").css('height', $(window).height() - $("#bottom-bar").height() - $("#top-bar").height() + 'px');
+            // <% elsif  request.fullpath.starts_with?('/map_view') %>
+            //             $("#map").css('height', $(window).height() - $("#bottom-bar").height() - $("#top-bar").height() + 'px');
+            //     refresh_map();
+            // <% end %>
+
+            }
+
+        });
+    }
+
+
+</script>
 {{end}}
 
 
 
 
-{{/*<script type="text/javascript">*/}}
-
-    {{/*var all_messages = [], refreshScansTimeout, refreshAdTimeout;*/}}
-
-    {{/*$(document).ready(function () {*/}}
-
-        {{/*FastClick.attach(document.body);*/}}
-
-    {{/*<% if request.fullpath.starts_with?('/map_view') || request.fullpath == '/my_stops' || request.fullpath == '/web' %>*/}}
-
-                {{/*refresh_messages();*/}}
-
-        {{/*$(".message-bubble").click(function (e) {*/}}
-            {{/*$.post('/set_viewed_alerts', {*/}}
-                {{/*authenticity_token: "<%= form_authenticity_token %>",*/}}
-                {{/*message_ids: all_messages.join(',')*/}}
-            {{/*}, function (response) {*/}}
-                {{/*// console.log(response)*/}}
-            {{/*});*/}}
-
-            {{/*if($("#overlay").is(':visible'))*/}}
-            {{/*{*/}}
-                {{/*$('#overlay').hide();*/}}
-            {{/*}*/}}
-            {{/*else*/}}
-            {{/*{*/}}
-                {{/*$('#overlay').show();*/}}
-            {{/*}*/}}
-
-            {{/*if($("#message-empty").is(':visible') || $("#message-filled").is(':visible'))*/}}
-            {{/*{*/}}
-                {{/*$("#message-close").show();*/}}
-                {{/*$("#message-empty").hide();*/}}
-                {{/*$("#message-filled").hide();*/}}
-            {{/*}*/}}
-            {{/*else*/}}
-            {{/*{*/}}
-                {{/*$("#message-close").hide();*/}}
-                {{/*$("#message-empty").show();*/}}
-                {{/*$("#message-filled").hide();*/}}
-            {{/*}*/}}
-
-
-
-{{/*//      $("html, body").animate({scrollTop: 0}, "slow");*/}}
-        {{/*})*/}}
-
-        {{/*<% end %>*/}}
-
-    {{/*})*/}}
-
-
-    {{/*<% if request.fullpath.starts_with?('/map_view') || request.fullpath == '/my_stops' || request.fullpath == '/web' %>*/}}
-
-            {{/*function refresh_messages() {*/}}
-
-                {{/*$.get('/alerts', {*/}}
-                    {{/*authenticity_token: '<%= form_authenticity_token %>'*/}}
-                {{/*}, function (response) {*/}}
-
-                    {{/*$("#messages").empty();*/}}
-
-                    {{/*if (response.result.unread_messages != '0') {*/}}
-                        {{/*//$(".message").text(response.result.unread_messages);*/}}
-                        {{/*//$(".fa-exclamation").show();*/}}
-                        {{/*$("#message-filled").show();*/}}
-                        {{/*$("#message-close").hide();*/}}
-                        {{/*$("#message-empty").hide();*/}}
-                    {{/*}*/}}
-
-                    {{/*for (var x = 0; x < response.result.safe_stop_messages.length; x++) {*/}}
-
-                        {{/*if (response.result.safe_stop_messages[x].priority == "info") {*/}}
-                            {{/*$("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#5bc0de; vertical-align: top;'><i class='fa fa-exclamation-circle'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");*/}}
-                        {{/*}*/}}
-                        {{/*else if (response.result.safe_stop_messages[x].priority == "alert") {*/}}
-                            {{/*$("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#d9534f; vertical-align: top;'><i class='fa fa-exclamation-triangle'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");*/}}
-                        {{/*}*/}}
-                        {{/*else if (response.result.safe_stop_messages[x].priority == "audible") {*/}}
-                            {{/*$("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#FCD20A; vertical-align: top;'><i class='fa fa-clock-o'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");*/}}
-                        {{/*}*/}}
-                        {{/*else if (response.result.safe_stop_messages[x].priority == "ad-offer") {*/}}
-                            {{/*$("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#4CB349; vertical-align: top;'><i class='fa fa-tag'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");*/}}
-                        {{/*}*/}}
-                        {{/*else if (response.result.safe_stop_messages[x].priority == "ad-other") {*/}}
-                            {{/*$("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#FCD20A; vertical-align: top;'><i class='fa fa-star'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");*/}}
-                        {{/*}*/}}
-
-                        {{/*all_messages.push(response.result.safe_stop_messages[x].id);*/}}
-                    {{/*}*/}}
-                {{/*});*/}}
-                {{/*refreshMessagesTimeout = setTimeout(refresh_messages, 30000);*/}}
-            {{/*}*/}}
-
-            {{/*<% end %>*/}}
-
-        {{/*var a=document.getElementsByTagName("a");*/}}
-    {{/*for(var i=0;i<a.length;i++)*/}}
-    {{/*{*/}}
-        {{/*a[i].onclick=function()*/}}
-        {{/*{*/}}
-            {{/*window.location=this.getAttribute("href");*/}}
-            {{/*return false*/}}
-        {{/*}*/}}
-    {{/*}*/}}
-
-    {{/*$( window ).scroll(function() {*/}}
-        {{/*$( "#overlay" ).css("top",$(window).scrollTop());*/}}
-    {{/*});*/}}
-
-
-    {{/*function refresh_scans() {*/}}
-        {{/*$.get('/scans', {*/}}
-            {{/*authenticity_token: "<%= form_authenticity_token %>"*/}}
-        {{/*}, function (response) {*/}}
-            {{/*if (response.length > 0) {*/}}
-                {{/*for (var x = 0; x < response.length; x++) {*/}}
-                    {{/*var id = response[x].id*/}}
-                    {{/*swal({*/}}
-                                {{/*title: "<%= t('student_scan') %>",*/}}
-                                {{/*text: response.result.scans[x].name + ' <%= t("was_scanned_at") %> ' + response.result.scans[x].date,*/}}
-                                {{/*type: "success",*/}}
-                                {{/*confirmButtonColor: "#A31F2D"*/}}
-                            {{/*},*/}}
-                            {{/*function () {*/}}
-                                {{/*$.post('/dismiss_scan', {*/}}
-                                    {{/*authenticity_token: "<%= form_authenticity_token %>",*/}}
-                                    {{/*id: id*/}}
-                                {{/*}, function (response) {*/}}
-
-                                {{/*});*/}}
-                            {{/*})*/}}
-                {{/*}*/}}
-            {{/*}*/}}
-            {{/*refreshScansTimeout = setTimeout(refresh_scans, 30000);*/}}
-        {{/*});*/}}
-    {{/*}*/}}
-
-
-    {{/*function refresh_ad() {*/}}
-        {{/*refreshAdTimeout = setTimeout(refresh_ad, 30000);*/}}
-        {{/*$.post('/next_ad', {*/}}
-            {{/*authenticity_token: '<%= form_authenticity_token %>'*/}}
-        {{/*}, function (response) {*/}}
-
-            {{/*if (response.ad) {*/}}
-                {{/*$("#ad").show();*/}}
-                {{/*$("#ad-image").attr("src", response.ad.app_image);*/}}
-
-            {{/*<% if request.fullpath == '/my_stops' || request.fullpath == '/web' %>*/}}
-                        {{/*$("#ad-link").attr("href", '/adclick/' + response.ad.id);*/}}
-                {{/*$("#my-stops").css("margin-bottom", "156px");*/}}
-                {{/*$("#my-stops").css('height', $(window).height() - $("#bottom-bar").height() - $("#top-bar").height() + 'px');*/}}
-
-            {{/*<% elsif  request.fullpath.starts_with?('/map_view') %>*/}}
-                        {{/*$("#map").css('height', $(window).height() - $("#bottom-bar").height() - $("#top-bar").height() + 'px');*/}}
-                {{/*refresh_map();*/}}
-            {{/*<% end %>*/}}
-            {{/*}*/}}
-            {{/*else{*/}}
-                {{/*$("#ad").hide();*/}}
-
-            {{/*<% if request.fullpath == '/my_stops' || request.fullpath == '/web' %>*/}}
-                        {{/*$("#my-stops").css('height', $(window).height() - $("#bottom-bar").height() - $("#top-bar").height() + 'px');*/}}
-            {{/*<% elsif  request.fullpath.starts_with?('/map_view') %>*/}}
-                        {{/*$("#map").css('height', $(window).height() - $("#bottom-bar").height() - $("#top-bar").height() + 'px');*/}}
-                {{/*refresh_map();*/}}
-            {{/*<% end %>*/}}
-
-            {{/*}*/}}
-
-        {{/*});*/}}
-    {{/*}*/}}
-
-
-{{/*</script>*/}}
