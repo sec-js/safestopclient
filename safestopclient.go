@@ -13,22 +13,12 @@ import (
 	"github.com/schoolwheels/safestopclient/controllers"
 	"github.com/schoolwheels/safestopclient/middleware"
 
-	"github.com/qor/i18n"
-	"github.com/qor/i18n/backends/yaml"
-	"path/filepath"
 )
 
 var sessionStore = sessions.NewCookieStore([]byte("Byte my ass 2018!"))
 
 func main() {
-
-	I18n := i18n.New(
-		yaml.New(filepath.Join("./config/locales")), // load translations from the YAML files in directory `config/locales`
-	)
-	french := I18n.T("fr", "french")
-	I18n.Default("Default").T("en", "french")
-	fmt.Println("french: ",french)
-
+	
 	fmt.Println("~~~~~ SafeStop Client ~~~~~")
 	fmt.Println("SSC_ENV:", os.Getenv("SSC_ENV"))
 
