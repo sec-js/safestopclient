@@ -1,0 +1,640 @@
+fr:
+
+  english: "anglais"
+  french: "français"
+
+
+  #Prompt Messages
+  are_you_sure: "vous êtes sûr ?"
+
+  #Validation error/success Messages
+  error: "Erreur"
+  oops: "Oups ..."
+  required: "obligatoire"
+  invalid_email_format: "Format d’email invalide"
+  invalid_phone_number: "Numéro de téléphone invalide"
+  invalid_email_or_password: "Email ou mot de passe invalide"
+  invalid_zip_code: "Code postal invalide"
+  email_address_already_in_use: "Adresse email déjà utilisée"
+  invalid_password_format: "Le mot de passe doit contenir 1 lettre majuscule et 1 chiffre"
+  passwords_do_not_match: "Les mots de passe ne correspondent pas"
+  invalid_student_identifier: "Identifiant de l’élève erroné"
+  must_agree_to_terms_and_policy: "doit accepter la politique et les conditions d’utilisation"
+  error_while_removing_sub_account: "Une erreur s’est produite lors de la tentative de suppression du sous-compte"
+  error_while_creating_sub_account: "Une erreur s’est produite lors de la création de votre sous-compte"
+  sub_account_limit_reached: "Vous avez atteint le nombre maximum de sous-comptes"
+  you_have_successfully_registered_for: "Vous êtes maintenant inscrit pour"
+  error_while_processing_request: " Une erreur s’est produite lors du traitement de votre demande"
+  successful_support_request: "Merci d'avoir soumis votre demande de support. Un membre de l'équipe SafeStop va traiter votre demande dès que possible."
+  error_while_creating_account: " Une erreur s’est produite lors de la création de votre compte"
+  jurisdiction_has_no_products: "Il n’existe aucune produit SafeStop disponible pour cette juridiction"
+  jurisdiction_not_available: "Cette juridiction n’est actuellement pas disponible"
+  already_have_subscription: "Vous êtes déjà inscrit sur SafeStop pour"
+  request_has_been_submitted: "Votre demande a été soumise"
+  error_while_adding_student: "Une erreur s’est produite lors de l’ajout de votre élève"
+  error_while_removing_student: " Une erreur s’est produite lors de la suppression de votre élève"
+  account_locked: "Votre compte a été verrouillé"
+  error_while_adding_student_scan_code: "Une erreur s’est produite lors de l’ajout du code scan de votre élève"
+
+  #Fields
+  email: "Adresse email"
+  password: "Mot de passe"
+  password_case_sensitive: " Mot de passe (reconnaît les minuscules/majuscules)"
+  confirm_password: "Confirmez le mot de passe"
+  first_name: "Prénom"
+  last_name: "Nom de famille"
+  your_first_name: "Votre prénom"
+  your_last_name: "Votre nom de famille"
+  student_first_name: "Prénom de l’élève"
+  student_last_name: "Nom de l’élève"
+  phone: "Numéro de téléphone"
+  address: "Adresse"
+  street_address: "Adresse de rue"
+  city: "Ville"
+  state: "Région"
+  zip_code: "Code postal"
+  jurisdiction: "Juridiction"
+  school_or_district: "École ou Quartier"
+  hear_about: "Comment avez-vous eu connaissance de notre application ?"
+  comments_or_questions: "Avis ou Questions"
+  interested_in_safe_stop: " SafeStop m’intéresse en tant que"
+  student_name: "Nom de l’élève"
+  scan_code: "Code scan"
+  student_identifier: "Identifiant de l’élève"
+  subject: "Sujet"
+  body: "Établissement"
+  district: "Quartier"
+  school_code: "Code de l’école"
+  credit_card: "Numéro de carte de crédit"
+  cvv: "CVV"
+  mm: "MM"
+  yy: "AA"
+  bus_run: "Trajet d’autobus"
+  bus_name_number: "Nom / Numéro de bus"
+  route_name_number: " Nom / Numéro de ligne"
+  your_stop: "Nom de votre arrêt de bus"
+  date_incident_occurred: "Date à laquelle l’incident s’est produit"
+  detailed_description_of_incident: "Description détaillée de l’incident"
+  detailed_description: "Description détaillée"
+  date_item_was_lost: "Date où l’objet a été perdu"
+  route: "Ligne"
+  route_u: "LIGNE"
+  stop: "Arrêt de bus"
+  stop_u: "ARRÊT DE BUS"
+  arrived: "ARRIVÉ"
+  expected: "PRÉVU"
+  scheduled: "FIXÉ"
+  as_of: "À"
+
+  #Buttons
+  register: "S’INSCRIRE"
+  sign_in: "CONNEXION"
+  sign_out: "DÉCONNEXION"
+  submit: "SOUMETTRE"
+  search: "RECHERCHER"
+  email_my_reset_link: "ENVOYEZ-MOI UN EMAIL AVEC LE LIEN DE RÉINITIALISATION"
+  cancel: "ANNULER"
+  okay: "OK"
+  get_safe_stop_now: "INSTALLER SAFESTOP MAINTENANT"
+  remove: "SUPPRIMER"
+  add_a_bus_stop: "AJOUTER UN ARRÊT DE BUS"
+  check_availability: "VÉRIFIER LA DISPONIBILITÉ"
+  contact_support: "CONTACTER LE SERVICE SUPPORT"
+  contact_information: "Coordonnées"
+
+  grade: "Année scolaire"
+  kindergarten: "Maternelle"
+  1st_grade: "CP"
+  2nd_grade: "CE1"
+  3rd_grade: "CE2"
+  4th_grade: "CM1"
+  5th_grade: "CM2"
+  6th_grade: "6ème"
+  7th_grade: "5ème"
+  8th_grade: "4ème"
+  9th_grade: "3ème"
+  10th_grade: "Seconde"
+  11th grade: "1ère"
+  12th_grade: " Terminale"
+  other: "Autre"
+  choose_a_district: "Sélectionner un quartier"
+
+  signed_in_as: "Se connecter en tant que :"
+  forgot_password: "Mot de passe oublié"
+  reset_password: "Réinitialiser le mot de passe"
+
+  student_scan: "Code scan de l’élève"
+  was_scanned_at: "scanné à"
+  no_stop_recorded: "Aucun arrêt de bus enregistré"
+
+  how_it_works: "COMMENT ÇA MARCHE ?"
+  features: "FONCTIONNALITÉS"
+  newsroom: "ACTUALITÉS"
+  blog: "BLOG"
+  faq: "FAQ"
+  user_guide: "GUIDE D’UTILISATION"
+  login: "SE CONNECTER"
+
+  ss_index_hero_1: "SafeStop est l'application mobile de suivi des bus de ramassage scolaire, leader sur le marché, qui facilite la vie des parents, trajet par trajet"
+  ss_index_hero_2: "Avec les cartes des quartiers et les heures d'arrivée prévues à portée de main, les parents n'ont plus besoin d'appeler l'école pour savoir où se trouve le bus ?"
+  ss_index_hero_3: "SafeStop fonctionne avec n'importe quel GPS, logiciel d’itinéraire, système de transport urbain ; notre application est ainsi compatible avec toutes les flottes de bus quelle qu’en soit la configuration"
+  ss_index_question_1: "Votre école utilise-t-elle SafeStop ?"
+  ss_index_option_1: "Inscrivez-vous ou renouvelez votre inscription maintenant"
+  ss_index_question_2: "Vous voulez que votre école utilise SafeStop ?"
+  ss_index_option_2: "Contacter notre équipe commerciale"
+  ss_index_get_started_1: "Comment utiliser l’application ?"
+  ss_index_get_started_2: "4 étapes suffisent pour profiter de notre application de suivi des bus scolaires !"
+  ss_index_get_started_3: "1. Vérifiez la disponibilité"
+  ss_index_get_started_4: "Lancez une recherche par code postal pour vérifier si SafeStop opère dans votre quartier ou pour votre école, ou demandez à ce que SafeStop y soit utilisée, en cliquant sur « Contacter notre équipe commerciale » dans la barre de menu ci-dessus."
+  ss_index_get_started_5: "2. Inscrivez-vous"
+  ss_index_get_started_6: "Créez un compte SafeStop à l’aide de votre adresse email, un mot de passe, et le numéro d’établissement de l’école de votre enfant ou son numéro d’identifiant en tant qu’élève."
+  ss_index_get_started_7: "3. Téléchargez l’application"
+  ss_index_get_started_8: " SafeStop peut être téléchargée via l'App Store d'Apple et Google Play. Vous pouvez également accéder à SafeStop via un navigateur Internet tel que Google Chrome."
+  ss_index_get_started_9: "4. Commencez votre suivi"
+  ss_index_get_started_10: " Une fois que vous vous êtes inscrit et que vous avez téléchargé l'application SafeStop, connectez-vous à votre compte pour effectuer un suivi des bus scolaires."
+  ss_index_features_1: " Fonctionnalités utiles pour les parents et les écoles "
+  ss_index_features_2: " Avec SafeStop, il est plus facile que jamais de savoir où sont vos enfants et à quelle heure ils rentreront à la maison."
+  ss_index_features_3: "MISE À JOUR EN TEMPS RÉEL DES PASSAGES DES BUS SCOLAIRES"
+  ss_index_features_4: "Notre écran de localisation des bus scolaires LiveView montre aux parents et aux intendants la position du bus de ramassage scolaire en fonction de son itinéraire, tandis que les horaires d'arrivée prévus sont affichés pour chaque arrêt de bus. Le personnel de la société d’autocars peut également envoyer des notifications de service en temps réel aux parents par l'intermédiaire du Centre d'alertes et de messagerie."
+  ss_index_features_5: "ANALYSES STATISTIQUES SAFESTOP"
+  ss_index_features_6: " Les administrateurs et le personnel de la sociétés d’autocars ont accès aux données clés et aux analyses statistiques pour pouvoir identifier les arrêts de bus sous-utilisés, surveiller la ponctualité des bus et obtenir des renseignements supplémentaires sur les véhicules susceptibles de créer un réseau de transport scolaire plus sûr, plus fiable et plus économique."
+  ss_index_features_7: "UNE PLATEFORME VRAIMENT SÛRE"
+  ss_index_features_8: " La sécurité de votre famille est notre priorité numéro un. C'est pourquoi nous travaillons directement avec votre école ou votre quartier pour créer un processus d'enregistrement sécurisé qui permet aux seuls parents et tuteurs légaux de nos passagers de s'inscrire à SafeStop. Nous garantissons la qualité et la sécurité des données que nous recueillons et nous ne vendrons jamais, ni ne distribuerons ou partagerons d'aucune façon les informations personnelles des passagers ou des véhicules recueillies par le système SafeStop."
+  ss_index_features_9: "COMPATIBLE AVEC TOUTES LES FLOTTES"
+  ss_index_features_10_html: " SafeStop fonctionne avec <b><i>n’importe quel</i></b> GPS, <b><i> logiciel </i></b> d’itinéraire et  <b><i>système</i></b> de transport urbain. Si votre flotte collecte déjà des données GPS, vous êtes prêt pour SafeStop ! Si vous avez besoin d’acquérir des GPS, SafeStop peut vous aider à démarrer votre projet en vous proposant d’acheter la quantité requise pour l’intégralité de votre flotte au prix du marché."
+  ss_index_footer_1: "Utilisation de l’appli SafeStop"
+  ss_index_footer_2: " Une fois votre inscription terminée, téléchargez SafeStop depuis l'App Store d'Apple ou Google Play ou connectez-vous à votre compte via Internet. Vous pouvez ensuite effectuer un suivi du bus scolaire de votre enfant !"
+  ss_index_footer_3: "Restez connecté"
+  ss_index_footer_4: " Vous avez besoin d'aide pour vous inscrire ou vous connecter à votre compte ? Vous voulez en savoir plus sur SafeStop et les avantages du suivi des bus de ramassage scolaire ? Suivez-nous sur les réseaux sociaux ou appelez notre équipe. Nous serons ravis de pouvoir vous aider !"
+  ss_index_footer_4_ca_html: " Vous avez besoin d'aide pour vous inscrire ou vous connecter à votre compte ? Vous voulez en savoir plus sur SafeStop et les avantages du suivi des bus de ramassage scolaire ? Envoyez un email à notre équipe à <a style='color: white' href='mailto:support@SafeStopApp.ca' >support@SafeStopApp.ca</a>. Nous serons ravis de pouvoir vous aider!"
+  ss_index_footer_6: "Droit d’auteurs 2016 SafeStop, Inc."
+  ss_index_footer_7: "Politique de confidentialité"
+  ss_index_footer_8: "Conditions générales d’utilisation"
+
+  ss_check_availability_1: "Vous ne trouvez pas votre école ?"
+  ss_check_availability_2: "AJOUTEZ VOTRE ÉCOLE À SAFESTOP™"
+  ss_check_availability_3: "INSCRIVEZ-VOUS, VOUS SEREZ RASSURÉS"
+  ss_check_availability_4: " SafeStop est une application de suivi des bus scolaires qui fournit aux parents des renseignements précieux sur le bus scolaire de leur enfant et une tranquillité d'esprit car ils savent que leurs enfants se rendent et reviennent de l’école en toute sécurité. En utilisant le suivi GPS, SafeStop combine la sécurité et la communication dans une application facile à utiliser."
+  ss_check_availability_5: "SafeStop est disponible pour les écoles de votre quartier !"
+  ss_check_availability_6: "Aucune école de votre quartier n’utilise SafeStop™ pour le moment"
+  ss_check_availability_partial_2: "Entrez le code postal de votre domicile pour vérifier si SafeStop est disponible pour votre école ou dans votre quartier."
+
+  ss_get_safe_stop_parents_1: "Pas sûr que l’école de votre enfant utilise SafeStop ?"
+  ss_get_safe_stop_parents_2: "Contactez-nous au"
+  ss_get_safe_stop_parents_3: "et laissez-nous vous aider !"
+  ss_get_safe_stop_parents_4: "Ajoutez votre école sur SafeStop !"
+  ss_get_safe_stop_parents_please_select: "Veuillez choisir ..."
+  ss_get_safe_stop_parents_parent: "Parent"
+  ss_get_safe_stop_parents_school_official: "Direction de l’école"
+  ss_get_safe_stop_parents_student: "Élève"
+  ss_get_safe_stop_parents_other: "Autre"
+  ss_get_safe_stop_parents_news_article: "Article d’actualités"
+  ss_get_safe_stop_parents_trade_show: "Salon / Exposition"
+  ss_get_safe_stop_parents_friend_family: "Ami, Proche, Collègue"
+  ss_get_safe_stop_parents_facebook: "Facebook"
+  ss_get_safe_stop_parents_twitter: "Twitter"
+
+  ss_activate_1: "Déjà client ? Connectez-vous ci-dessous pour renouveler votre inscription"
+  ss_activate_9: "OU"
+  ss_activate_10: "Nouveau sur SafeStop ? Créez votre compte ci-dessous"
+  ss_activate_eula_privacy_policy: "J’accepte l’<a href='/safe_stop/eula' target='_blank'>accord de licence</a> et <a href='/safe_stop/privacy'>la politique de confidentialité</a>"
+
+  ss_register_1: "Obtenez SafeStop aujourd’hui gratuitement !"
+  ss_register_2: "Obtenez SafeStop aujourd’hui pour seulement :"
+  ss_register_3: "/ mois"
+  ss_register_4: "1 règlement de"
+  ss_register_5: "INFORMATION DE SÉCURITÉ"
+  ss_register_6: "INFORMATION DE FACTURATION"
+  ss_register_student_1: "ID de l’élève numéro 1 (fourni par votre école. Typiquement un numéro composé de 6-9 chiffres.)"
+  ss_register_student_2: " ID de l’élève numéro 2 (optionnel)"
+  ss_register_student_3: " ID de l’élève numéro 3 (optionnel)"
+  ss_register_student_4: " ID de l’élève numéro 4 (optionnel)"
+  ss_register_agree_to_payment_terms: "J’accepte les <a href='/safe_stop/payment_terms' target='_blank'>conditions de paiement</a>"
+
+  ss_support_request_1: "Demande de support SafeStop"
+
+  ss_client_login_5: "Besoin d’aide ? Appelez-nous"
+  ss_client_login_6: "ou envoyez-nous un email"
+  ss_client_login_6_ca: "Email"
+  ss_client_login_7: "Ajoutez l’application à votre écran de démarrage pour en profitez encore mieux !"
+
+  remove_all_stops: "SUPPRIMER TOUS LES ARRÊTS"
+  manage_notifications: "GÉREZ LES NOTIFICATIONS"
+  manage_subscriptions: " GÉREZ LES INSCRIPTIONS"
+  connect_with_safe_stop: "SE CONNECTER À SAFESTOP"
+  facebook: "FACEBOOK"
+  twitter: "TWITTER"
+  connect_with_terminal: "SE CONNECTER AVEC UN TERMINAL"
+  report_lost_item: "DÉCLARER LA PERTE D’UN OBJET"
+  report_bullying: "RAPPORTER UN FAIT DE HARCÈLEMENT"
+
+  ss_client_account_language: "LANGUE"
+  ss_client_account_js_4: "Supprimer tous les arrêts ?"
+  ss_client_account_js_5: "Vous ne pourrez plus suivre aucun bus"
+
+  ss_client_my_stops_2: "Affichage de la carte"
+  ss_client_my_stops_3: "Vous n’avez sélectionné aucun arrêt de bus, cliquez ci-dessous pour en ajoutez un"
+  ss_client_my_stops_js_1: "Le service SafeStop associé à votre école n’est pas encore en ligne. Merci de bien vouloir patienter ! Vous recevrez une notification dès que vos lignes de bus seront disponibles."
+  ss_client_my_stops_js_4: "MIN. AUPARAVANT"
+  ss_client_my_stops_js_6: "COMME PRÉVU"
+
+  ss_client_live_view_js_3: "Cet arrêt sera supprimé de votre liste d’arrêts"
+  ss_client_live_view_js_4: "Supprimez-le !"
+  ss_client_live_view_js_8: "MIN. AUPARAVANT"
+
+  ss_client_add_sub_account_2: "Aucun compte SafeStop n’est actuellement associé à cette adresse email. Veuillez renseigner les informations ci-dessous pour créer un nouveau compte utilisateur."
+
+  ss_client_setup_1: "Effectuer une recherche par nom d’itinéraires"
+  ss_client_setup_2: "Rechercher les arrêts de bus proche de chez moi"
+  ss_client_setup_4: "Impossible de trouver des lignes de bus"
+
+  ss_client_setup_js_2: "Une adresse 1 et un code postal valides sont requis pour une recherche par adresse"
+  ss_client_setup_js_3: "Limite d’arrêts atteinte"
+  ss_client_setup_js_4: "Peut-être pouvez-vous juste surveiller "
+  ss_client_setup_js_5: " arrêts en même temps dans cette juridiction. Contactez le support au 00-1-800-843-8936 si vous avez des questions"
+  ss_client_setup_js_5_ca: " arrêts en même temps dans cette juridiction. Envoyez un email à support@SafeStopApp.ca si vous avez des questions"
+
+  ss_client_setup_js_6: " Impossible de déterminer l'emplacement de cette adresse. Cela peut se produire lorsqu'une adresse n'est pas valide (n’est pas une adresse réelle) ou que l'adresse est trop récente et que le service postal ne l'a pas encore saisie dans sa base de données."
+  ss_client_setup_js_7: "Affichage des itinéraires dans un rayon de "
+  ss_client_setup_js_8: " km"
+  ss_client_setup_js_9: "Vous avez sélectionné"
+  ss_client_setup_js_10: " sur "
+  ss_client_setup_js_11: " arrêts"
+
+  ss_client_subscription_details_1: "SOUS-COMPTES"
+  ss_client_subscription_details_2: "ÉLÈVES"
+  ss_client_subscription_details_3: "NUMÉRISATION DE L’ÉLÈVE"
+  ss_client_subscription_details_js_2: "Supprimer l’utilisateur du sous-compte"
+  ss_client_subscription_details_js_3: "Supprimer cet élève"
+
+  ss_client_lost_item_1: "Déclarer la perte d’un objet"
+  ss_client_lost_item_2: " Veuillez fournir une description détaillée, dont la marque, la couleur, la taille et les caractéristiques distinctives de l’objet que vous avez perdu à bord du bus."
+  ss_client_report_bullying_1: "Rapporter un fait de harcèlement"
+
+  ss_welcome_mailer_1: "Bienvenue sur SafeStop !"
+  ss_welcome_mailer_2: "Nous vous remercions de vous être inscrit à notre service. C’est parti !"
+  ss_welcome_mailer_3: " L'application SafeStop peut actuellement être téléchargée via l'App Store d'Apple et Google Play Store ! Vous pouvez également accéder à SafeStop via Internet à l'adresse www.SafeStopApp.com/web"
+  ss_welcome_mailer_3_ca: " L'application SafeStop peut actuellement être téléchargée via l'App Store d'Apple et Google Play Store ! Vous pouvez également accéder à SafeStop via Internet à l'adresse www.SafeStopApp.com/web"
+  ss_welcome_mailer_4: " Pour commencer à utiliser SafeStop, connectez-vous avec l'email et le mot de passe que vous avez utilisés pour créer votre compte lors du processus d'inscription. Ensuite, sélectionnez les itinéraires et les arrêts que vous souhaitez ajouter à votre compte en cliquant sur « Ajouter un arrêt de bus » et en effectuant une recherche avec votre adresse de domicile."
+  ss_welcome_mailer_5: "<b>Remarque :</b> Si votre école ou votre quartier a rejoint SafeStop récemment, seules l’affichage de la carte du localisateur de bus et la fonction alertes et messagerie seront disponibles jusqu’à ce que les itinéraires aient été validés dans notre système. Puis, les horaires d’arrivée estimés seront ensuite disponibles en plus des horaires prévus aux arrêts."
+  ss_welcome_mailer_6_html: "Si vous avez des questions concernant le téléchargement de notre application, la création de votre compte ou l’utilisation du service SafeStop, contactez-nous par email à <a href='mailto:support@SafeStopApp.com'>support@SafeStopApp.com</a> ou appelez-nous au 00-1-800-843-8936. Nous espérons que vous allez adorer ce service !"
+  ss_welcome_mailer_6_ca_html: " Si vous avez des questions concernant le téléchargement de notre application, la création de votre compte ou l’utilisation du service SafeStop, contactez-nous par email à <a href='mailto:support@SafeStopApp.ca'>support@SafeStopApp.ca</a>. Nous espérons que vous allez adorer ce service !"
+  ss_welcome_mailer_7: "Des trajets en toute sécurité,"
+  ss_welcome_mailer_8: "L’équipe SafeStop"
+
+  ss_pw_reset_email_subject: "Réinitialisation du mot de passe"
+  ss_pw_reset_email_1: "Cliquez"
+  ss_pw_reset_email_2: "pour réinitialiser votre mot de passe."
+  ss_pw_reset_email_flash_1: "Vérifiez votre email, vous y trouverez le lien pour réinitialiser votre mot de passe"
+  ss_pw_reset_email_flash_2: "Désolés, impossible de retrouver cet email"
+
+  #safe_stop_api
+  reregister: "Vous devez saisir l’identifiant de l’élève à nouveau ou le code de l’école pour l’année en cours. Si vous avez besoin d’aide, veuillez contacter notre support ou le personnel de votre école !"
+
+  ss_register_student_request_form_1: "Formulaire de demande d’inscription d’un élève"
+  ss_register_student_request_form_2: " Informations concernant l’élève"
+
+  ss_newsroom_1: "Des articles"
+  ss_newsroom_2: "SafeStop change le jeu d'attente pour les parents et les enfants occupés à l'arrêt d'autobus. Avec notre localisateur de bus en temps réel et les cartes de quartier, les familles peuvent maintenant voir où se trouve l'autobus scolaire et quand il arrivera à leur arrêt. Mais ne nous croyez pas sur parole - voyez ce que nos clients et les médias disent de nous!"
+
+
+  ss_eula_1_html: "ACCORD DE LICENCE DE L’UTILISATEUR FINAL DE SAFESTOP"
+  ss_eula_2_html: "Les produits et services décrits dans le présent document sont fournis par SafeStop, Inc., situé au 885 Island Park Drive, Ste 200, Daniel Island, Caroline du Sud 29492 États-Unis(“<b>SSI</b>”). En téléchargeant, installant et / ou utilisant le logiciel et / ou l'application SafeStop, en accédant au service SafeStop ou en utilisant le Service SafeStop (ensemble, les “<b>Produits </b>” ou “<b> Services </b>”), ou l'accès ou l'utilisation de l'un des contenus disponibles dans les Produits, vous acceptez d'être lié par tous les termes contenus dans ce document. Lisez-le soigneusement car ces conditions forment un accord contraignant entre vous et SSI concernant votre utilisation des Produits ou Services."
+  ss_eula_3_html: "1.  Votre compte SSI"
+  ss_eula_4_html: " Vous aurez besoin d'un compte SSI pour utiliser nos Services. Pour protéger votre compte SSI, gardez votre mot de passe confidentiel. Vous êtes responsable de l'activité qui se produit sur ou via votre compte SSI. SSI vous suggère d'utiliser un mot de passe unique que vous n'utilisez pas actuellement pour tout autre périphérique ou compte et SSI vous suggère de ne pas l'utiliser sur un futur périphérique ou compte."
+  ss_eula_5_html: "2.  À propos du Logiciel relatif à nos Services"
+  ss_eula_6_html: " Le logiciel SSI peut être mis à jour automatiquement sur votre appareil une fois qu'une nouvelle version ou fonction est disponible. Certains Services peuvent vous permettre de régler vos paramètres de mise à jour automatique."
+  ss_eula_7_html: "3. Utilisation des Produits"
+  ss_eula_8_html: " SSI vous accorde une licence non exclusive et non transférable pour accéder au Service SafeStop, télécharger et utiliser le logiciel et le Service SafeStop et accéder au Contenu (tel que défini ci-dessous) des Produits et ce, strictement selon les termes du présent Accord."
+  ss_eula_9_html: "4. Restrictions d’utilisation"
+  ss_eula_10_html: "Sauf si vous avez reçu une autorisation écrite préalable de SSI, vous vous engagez à ne pas: (a) modifier, traduire, copier ou créer des œuvres dérivées du Contenu ou d'une partie de celui-ci; (B) redistribuer, sous-licencier, louer, publier, vendre, céder, prêter, commercialiser, transférer ou mettre les Produits ou le Contenu à la disposition de tiers; C) procéder à une ingénierie inverse, décompiler ou tenter autrement d'extraire le code source du Service ou d'une partie de celui-ci, à moins que cela ne soit expressément autorisé ou exigé par la loi applicable; (D) supprimer, altérer ou modifier de quelque manière que ce soit les avertissements ou liens qui apparaissent dans les Produits ou le Contenu, (e) utiliser nos Services de comme distraction vous empêchant d'obéir aux lois de la circulation routière ou aux consignes de la sécurité routière lors de la conduite d'un véhicule à moteur."
+  ss_eula_11_html: "Vous acceptez de ne pas accéder aux Services SSI en utilisant une méthode autre que l'interface et les instructions fournies par SSI. Vous ne pouvez utiliser les Services SSI que dans la mesure permise par la loi et SSI peut suspendre ou cesser de vous fournir ses Services si vous ne respectez pas ces conditions ou les politiques SSI ou si SSI doit conduire une enquête pour mauvaise conduite présumée de votre part."
+  ss_eula_12_html: "DROITS D'AUTEUR : Les droits d'auteur et autres droits intellectuels, industriels et / ou de propriété des Produits et Services SSI appartiennent exclusivement à SSI. SSI vous permet d'utiliser le Logiciel uniquement en respectant les termes du présent CLUF. Tous les droits non expressément accordés dans le présent CLUF sont réservés par SSI. Le contenu, l'organisation, les graphismes, la conception, la compilation, la conversion magnétique, la conversion numérique et d'autres sujets relatifs aux Produits et Services SSI sont protégés par les droits d'auteur, brevets, marques déposées et autres droits d’exclusivité et / ou de propriété intellectuelle applicables. La copie, la redistribution, l'utilisation ou la publication par vous de ces sujets ou de toute partie des Produits et Services est strictement interdite. SSI (ainsi que ses fournisseurs et concédants de licence) réservent expressément tous les droits de propriété intellectuelle dans tout texte, programme, produit, processus, technologie, contenu et autre matériel relatif aux Produits et Services. Tous les logos, emblèmes, noms de sociétés, noms de produits et noms de services ( « marques déposées ») référencés dans ou par les Produits et Services ou accessibles dans toute application des Produits et Services sont des marques déposées de leurs propriétaires respectifs. Vous n'avez pas la permission d'utiliser une marque déposée appartenant à SSI ou une marque déposée de tiers mentionnée dans ou par les Produits et Services, sans l'autorisation expresse du propriétaire de la marque déposée."
+  ss_eula_13_html: "5. Bonne conduite ; Conformité à la loi et aux politiques SSI."
+  ss_eula_14_html: " Vous acceptez d’être tenu responsable de votre propre conduite et de votre contenu lors de l'utilisation des Produits, ainsi que des conséquences qui en découlent. Vous acceptez d'utiliser les Produits uniquement à des fins appropriées et conformes aux Conditions et aux politiques ou directives applicables que SSI peut rendre disponibles. Par exemple, et sans s’y limiter, vous acceptez que, lors de l'utilisation des Produits ou du Contenu, vous ne (a) vous ferez pas passer pour une autre personne ou entité, (b) créerez pas des comptes utilisateurs par des moyens automatisés ou sous des prétextes faux ou frauduleux ; ou (c) transmettrez pas de virus, vers, défauts, chevaux de Troie ou tout élément de nature destructrice."
+  ss_eula_15_html: "6. Contenu des Produits"
+  ss_eula_16_html: " SSI et SafeStop vous permettent d'accéder et de visualiser une variété de contenus, y compris, mais sans s'y limiter, des images photographiques, des données cartographiques et des sites, la circulation et d'autres informations connexes fournies par SSI et ses concédants (le “<b>Contenu</b>”). Vous comprenez et acceptez ce qui suit : (a) Les données cartographiques, la circulation, les directions et les contenus connexes sont fournis à des fins de planification uniquement. Vous constaterez peut-être que les conditions météorologiques, les projets de construction, les fermetures d’accès ou d'autres événements peuvent avoir comme conséquences que les conditions routières ou les directions diffèrent des résultats de la carte. Vous devez exercer votre jugement en vous reposant sur ce Contenu. (B) Certains Contenus sont fournis sous licence par des tiers et sont soumis aux droits d'auteur et autres droits de propriété intellectuelle détenus par ou autorisés à ces tiers. Vous pourrez être tenu responsable de toute copie ou divulgation non autorisée de ce Contenu. Votre utilisation du contenu d’un tiers, dont, mais sans s'y limiter, l'impression ou l'utilisation dans des supports marketing ou de promotion est soumise à des restrictions supplémentaires dont référence est faite sur la page Mentions Légales."
+  ss_eula_17_html: "7.  Limitations de garantie, limitation des dommages et dispositions d'indemnisation SSI"
+  ss_eula_18_html: "SSI garantit que les Services mis à disposition seront fournis avec le soin et les compétences commerciales raisonnables. En revanche, SSI ne promet pas certaines choses concernant ses Services."
+  ss_eula_19_html: "AUTRES QUE CELLES EXPRESSÉMENT ÉNONCÉES DANS CES CONDITIONS OU CONDITIONS SUPPLÉMENTAIRES, SSI NE FAIT PAS D’AUTRES PROMESSES SPÉCIFIQUES CONCERNANT SES SERVICES OU SON APPLICATION. PAR EXEMPLE, SSI NE PREND AUCUN ENGAGEMENT QUANT AU CONTENU DES SERVICES OU DE L'APPLICATION, AUX FONCTIONS SPÉCIFIQUES DES SERVICES OU DE L'APPLICATION, NI CONCERNANT SA FIABILITÉ, SA DISPONIBILITÉ OU SA CAPACITÉ À RÉPONDRE À VOS BESOINS. NOUS OFFRONS LES SERVICES « EN L'ÉTAT » ET AVEC TOUTES LES DÉFAILLANCES ÉVENTUELLES."
+  ss_eula_20_html: "RIEN AU SEIN DE CES CONDITIONS N'EXCLURA NI NE LIMITERA LA GARANTIE OU LA RESPONSABILITÉ DE SAFESTOP QUANT AUX PERTES QUI NE PEUVENT PAS ÊTRE LÉGALEMENT EXCLUES OU LIMITÉES PAR LA LOI APPLICABLE. CERTAINES JURIDICTIONS N’AUTORISENT PAS L'EXCLUSION DE CERTAINES GARANTIES OU CONDITIONS OU LA LIMITATION OU L'EXCLUSION DE LA RESPONSABILITÉ POUR CERTAINS TYPES DE PERTES OU DE DOMMAGES. EN CONSÉQUENCE, SEULES LES LIMITATIONS LÉGALES DANS VOTRE JURIDICTION VOUS SERONT APPLIQUÉES ET LA RESPONSABILITÉ DE SAFESTOP SERA LIMITÉE À L'EXTENSION MAXIMALE PERMISE PAR LA LOI. <b>DANS LA MESURE AUTORISÉE PAR LA LOI, SSI EXCLUT EXPRESSÉMENT TOUTES GARANTIES ET CONDITIONS DE QUELQUE NATURE QUE CE SOIT, EXPRESSES OU IMPLICITES, Y COMPRIS, MAIS SANS S'Y LIMITER, LES GARANTIES ET CONDITIONS IMPLICITES DE QUALITÉ MARCHANDE, D'ADÉQUATION À UN USAGE PARTICULIER ET DE NON-INFRACTION.</b>"
+  ss_eula_21_html: "VOUS COMPRENEZ ET ACCEPTEZ EXPRESSÉMENT QUE VOTRE UTILISATION DU SERVICE ET DU CONTENU EST EFFECTUÉE À VOS SEULS RISQUES ET QUE LE SERVICE ET L’APPLICATION SSI SONT FOURNIS « TELS QUELS » ET « TELS QUE DISPONIBLES ». EN PARTICULIER, SAFESTOP, SES FILIALES, SOCIÉTÉ MÈRE ET SOCIÉTÉS AFFILIÉES, SES CONCÉDANTS DE LICENCE ET LEURS FOURNISSEURS, NE REPRÉSENTENT NI NE VOUS GARANTISSENT QUE:"
+  ss_eula_22_html: "(a) VOTRE UTILISATION DU SERVICE OU DE L'APPLICATION SERA CONFORME À VOS BESOINS ;"
+  ss_eula_23_html: "(b) VOTRE UTILISATION DU SERVICE OU DE L' APPLICATION SERA ININTERROMPUE, PONCTUELLE, SÉCURISÉE OU LIBRE DE TOUTES ERREURS ;"
+  ss_eula_24_html: "(c) LES INFORMATIONS QUE VOUS AUREZ OBTENUES EN RAISON DE VOTRE UTILISATION DU SERVICE SERONT EXACTES OU FIABLES ; OU"
+  ss_eula_25_html: "(d) LES DÉFAUTS DANS LE FONCTIONNEMENT OU LA FONCTIONNALITÉ DE TOUT LOGICIEL QUI VOUS AURA ÉTÉ FOURNI EN TANT QUE PARTIE DU SERVICE SERONT CORRIGÉS."
+  ss_eula_26_html: "TOUT USAGE DE L'APPLICATION SSI EST EFFECTUÉE À VOS PROPRES DISCRÉTION ET RISQUE ET VOUS SEREZ LE SEUL RESPONSABLE DE TOUT DOMMAGE OU BLESSURE QUI RÉSULTERAIT DU TÉLÉCHARGEMENT OU DE L'UTILISATION D'UN TEL CONTENU."
+  ss_eula_27_html: "VOUS ACCEPTEZ QU'AUCUN CONSEIL OU INFORMATION, PAR ORAL OU PAR ÉCRIT, OBTENU PAR VOUS VIA SSI, LE SERVICE OU LE CONTENU, CRÉERA UNE GARANTIE NON EXPRESSÉMENT DÉCRITE DANS CES CONDITIONS."
+  ss_eula_28_html: "VOUS COMPRENEZ ET ACCEPTEZ EXPRESSÉMENT QUE, DANS LA MESURE MAXIMALE AUTORISÉE PAR LA LOI APPLICABLE, SSI, SA SOCIÉTÉ MÈRE, SES FILIALES, SES SOCIÉTÉS  AFFILIÉES ET LES CONCÉDANTS DE LICENCES DE SSI ET LEURS FOURNISSEURS, NE SERONT PAS TENUS RESPONSABLES DE :"
+  ss_eula_29_html: "(a) TOUT DOMMAGE DIRECT, INDIRECT, ACCESSOIRE, SPÉCIAL, CONSÉQUENTIEL OU EXEMPLAIRE QUE VOUS POURRIEZ SUBIR, QUELLES QU’EN SOIENT LES CAUSES ET QUEL QU’EN SOIT LE TYPE DE RESPONSABILITÉ (Y COMPRIS, MAIS SANS S'Y LIMITER : CONTRACTUELLE, DE DROIT, DE DROIT COMMUN OU LÉGALE PAR DOMMAGES-INTÉRÊTS, TOUTE PERTE DE PROFIT (QU’ELLE SOIT DIRECTE OU INDIRECTE), TOUTE PERTE D’OPPORTUNITÉS OU DE RÉPUTATION COMMERCIALES, TOUTE PERTE DE DONNÉES, DE COÛT D'ACQUISITION DE PRODUITS OU DE SERVICES SUBSTITUTS OU TOUTE AUTRE PERTE INTANGIBLE) : OU"
+  ss_eula_30_html: "(b) TOUTE PERTE OU DOMMAGE RÉSULTANT DE :
+                    (i) TOUTE CONFIANCE DONT VOUS TÉMOIGNEZ QUANT À L’APPLICATION SSI ;
+                    (ii) TOUT CHANGEMENT APPORTÉ PAR SSI AU SERVICE, OU TOUTE CESSATION PERMANENTE OU TEMPORAIRE DANS LA PRESTATION DU SERVICE (OU TOUTES FONCTIONNALITÉS AU SEIN DU SERVICE) ;
+                    (iii) L'ÉLIMINATION, LA CORRUPTION OU L'IMPOSSIBILITÉ DE STOCKER TOUT CONTENU ET AUTRES DONNÉES DE COMMUNICATION MAINTENUES OU TRANSMISES PAR OU VIA L'UTILISATION DU SERVICE ;
+                    (iv) VOTRE OMISSION DE FOURNIR À SSI DES INFORMATIONS DE COMPTE EXACTES ; OU
+                    (v) VOTRE OMISSION DE CONSERVER VOTRE MOT DE PASSE OU LES DÉTAILS DE VOTRE COMPTE SÉCURISÉS ET CONFIDENTIELS."
+  ss_eula_31_html: "DANS LA MESURE AUTORISÉE PAR LA LOI, LA RESPONSABILITÉ TOTALE DE SSI, DE SES FOURNISSEURS ET DISTRIBUTEURS, POUR TOUTE RÉCLAMATION EN VERTU DE CES CONDITIONS, Y COMPRIS TOUTE GARANTIE IMPLICITE, DANS LA MESURE OU LA LOI SUR L'ÉTAT APPLICABLE NE PERMET PAS L'EXCLUSION DE CE DROIT LIMITÉE AU MONTANT QUE VOUS AVEZ PAYÉ POUR UTILISER LES SERVICES."
+  ss_eula_32_html: "LES LIMITATIONS RELATIVES À LA RESPONSABILITÉ DE SSI VIS-À-VIS DE VOUS INCLUSES AU PRÉSENT ACCORD SERONT APPLIQUÉES, QUE SSI, SES FILIALES, SA SOCIÉTÉ MÈRE, SES SOCIÉTÉS AFFILIÉES, SES CONCÉDANTS OU LEURS FOURNISSEURS AIENT ÉTÉ AVERTIS OU PAS, OU QU’ILS AIENT ÉTÉ CONSCIENTS DE LA POSSIBILITÉ DE TELS PERTES OU DOMMAGES OU PAS."
+  ss_eula_33_html: "Défense et indemnisation"
+  ss_eula_34_html: "Par le présent accord, vous acceptez de défendre, indemniser et soutenir SSI, sa société mère, ses dirigeants, ses directeurs, ses agents, ses sociétés affiliées, ses partenaires stratégiques, ses concédants de licence et leurs fournisseurs (les « Parties indemnisées ») contre toute réclamation ou responsabilité de tiers dues à :
+                    (a) votre utilisation de l’application SSI ; et
+                    (b) toute utilisation par les utilisateurs de l’application SSI que vous avez téléchargée"
+  ss_eula_35_html: "Vous acceptez de coopérer aussi pleinement que raisonnablement nécessaire dans la défense de toute réclamation. SSI se réserve le droit, à ses propres frais, d'assumer la défense et le contrôle exclusifs de tout sujet que vous soumettriez à indemnisation. Vous reconnaissez que les dommages et intérêts pour utilisation abusive de l'application SSI peuvent être irréparables. Par conséquent, vous acceptez que SSI ait le droit de demander et d'obtenir une réparation légale équitable, y compris, mais sans s'y limiter, l'injonction préliminaire et l'injonction, en plus de tous les autres recours."
+  ss_eula_36_html: "8.  Conditions supplémentaires"
+  ss_eula_37_html: "SSI peut modifier ces conditions ou toutes autres conditions qui s'appliquent à un Service pour, par exemple, refléter des modifications apportées à la loi ou des changements aux services SSI. Ces modifications ne s'appliqueront pas rétroactivement et prendront effet au plus tôt quatorze jours après leur publication. Toutefois, les modifications concernant les nouvelles fonctions d'un Service ou les modifications apportées pour des raisons juridiques entreront en vigueur immédiatement. Si vous n'acceptez pas les conditions modifiées pour un Service, vous devez interrompre votre utilisation du Service SSI."
+  ss_eula_38_html: "Tous les termes du présent accord régissent la relation entre SSI et vous. Ils ne créent pas de droits de tiers bénéficiaire. Si vous ne respectez pas ces conditions et que SSI ne prend pas de mesures immédiates, SSI ne renonce à aucun droit qu'elle pourrait avoir (par exemple, prendre des mesures ultérieures). S'il s'avère qu'une condition donnée n'est pas exécutoire, cela n'affectera pas les autres conditions du présent accord."
+  ss_eula_39_html: "TRADUCTIONS : La version anglaise de ce CLUF est la version qui fera autorité. Toutes les traductions sont uniquement fournies à titre pratique. En cas de conflit entre cette traduction et la version anglaise, la version anglaise du présent Accord l’emportera, dans la mesure où la loi de votre juridiction ne l'interdit pas expressément. Les parties ont convenu que le présent Accord soit rédigé en langue anglaise."
+  ss_eula_40_html: "DROIT APPLICABLE : Ce CLUF et tout litige lié à ce CLUF ou à l'utilisation du Logiciel SSI et / ou du Matériel ou autrement sont soumis à la loi de la Caroline du Sud, sans donner effet à aucun des principes qui peuvent prévoir l'application de la loi d'une autre juridiction. La Convention des Nations Unies sur les contrats de vente internationale de marchandises est exclue de l'application du présent CLUF. Tous les litiges découlant du présent CLUF seront réglés par les tribunaux fédéraux ou étatiques situés à Charleston, en Caroline du Sud, qui auront une compétence exclusive en ce qui concerne ces différends."
+  ss_eula_41_html: "Vous acceptez de vous conformer à toutes les lois internationales et nationales qui s'appliquent aux produits et services SSI, y compris aux réglementations canadiennes et américaines en matière d'exportation, ainsi qu'aux restrictions imposées aux utilisateurs finaux, aux utilisations finales et aux destinations émises par les gouvernements canadiens, américains et autres . Vous ne pouvez pas utiliser, acquérir, expédier, transporter, exporter ou réexporter les Produits et Services de SSI, à l'exception de ce qui est autorisé par SSI et conformément aux lois applicables. Les Produits et Services ne peuvent être acquis, expédiés, transportés, exportés ou réexportés (i) dans un pays sous embargo des États-Unis, (ii) à un ressortissant ou résident d'un pays sous embargo des États-Unis, (iii) de la liste des ressortissants spécialement désignés du ministère du Trésor des États-Unis ou du tableau des ordonnances de refus du Ministère du Commerce américain. En utilisant les Produits et Services, vous déclarez et garantissez que vous n'êtes pas situé dans, sous le contrôle de, ou un ressortissant ou résident d'un tel pays ou sur une telle liste. Vous acceptez par la présente d'indemniser, de défendre et de dégager SSI de toute réclamation, perte, dommage, responsabilité, frais et dépenses, y compris les honoraires d'avocat raisonnables, dans la mesure où ces réclamations découlent de tout manquement par vous des dispositions du présent Paragraphe."
+
+
+  ss_privacy_1_html: "POLITIQUE DE CONFIDENTIALITÉ SAFESTOP"
+  ss_privacy_2_html: "SSI prend la protection et l'utilisation appropriée de vos informations personnelles au sérieux et s'engage à protéger vos informations personnelles en sa possession et à se conformer à toutes les lois fédérales, provinciales et étatiques relatives à ces informations. SSI veut que vous compreniez quelles sont les informations personnelles qu’elle peut recueillir auprès de vous et comment SSI utilise ces informations. En utilisant les Produits et Services SSI, vous acceptez que SSI puisse utiliser ces données conformément à sa politique de confidentialité contenu dans le présent document."
+  ss_privacy_3_html: "Dans cette politique, « informations personnelles » désigne toute information par laquelle vous pouvez être identifié ou contacté, tels que votre nom (prénom et nom de famille), votre adresse (ville, région, code postal), votre adresse email, votre numéro de téléphone, etc ... SSI recueille des informations personnelles quand elle communique ou interagit avec vous à travers son application ou son site Internet ainsi que par téléphone. Par exemple, lorsque vous vous inscrivez pour ouvrir un compte ou lorsque vous communiquez avec SSI en postant un commentaire, une question ou une plainte."
+  ss_privacy_4_html: "Lorsque vous visitez le site Internet de SSI, SSI peut également recueillir certaines informations automatiquement et les stocker dans des fichiers log. Ces informations peuvent inclure des adresses IP (protocole Internet) ou d'autres identifiants de périphérique, des informations sur le navigateur, le fournisseur de services Internet (ISP), le système d'exploitation, l'emplacement, l'horodatage et les données de flux de clics."
+  ss_privacy_5_html: "<b>Utilisation par SSI des informations vous concernant</b>"
+  ss_privacy_6_html: "SSI utilise les informations personnelles qu'elle recueille pour mener ses activités et vous fournir les meilleurs services et la meilleure expérience possible. SSI ne partage avec aucune tierce partie les informations relatives à ses utilisateurs (étudiant / parent / tuteur) qui identifieraient l'utilisateur de quelque manière que ce soit, à l'exception du fait que SSI peut, dans certains cas, divulguer vos informations personnelles sur demande d’une cour de justice. SSI ne peut recueillir, utiliser et fournir à des tiers de confiance que des données anonymes (statistiques et données quantitatives) telles que l'utilisation globale de l'application SSI à un emplacement géographique spécifique, la durée d'utilisation de l'application par une personne lors d’une session donnée (sans identifier l’individu concerné), ainsi que l'accès moyen quotidien, hebdomadaire et mensuel à l'application par des utilisateurs non identifiés. Nous pouvons également utiliser, mais ne pas partager avec des tiers, vos informations pour vous aviser de problèmes de sécurité, répondre à vos commentaires, questions ou plaintes et personnaliser votre expérience. SSI utilise également vos données personnelles en interne pour ses besoins quotidiens tels que la sécurité, le traitement des paiements, l'analyse, les opérations, la détection et la prévention de la fraude, le reporting, la création de sauvegardes et le respect des lois."
+  ss_privacy_7_html: "Les fournisseurs de services, les tierces parties, qui fournissent des services pour le compte de SSI, seront restreints contractuellement dans l'utilisation de toute information anonyme fournie par SSI d'une manière autre que dans le but d’aider SSI à vous fournir des services de qualité."
+  ss_privacy_8_html: "Plus précisément, vous pouvez être assuré que SSI :"
+  ss_privacy_9_html: "Ne vend pas d'information concernant les élèves ;"
+  ss_privacy_10_html: "Ne construit pas de profil personnel d'un étudiant autrement que pour un support à des fins scolaires / éducatives autorisées ou lorsque cela a été autorisé par le parent / l'élève ;"
+  ss_privacy_11_html: "Ne réalise pas de publicité comportementale ciblée ;"
+  ss_privacy_12_html: "Utilise les données à des fins éducatives autorisées uniquement ;"
+  ss_privacy_13_html: "Ne conserve pas en connaissance de cause les informations personnelles de l'élève au-delà de la période nécessaire pour un support à des fins scolaires / éducatives autorisées ou lorsque cela a été autorisé par le parent / l'élève."
+  ss_privacy_14_html: "Supporte l’accès des parents à l'information de leurs enfants et la correction des erreurs;"
+  ss_privacy_15_html: "Maintient un programme complet de sécurité raisonnablement conçu pour protéger la sécurité, la confidentialité et l'intégrité des informations personnelles des élèves contre des risques tels que l'accès ou l'utilisation non autorisés ou la divulgation involontaire ou inappropriée grâce à des mesures de protection administrative, technologique et physique appropriées à la sensibilité de l'information ; et"
+  ss_privacy_16_html: "Opère en toute transparence lors de la collecte et de l’utilisation des données."
+  ss_privacy_17_html: "<b>Cookies</b>"
+  ss_privacy_18_html: "Le site Internet de SSI peut utiliser la technologie des « cookies » et des « balises Internet ». SSI utilise des cookies et des balises Internet pour identifier votre appareil, assurer l'authentification des utilisateurs du site Internet, mener des opérations de prévention et de gestion de la fraude, vous distinguer des autres visiteurs, enregistrer votre adresse IP et comprendre votre utilisation de notre site et identifier le nom du site Internet que vous avez lié à SSI. Cette information est utilisée uniquement en interne pour remplir les contrats avec les partenaires commerciaux de SSI et pour aider SSI à mieux vous servir en améliorant la conception et l'application de site Internet de SSI. SSI n'enregistre pas d'autres informations sur votre utilisation d'autres sites Internet. Les informations obtenues via les cookies et Internet ne seront pas partagées avec des tiers sous réserve des exceptions énoncées."
+  ss_privacy_19_html: "<b> Respect des lois sur la protection des informations personnelles </b>"
+  ss_privacy_20_html: "En ce qui concerne l'utilisation des informations personnelles prévue aux présentes, SSI respecte toutes les lois fédérales et étatiques sur la protection des informations personnelles applicables aux États-Unis et la Loi sur la protection des informations personnelles et les documents électroniques et les autres lois applicables au Canada. Si une disposition de la présente Politique de Confidentialité entre en conflit avec des aspects spécifiques des lois susmentionnées, lesdites lois prévaudront."
+  ss_privacy_21_html: "<b>Révisions</b>"
+  ss_privacy_22_html: "De temps à autre, SSI peut choisir de mettre à jour son Contrat de licence utilisateur final (CLUF) et cette Politique de confidentialité. Lorsqu'elle choisira de le faire, vous en serez informé et redirigé vers le CLUF et la Politique de confidentialité pour examen, compréhension et acceptation ou rejet affirmatifs. SSI ne modifiera pas ses politiques de confidentialité tant qu’elles vous concernent sans avis et choix préalables."
+
+
+
+
+
+  student_id_description: "Your student's ID is provided by your school"
+  student_1_description: "Student ID Number 1 (Required)"
+  create_an_account: "CREATE AN ACCOUNT"
+  account_creation: "Account Creation"
+  add_school_or_district: "ADD SCHOOL OR DISTRICT"
+  add_student: "ADD STUDENT"
+  add_scan_code: "ADD SCAN CODE"
+  add_sub_account: "ADD SUB ACCOUNT"
+  confirm_email: "Confirm Email"
+  email_addresses_do_not_match: "Email addresses do not match"
+  scan_code_not_found_for_identifier: "Scan code not found for this identifier"
+  add_my_students: "ADD MY STUDENTS"
+  are_you_a_school_or_district_employee: "Are you a school or district employee?"
+  student_id_or_school_code_not_valid: "Student ID or School Code Not Valid"
+  student_rider_first_name: "Student/Rider First Name"
+  student_rider_last_name: "Student/Rider Last Name"
+  code_or_id_attempted_to_use: "Code or ID Attempted To Use"
+  student_rider_first_name: "Student/Rider's First Name"
+  student_rider_last_name: "Student/Rider's Last Name"
+  detailed_description: "Detailed Description"
+  lost_date: "Date Item was Lost"
+  route_name: "Route Name"
+  lost_item_report_has_been_submitted: "Your lost item report has been submitted"
+  report_a_problem: "Report a Problem"
+  lost_item_report: "Lost Item Report"
+  incident_report: "Incident Report"
+  my_bus_does_not_appear_to_be_updating: "My bus doesn't appear to be moving/updating"
+  my_routing_information_is_wrong: "My scheduled route or stop information is wrong"
+  my_eta_is_inaccurate: "The ETA for my bus stop is inaccurate"
+  report_an_app_issue: "REPORT AN APP ISSUE"
+  manage_student_scanning: "MANAGE STUDENT SCANNING"
+  manage_sub_accounts: "MANAGE SUB ACCOUNTS"
+  add_student_id: "ADD STUDENT ID"
+  activate_account: "ACTIVATE ACCOUNT"
+  state_or_province: "State or Province"
+  manage_account: "MANAGE ACCOUNT"
+  send_alert: "SEND ALERT"
+  account_not_active: "Account Not Active"
+  account_not_active_description: "Your account is not yet linked to a school, district, or transportation system. Select “Activate Account” and complete the registration process to gain access to the SafeStop service."
+
+
+
+
+
+
+
+
+
+
+
+
+
+  activerecord:
+    errors:
+      messages:
+        record_invalid: 'La validation a échoué : %{errors}'
+        restrict_dependent_destroy:
+          has_one: "Vous ne pouvez pas supprimer l'enregistrement car une personne à charge %{record} existe"
+          has_many: "Vous ne pouvez pas supprimer l'enregistrement parce que les %{record} dépendants existent"
+  date:
+    abbr_day_names:
+    - dim
+    - lun
+    - mar
+    - mer
+    - jeu
+    - ven
+    - sam
+    abbr_month_names:
+    -
+    - jan.
+    - fév.
+    - mar.
+    - avr.
+    - mai
+    - juin
+    - juil.
+    - août
+    - sept.
+    - oct.
+    - nov.
+    - déc.
+    day_names:
+    - dimanche
+    - lundi
+    - mardi
+    - mercredi
+    - jeudi
+    - vendredi
+    - samedi
+    formats:
+      default: "%d/%m/%Y"
+      short: "%e %b"
+      long: "%e %B %Y"
+    month_names:
+    -
+    - janvier
+    - février
+    - mars
+    - avril
+    - mai
+    - juin
+    - juillet
+    - août
+    - septembre
+    - octobre
+    - novembre
+    - décembre
+    order:
+    - :day
+    - :month
+    - :year
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: environ une heure
+        other: environ %{count} heures
+      about_x_months:
+        one: environ un mois
+        other: environ %{count} mois
+      about_x_years:
+        one: environ un an
+        other: environ %{count} ans
+      almost_x_years:
+        one: presqu'un an
+        other: presque %{count} ans
+      half_a_minute: une demi-minute
+      less_than_x_minutes:
+        zero: moins d'une minute
+        one: moins d'une minute
+        other: moins de %{count} minutes
+      less_than_x_seconds:
+        zero: moins d'une seconde
+        one: moins d'une seconde
+        other: moins de %{count} secondes
+      over_x_years:
+        one: plus d'un an
+        other: plus de %{count} ans
+      x_days:
+        one: 1 jour
+        other: "%{count} jours"
+      x_minutes:
+        one: 1 minute
+        other: "%{count} minutes"
+      x_months:
+        one: 1 mois
+        other: "%{count} mois"
+      x_seconds:
+        one: 1 seconde
+        other: "%{count} secondes"
+    prompts:
+      day: Jour
+      hour: Heure
+      minute: Minute
+      month: Mois
+      second: Seconde
+      year: Année
+  errors:
+    format: "%{attribute} %{message}"
+    messages:
+      accepted: doit être accepté(e)
+      blank: doit être rempli(e)
+      present: doit être vide
+      confirmation: ne concorde pas avec %{attribute}
+      empty: doit être rempli(e)
+      equal_to: doit être égal à %{count}
+      even: doit être pair
+      exclusion: n'est pas disponible
+      greater_than: doit être supérieur à %{count}
+      greater_than_or_equal_to: doit être supérieur ou égal à %{count}
+      inclusion: n'est pas inclus(e) dans la liste
+      invalid: n'est pas valide
+      less_than: doit être inférieur à %{count}
+      less_than_or_equal_to: doit être inférieur ou égal à %{count}
+      model_invalid: "Validation échouée: %{errors}"
+      not_a_number: n'est pas un nombre
+      not_an_integer: doit être un nombre entier
+      odd: doit être impair
+      required: doit exister
+      taken: n'est pas disponible
+      too_long:
+        one: est trop long (pas plus d'un caractère)
+        other: est trop long (pas plus de %{count} caractères)
+      too_short:
+        one: est trop court (au moins un caractère)
+        other: est trop court (au moins %{count} caractères)
+      wrong_length:
+        one: ne fait pas la bonne longueur (doit comporter un seul caractère)
+        other: ne fait pas la bonne longueur (doit comporter %{count} caractères)
+      other_than: doit être différent de %{count}
+    template:
+      body: 'Veuillez vérifier les champs suivants : '
+      header:
+        one: 'Impossible d''enregistrer ce(tte) %{model} : 1 erreur'
+        other: 'Impossible d''enregistrer ce(tte) %{model} : %{count} erreurs'
+  helpers:
+    select:
+      prompt: Veuillez sélectionner
+    submit:
+      create: Créer un(e) %{model}
+      submit: Enregistrer ce(tte) %{model}
+      update: Modifier ce(tte) %{model}
+  number:
+    currency:
+      format:
+        delimiter: " "
+        format: "%n %u"
+        precision: 2
+        separator: ","
+        significant: false
+        strip_insignificant_zeros: false
+        unit: "€"
+    format:
+      delimiter: " "
+      precision: 3
+      separator: ","
+      significant: false
+      strip_insignificant_zeros: false
+    human:
+      decimal_units:
+        format: "%n %u"
+        units:
+          billion: milliard
+          million: million
+          quadrillion: million de milliards
+          thousand: millier
+          trillion: billion
+          unit: ''
+      format:
+        delimiter: ''
+        precision: 3
+        significant: true
+        strip_insignificant_zeros: true
+      storage_units:
+        format: "%n %u"
+        units:
+          byte:
+            one: octet
+            other: octets
+          gb: Go
+          kb: ko
+          mb: Mo
+          tb: To
+    percentage:
+      format:
+        delimiter: ''
+        format: "%n%"
+    precision:
+      format:
+        delimiter: ''
+  support:
+    array:
+      last_word_connector: " et "
+      two_words_connector: " et "
+      words_connector: ", "
+  time:
+    am: am
+    formats:
+      default: "%d %B %Y %Hh %Mmin %Ss"
+      long: "%A %d %B %Y %Hh%M"
+      short: "%d %b %Hh%M"
+    pm: pm
+
