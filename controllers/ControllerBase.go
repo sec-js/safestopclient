@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/schoolwheels/safestopclient/i18n"
 )
 
 type ControllerBase struct {
@@ -40,13 +41,17 @@ func (c *ControllerBase) addTemplate(name string, file string, layout string){
 		c.Templates = make(map[string]*template.Template)
 	}
 
-	funcMap := template.FuncMap{"mod": mod, "n": N}
+	funcMap := template.FuncMap{"mod": mod, "n": N, "t": T}
 
 	c.Templates[name] = template.Must(template.New("base.html").Funcs(funcMap).ParseFiles("views/"+c.Name+"/"+file, "views/layouts/"+layout, "views/layouts/base.html"))
 }
 
 func (c *ControllerBase) render(w http.ResponseWriter, r *http.Request, template string, data interface{} ) {
 	c.renderTemplate(w, r, template, "layout", data)
+}
+
+func T(key string, value string, args ...interface{}) string {
+	return i18n.GetI18n().Default(value).T("en", key, args...)
 }
 
 func mod(i, j int) bool {

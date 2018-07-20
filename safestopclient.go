@@ -25,7 +25,8 @@ func main() {
 	I18n := i18n.New(
 		yaml.New(filepath.Join("./config/locales")), // load translations from the YAML files in directory `config/locales`
 	)
-	french := I18n.T("en", "french")
+	french := I18n.T("fr", "french")
+	I18n.Default("Default").T("en", "french")
 	fmt.Println("french: ",french)
 
 	fmt.Println("~~~~~ SafeStop Client ~~~~~")
