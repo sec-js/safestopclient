@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="safestopclient development" type="GoApplicationRunConfiguration" factoryName="Go Application" singleton="true">
+    <module name="safestopclient" />
+    <working_directory value="$PROJECT_DIR$/" />
+    <go_parameters value="-i" />
+    <envs>
+      <env name="SSC_ENV" value="development" />
+    </envs>
+    <kind value="FILE" />
+    <filePath value="$PROJECT_DIR$/safestopclient.go" />
+    <package value="github.com/schoolwheels/safestopclient" />
+    <directory value="$PROJECT_DIR$/" />
+    <method>
+      <option name="LaunchBrowser.Before.Run" url="http://localhost:8080" />
+    </method>
+  </configuration>
+</component>

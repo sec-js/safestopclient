@@ -1,0 +1,7 @@
+db_host: localhost
+db_port: 5432
+db_username: safestopapp
+db_password: safestopapp
+db_name: hermes_dev
+domain: safestopapp.com
+

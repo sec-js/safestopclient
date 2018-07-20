@@ -1,0 +1,11 @@
+FROM alpine
+
+ENV SSC_DB_HOST=192.168.0.0
+ENV SSC_DB_USERNAME=safestopapp
+ENV SSC_DB_NAME=hermes_dev
+ENV GOPATH=/go
+
+WORKDIR /go/src/github.com/schoolwheels/safestopclient
+ADD . /go/src/github.com/schoolwheels/safestopclient
+ENTRYPOINT /go/src/github.com/schoolwheels/safestopclient/safestopclient
+EXPOSE 8443 8080

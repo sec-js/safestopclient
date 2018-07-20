@@ -1,0 +1,16 @@
+.git
+vendor
+README.md
+LICENSE
+
+build.sh
+cleandocker.sh
+deploy.sh
+installservice.sh
+logsapp.sh
+prodappip.sh
+proddbip.sh
+rundocker.sh
+sshapp.sh
+sshdb.sh
+safestopclient.service

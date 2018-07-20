@@ -1,0 +1,15 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html>
+<head>
+    {{template "base-head" .}}
+    <link rel="stylesheet" href="/stylesheets/default-layout.css" type="text/css" />
+    {{template "head" .}}
+</head>
+<body>
+<div id='wrap'>
+{{template "body" .}}
+</div>
+</body>
+</html>
+{{end}}

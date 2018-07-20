@@ -1,0 +1,28 @@
+{{define "head"}}
+    <title></title>
+{{end}}
+{{define "body"}}
+
+<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+    <div class='row' style="width: 100%; margin: 0px !important;">
+
+{{if .CurrentUser.Email}}
+    <div class='col text-right'>
+        <a class="btn btn-outline-secondary btn-sm" href='/dashboard'>
+            Enter
+        </a>
+    </div>
+{{else}}
+    <div class='col text-right'>
+        <a class="btn btn-outline-secondary btn-sm" href='/login'>
+            Sign In
+        </a>
+    </div>
+{{end}}
+
+    </div>
+    </div>
+</nav>
+
+{{end}}
