@@ -18,7 +18,7 @@ import (
 var sessionStore = sessions.NewCookieStore([]byte("Byte my ass 2018!"))
 
 func main() {
-	
+
 	fmt.Println("~~~~~ SafeStop Client ~~~~~")
 	fmt.Println("SSC_ENV:", os.Getenv("SSC_ENV"))
 
