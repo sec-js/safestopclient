@@ -2,8 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"encoding/json"
-
 )
 
 type APIController struct {
@@ -27,18 +25,6 @@ func (c *APIController) versionAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c.renderJSON(data, w)
-}
-
-func (c *APIController) renderJSON(data interface{}, w http.ResponseWriter) {
-
-	js, err := json.Marshal(data)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
 }
 
 

@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/schoolwheels/safestopclient/i18n"
+	"encoding/json"
 )
 
 type ControllerBase struct {
@@ -44,6 +45,18 @@ func (c *ControllerBase) addTemplate(name string, file string, layout string){
 	funcMap := template.FuncMap{"mod": mod, "n": N, "t": T}
 
 	c.Templates[name] = template.Must(template.New("base.html").Funcs(funcMap).ParseFiles("views/"+c.Name+"/"+file, "views/layouts/"+layout, "views/layouts/base.html"))
+}
+
+func (c *ControllerBase) renderJSON(data interface{}, w http.ResponseWriter) {
+
+	js, err := json.Marshal(data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
 }
 
 func (c *ControllerBase) render(w http.ResponseWriter, r *http.Request, template string, data interface{} ) {
