@@ -13,9 +13,11 @@ func (c *AppController) Register() {
 
 	//templates
 	c.addTemplate("index", "index.html", "app.html")
+	c.addTemplate("account", "account.html", "app.html")
 
 	//actions
 	c.addRouteWithPrefix("/", c.indexAction)
+	c.addRouteWithPrefix("/account", c.accountAction)
 }
 
 type dashData struct {
@@ -30,6 +32,16 @@ func (c *AppController) indexAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c.render(w, r, "index", nil)
+}
+
+func (c *AppController) accountAction(w http.ResponseWriter, r *http.Request) {
+	session, _ :=  c.SessionStore.Get(r, "auth")
+	email := session.Values["current_user_email"]
+	if email != nil {
+		http.Redirect(w, r, r.URL.Host+"/dashboard", http.StatusFound)
+	}
+
+	c.render(w, r, "account", nil)
 }
 
 
