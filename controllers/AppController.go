@@ -12,7 +12,7 @@ type AppController struct {
 func (c *AppController) Register() {
 
 	//templates
-	c.addTemplate("index", "index.html", "default.html")
+	c.addTemplate("index", "index.html", "app.html")
 
 	//actions
 	c.addRouteWithPrefix("/", c.indexAction)

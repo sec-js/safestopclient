@@ -1,10 +1,12 @@
 {{define "base-head"}}
 
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    {{/*<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no"/>*/}}
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     {{/*<link rel="apple-touch-startup-image" href="/launch.png">*/}}
     {{/*<meta name="apple-mobile-web-app-status-bar-style" content="black">*/}}
     <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
     <meta charset="UTF-8"/>
 
     <link rel="apple-touch-icon-precomposed" sizes="57x57" href="/images/favicomatic/apple-touch-icon-57x57.png" />
@@ -31,25 +33,44 @@
 
     {{/*<!-- JQuery -->*/}}
     <script crossorigin='anonymous' integrity='sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=' src='https://code.jquery.com/jquery-3.2.1.min.js'></script>
+
     {{/*<!-- Bootstrap -->*/}}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
     {{/*<!-- FontAwesome -->*/}}
     <script src="//use.fontawesome.com/6e2d4f5c12.js"></script>
     <script defer src="/javascript/fontawesome/fontawesome-all.js"></script>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
     {{/*<!-- Bootstrap DateTimePicker & Moment.js -->*/}}
     <link href='//cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css' rel='stylesheet'>
     <script src='//cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment-with-locales.min.js'></script>
     <script src='//cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.13/moment-timezone-with-data-2012-2022.min.js'></script>
     <script src='//cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min.js'></script>
+
+    {{/*<!-- FormValidation -->*/}}
+    <script src="/javascript/formValidation.min.js"></script>
+    <script src="/javascript/formValidation-bootstrap.min.js"></script>
+
     {{/*<!-- Bootstrap Multiselect -->*/}}
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.min.js"></script>
+
     {{/*<!-- Sweet Alert 2 -->*/}}
     <script src="//cdn.jsdelivr.net/sweetalert2/6.4.4/sweetalert2.min.js"></script>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/sweetalert2/6.4.4/sweetalert2.min.css">
+
+    {{/*<!--  Mustache -->*/}}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.5/waypoints.min.js"></script>
+
+
     {{/*<!-- Stay Standalone -->*/}}
     {{/*<script type="text/javascript">(function(a,b,c){if(c in b&&b[c]){var d,e=a.location,f=/^(a|html)$/i;a.addEventListener("click",function(a){d=a.target;while(!f.test(d.nodeName))d=d.parentNode;"href"in d&&(chref=d.href).replace(e.href,"").indexOf("#")&&(!/^[a-z\+\.\-]+:/i.test(chref)||chref.indexOf(e.protocol+"//"+e.host)===0)&&(a.preventDefault(),e.href=d.href)},!1)}})(document,window.navigator,"standalone");</script>*/}}
     <script type="text/javascript">
