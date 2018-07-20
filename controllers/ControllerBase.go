@@ -50,8 +50,8 @@ func (c *ControllerBase) render(w http.ResponseWriter, r *http.Request, template
 	c.renderTemplate(w, r, template, "layout", data)
 }
 
-func T(key string, value string, args ...interface{}) string {
-	return i18n.GetI18n().Default(value).T("en", key, args...)
+func T(locale string, key string, value string, args ...interface{}) template.HTML {
+	return i18n.GetI18n().Default(value).T(locale, key, args...)
 }
 
 func mod(i, j int) bool {
