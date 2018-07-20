@@ -5,6 +5,8 @@
     <go_parameters value="-i" />
     <envs>
       <env name="SSC_ENV" value="development" />
+      <env name="SAFE_STOP_DOMAIN" value="safestopapp.com" />
+      <env name="SAFE_STOP_SUPPORT_NUMBER" value="1-800-843-8936" />
     </envs>
     <kind value="FILE" />
     <filePath value="$PROJECT_DIR$/safestopclient.go" />
