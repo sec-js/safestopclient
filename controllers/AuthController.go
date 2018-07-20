@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/schoolwheels/safestopclient/models"
 	"log"
+	"os"
 )
 
 type AuthController struct {
@@ -30,10 +31,27 @@ func (c *AuthController) Register() {
 	c.addRouteWithPrefix("/forgot_password", c.forgotPasswordAction)
 }
 
+
+
+
+type loginData struct {
+	Domain string
+	SupportNumber string
+	IsUS bool
+}
+
 func (c *AuthController) loginAction(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("method:", r.Method) //get request method
 	if r.Method == "GET" {
-		c.render(w, r, "login", nil)
+
+
+		var data loginData
+		data.Domain = os.Getenv("SAFE_STOP_DOMAIN")
+		data.SupportNumber = os.Getenv("SAFE_STOP_SUPPORT_NUMBER")
+		data.IsUS = (os.Getenv("SAFE_STOP_DOMAIN") == "safestopapp.com")
+
+
+		c.render(w, r, "login", data)
 	} else {
 		r.ParseForm()
 		// logic part of log in

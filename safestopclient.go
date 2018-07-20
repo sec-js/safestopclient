@@ -82,7 +82,7 @@ func main() {
 	} else {
 		// redirect every http request to https
 		go http.ListenAndServe(":8080", http.HandlerFunc(redirect))
-		log.Fatal(http.ListenAndServeTLS(":8443", "certs/safestopapp.com.pem", "certs/safestopapp.com-key.pem", middleware.RequestLogger(r)))
+		//log.Fatal(http.ListenAndServeTLS(":8443", "certs/safestopapp.com.pem", "certs/safestopapp.com-key.pem", middleware.RequestLogger(r)))
 	}
 }
 
