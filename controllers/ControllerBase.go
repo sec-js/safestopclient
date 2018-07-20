@@ -37,6 +37,10 @@ func (c *ControllerBase) addTemplateNoNav(name string){
 	c.addTemplate(name, name + ".html", "no_nav.html")
 }
 
+func (c *ControllerBase) addTemplateApp(name string){
+	c.addTemplate(name, name + ".html", "app.html")
+}
+
 func (c *ControllerBase) addTemplate(name string, file string, layout string){
 	if c.Templates == nil {
 		c.Templates = make(map[string]*template.Template)
