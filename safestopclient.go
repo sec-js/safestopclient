@@ -65,6 +65,9 @@ func main() {
 	AppController := controllers.AppController{&controllers.ControllerBase{Name: "AppController", Templates: make(map[string]*template.Template), Router: r, SessionStore: sessionStore}}
 	AppController.Register()
 
+	APIController := controllers.APIController{&controllers.ControllerBase{Name: "APIController", Templates: make(map[string]*template.Template), Router: r, SessionStore: sessionStore}}
+	APIController.Register()
+
 	http.Handle("/", r)
 	log.Println("Listening...")
 	if viper.GetString("env") == "development" {

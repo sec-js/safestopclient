@@ -1,28 +1,235 @@
 {{define "head"}}
-    <title>{{ t "fr" "french" "Default1" }} | {{ t "en" "french" "Default1" }}</title>
+
 {{end}}
 {{define "body"}}
 
-<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
-    <div class="container">
-    <div class='row' style="width: 100%; margin: 0px !important;">
+<style>
+    .icon-stack {
+        position: relative;
+        display: inline-block;
+        width: 70px;
+        height: 70px;
+        line-height: 2em;
+        vertical-align: middle;
+    }
+    .icon-stack-1x,
+    .icon-stack-2x,
+    .icon-stack-3x {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        text-align: center;
+    }
+    .icon-stack-1x {
+        line-height: inherit;
+    }
+    .icon-stack-2x {
+        font-size: 1.5em;
+    }
+    .icon-stack-3x {
+        font-size: 2em;
+    }
+    .fa-clock-o{
+        cursor: pointer;
+    }
+</style>
 
-{{if .CurrentUser.Email}}
-    <div class='col text-right'>
-        <a class="btn btn-outline-secondary btn-sm" href='/dashboard'>
-            Enter
-        </a>
-    </div>
-{{else}}
-    <div class='col text-right'>
-        <a class="btn btn-outline-secondary btn-sm" href='/login'>
-            Sign In
-        </a>
-    </div>
-{{end}}
 
-    </div>
-    </div>
-</nav>
+<script id="ms-template" type="text/html">
+{{`{{={| |}=}}`}}
+{|#jurisdictions|}
 
+<li class="list-group-item text-center ms-jurisdiction">{|jurisdiction_name|}</li>
+
+{|#routes|}
+
+{|#stops|}
+
+<div class="list-group-item stop-li" style="border-radius:0px; border:1px solid #DDDDDD;">
+
+<table style="width: 100%;">
+<tr>
+<td style="width: 90%;">
+<table style="width:100%;">
+<tr>
+<td colspan="2" class="ms-route" style="font-style: {|inactive_font|}; color: {|inactive_color|};">{|route_name|}
+
+{|#audible|}
+    <i class="fa fa-clock-o" style="font-style: {|inactive_font|}; color: #FCD20A;" aria-hidden="true"></i>
+{|/audible|}
+
+</td>
+</tr>
+<tr>
+        <td colspan="2" class="ms-stop" style="font-style: {|inactive_font|}; color: {|inactive_color|};">
+{|stop_name|}
+</td>
+</tr>
+<tr>
+
+{|^loop_mode_flag|}
+<td style="width: {|width|}; vertical-align: top;">
+
+        <div class="se-title" style="font-style: {|inactive_font|}; color: {|inactive_color|};">{|scheduled_title|}</div>
+<div class="ms-time">{|scheduled_time|}</div>
+</td>
+{|/loop_mode_flag|}
+
+            {|^audible|}
+              {|^hide_predictions|}
+<td style="width: 40%;" class="text-left">
+<div class="se-title">{|time_title|}</div>
+        <div class="ms-time" style="color: {|time_color|};">{|time|}</div>
+<div class="as_of">{|as_of|}</div>
+</td>
+{|/hide_predictions|}
+            {|/audible|}
+
+</tr>
+</table>
+</td>
+        <td style="vertical-align: middle; display: {|hide_pin|};" class="text-right">
+    <!--<i class="fa fa-chevron-right nav-arrow"></i>-->
+
+        <a href="/map_view?bus_route_id={|route_id|}&bus_route_stop_id={|stop_id|}" class="icon-stack">
+    <i class="ss ss-live-map-map icon-stack-3x" style="color: #575B5E;
+                                                             font-size: 40px;
+                                                             padding-top: 10px;
+                                                             border: 3px solid #575B5E;
+                                                             height:70px;
+                                                             width:70px;
+                                                             position: relative;
+                                                             -webkit-border-radius:35px;
+                                                             -moz-border-radius:35px;">
+
+    </i>
+    <i class="ss ss-live-map-pin icon-stack-1x" style="color: #A12130; font-size: 30pt; top: 18px"></i>
+</a>
+
+
+</td>
+</tr>
+</table>
+
+</div>
+
+{|/stops|}
+  {|/routes|}
+  {|/jurisdictions|}
+
+</script>
+
+
+<ul class="list-group" id="my-stops" style="overflow-y: scroll !important;">
+
+
+</ul>
+
+
+
+<div id="loading_spinner" style="display:none;" align="center">
+    <img src="/images/spinner.png">
+</div>
+
+<script type="text/javascript">
+
+var refreshTimeout;
+var refreshAdTimeout;
+var ms_template = $("#ms-template").html();
+Mustache.parse(ms_template);
+
+
+$(document).ready(function () {
+
+{{ if true }} <!-- !@register.nil? and @register -->
+
+    if(isNativeiOSApp()) {
+        sendMessageToNative({
+            command: 'register_for_notifications',
+            callback: 'did_register_for_notifications_with_user_callback',
+            data: ''
+        });
+    }
+    else if (isNativeAndroidApp()) {
+        gcm_token = Android.getGCMToken();
+        gcm_user_callback(gcm_token);
+    }
+
+{{ end }}
+
+$("#my-stops").height((window.innerHeight - 106) + 'px');
+
+    //refresh_stops();
+    //refresh_scans();
+    //refresh_ad();
+
+$(document).on('click', '.fa-clock-o', function(e){
+    e.stopPropagation();
+    $('.message-bubble').trigger('click');
+})
+
+});
+
+
+function refresh_stops() {
+
+    //START PROGRESS BAR
+    progressValue = 100;
+    if (!inProgress) {
+        progress();
+        inProgress = !inProgress;
+    }
+
+    $('#loading_spinner').show();
+    refreshTimeout = setTimeout(refresh_stops, 30000);
+
+$.get('/my_stops', {
+    authenticity_token: '<%= form_authenticity_token %>',
+    format: 'json'
+}, function (response) {
+    console.log("Res", response)
+
+    $("#my-stops").empty();
+    $('#loading_spinner').hide();
+
+if (response.length > 0) {
+    $('#my-stops').append(Mustache.render(ms_template, {jurisdictions: response}));
+}
+else {
+
+}
+
+// <% if current_app_user and [Sti::LICENSE_5, Sti::SUB_ACCOUNT_USER].include?(current_app_user.client_permission_group) %>
+//         <% current_app_user.client_jurisdictions.each do |j| %>
+//         <% if j.jurisdiction_safe_stop_info.status == 'testing' %>
+//
+//         $('#my-stops').append('<li class="list-group-item text-center ms-jurisdiction"><%= j.name %></li>');
+//     $('#my-stops').append('<li class="list-group-item text-center"><%= t('ss_client_my_stops_js_1', locale: current_locale) %></li>');
+//
+// <% end %>
+// <% end %>
+// <% end %>
+
+
+
+
+});
+}
+
+function refreshAd() {
+    refreshAdTimeout = setTimeout(refreshAd, 30000);
+$.post('/next_ad', {
+    authenticity_token: '<%= form_authenticity_token %>'
+}, function (response) {
+//        alert(response.ad.app_image);
+    if(response.ad) {
+        $("#ad-image").attr("src", response.ad.app_image);
+        $("#ad-link").attr("href", '/adclick/'+response.ad.id);
+        $("#my-stops").css("margin-bottom", "156px");
+    }
+});
+}
+
+
+</script>
 {{end}}
