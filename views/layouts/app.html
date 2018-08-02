@@ -1,19 +1,403 @@
 {{define "layout"}}
 <!DOCTYPE html>
-<html>
+<html style="width: 100%;">
 <head>
 
     {{template "base-head" .}}
     <link rel="stylesheet" href="/stylesheets/app-layout.css" type="text/css" />
     {{template "head" .}}
 </head>
-<body style="margin-top: 55px; margin-bottom: 60px; padding-bottom: 10px;">
+<body id="body" class="app-body">
 
-        
-    <div id='wrap'>
-    {{template "body" .}}
-    </div>
+<div id="overlay"
+     style="
+     position:absolute;
+         height:100%;
+         width:100%;
+         background:black;
+         opacity:.7;
+         z-index:2;
+         display:none;
+     ">
+</div>
+
+<div id="top-bar" style="background: #ffffff;
+    z-index: 5000;
+    position: fixed;
+    width:100%;
+    top: 0px;
+    border-bottom: 1px solid #ccc;
+    height:50px;">
+
+{{/*<table style="width:100%; height: 50px; z-index: 5000;">*/}}
+        {{/*<tr>*/}}
+            {{/*<td style="width: 40px; height:50px; padding-top: 4px;">*/}}
+
+                {{/*<% if request.fullpath == "/setup" ||*/}}
+                {{/*request.fullpath == '/account' ||*/}}
+                {{/*request.fullpath.starts_with?('/map_view') %>*/}}
+                {{/*<a style="margin-left:10px;" href="/web"><i style="font-size: 25pt; color: #A32837;" class="fa fa-times back" aria-hidden="true"></i></a>*/}}
+                {{/*<% elsif*/}}
+                {{/*request.fullpath == '/manage_notifications' ||*/}}
+                {{/*request.fullpath == '/manage_subscriptions' ||*/}}
+                {{/*request.fullpath == '/language' ||*/}}
+                {{/*request.fullpath == '/faq'*/}}
+
+                {{/*%>*/}}
+                {{/*<a style="margin-left:10px;" href="/account"><i style="font-size: 16pt; color: #A32837;" class="fa fa-chevron-left back" aria-hidden="true"></i></a>*/}}
+
+                {{/*<% elsif*/}}
+                {{/*request.fullpath.starts_with?('/my_routes/')*/}}
+                {{/*%>*/}}
+                {{/*<a style="margin-left:10px;" href="/my_routes_overview"><i style="font-size: 25pt; color: #A32837;" class="fa fa-times back" aria-hidden="true"></i></a>*/}}
+
+
+                {{/*<% elsif request.fullpath.start_with?('/subscription_details') %>*/}}
+                {{/*<a style="margin-left:10px;" href="/manage_subscriptions"><i style="font-size: 16pt; color: #A32837;" class="fa fa-chevron-left back" aria-hidden="true"></i></a>*/}}
+
+                {{/*<% end %>*/}}
+            {{/*</td>*/}}
+
+            {{/*<td align="center">*/}}
+                {{/*<table>*/}}
+                    {{/*<tr>*/}}
+                        {{/*<td style="height: 50px; width:10px; vertical-align: middle">*/}}
+                            {{/*<i style="font-size: 10pt; " class="fa fa-user" aria-hidden="true"></i></td>*/}}
+                        {{/*<td style="height: 50px; vertical-align: middle">*/}}
+                            {{/*<span style="margin-left:4px;" class="signed-in-as"><%= @user.email if @user %></span>*/}}
+                        {{/*</td>*/}}
+                    {{/*</tr>*/}}
+                {{/*</table>*/}}
+            {{/*</td>*/}}
+
+            {{/*<td style="width: 40px; text-align: right">*/}}
+
+                {{/*<% if request.fullpath == "/my_stops" ||*/}}
+                {{/*request.fullpath.starts_with?('/map_view') || request.fullpath == '/web' || request.fullpath == "/my_stops" %>*/}}
+                {{/*<i id="message-close" style="display: none; font-size: 25pt; margin-right:10px; color: #A32837;" class="fa fa-times message-bubble" aria-hidden="true" data-toggle="collapse" data-target="#message-td"></i>*/}}
+                {{/*<i id="message-filled" style=" display: none; font-size: 16pt; margin-right:10px; color: #A32837;" class="ss ss-small-message-filled message-bubble" aria-hidden="true" data-toggle="collapse" data-target="#message-td"></i>*/}}
+                {{/*<i id="message-empty" style="font-size: 16pt; margin-right:10px; color: #A32837;" class="ss ss-small-message-empty message-bubble" aria-hidden="true" data-toggle="collapse" data-target="#message-td"></i>*/}}
+                {{/*<% end %>*/}}
+
+                {{/*<% if request.fullpath == '/subscription_details' %>*/}}
+                {{/*<a style="margin-right:10px;" href="/account"><i style="font-size: 16pt; color: #A32837;" class="fa fa-check back" aria-hidden="true"></i></a>*/}}
+                {{/*<% end %>*/}}
+
+                {{/*<% if request.fullpath == '/setup' %>*/}}
+                {{/*<a style="margin-right:10px;" href="/my_stops"><i style="font-size: 16pt; color: #A32837;" class="fa fa-check back" aria-hidden="true"></i></a>*/}}
+                {{/*<% end %>*/}}
+
+            {{/*</td>*/}}
+        {{/*</tr>*/}}
+
+        {{/*<% if request.fullpath.starts_with?('/map_view') || request.fullpath == '/my_stops' || request.fullpath == '/web' || request.fullpath.starts_with?('/my_routes') || request.fullpath == "/my_stops" %>*/}}
+        {{/*<tr>*/}}
+            {{/*<td style="width:100%; padding: 0px;" colspan="3">*/}}
+                {{/*<div class="progress" style="height:5px; margin: 0px;">*/}}
+                    {{/*<div class="progress-bar progress-bar-danger progress-bar-sm" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">*/}}
+                    {{/*</div>*/}}
+                {{/*</div>*/}}
+            {{/*</td>*/}}
+        {{/*</tr>*/}}
+
+        {{/*<tr>*/}}
+            {{/*<td style="width:100%; border-bottom: 1px solid #ccc;" colspan="3">*/}}
+                {{/*<div style="background: #FFFFFF; padding: 10px; z-index:3; overflow-y: scroll !important; max-height: 500px; !important;" id="message-td" class="collapse">*/}}
+                    {{/*<table id="messages"></table>*/}}
+                {{/*</div>*/}}
+            {{/*</td>*/}}
+        {{/*</tr>*/}}
+        {{/*<% end %>*/}}
+    {{/*</table>*/}}
+
+</div>
+
+
+{{/*<% flash.each do |type, message| %>*/}}
+{{/*<div class="alert <%= bootstrap_class_for(type) %> fade in">*/}}
+{{/*<button class="close" data-dismiss="alert">×</button>*/}}
+{{/*<%= message %>*/}}
+{{/*</div>*/}}
+{{/*<% end %>*/}}
+
+{{template "body" .}}
+
+
+<div id="bottom-bar" style="position: fixed;
+bottom: 0px;
+min-height: 56px;
+width:100%;
+background:#ECECEC;
+z-index: 5000;">
+    {{/*<% if (request.fullpath.include?('/my_stops') || request.fullpath.starts_with?('/map_view') || request.fullpath == '/web' || request.fullpath == "/my_stops") %>*/}}
+    {{/*<div id="ad" style="background-color: whitesmoke; text-align: center;">*/}}
+    {{/*<a id="ad-link" href="#" style="border: 0px;"><img id="ad-image" src=""></a>*/}}
+    {{/*</div>*/}}
+    {{/*<% end %>*/}}
+    <table style="min-height: 56px; width:100%; border-top:1px solid #ccc;">
+        <tr>
+            <td style="vertical-align: middle; border-right:1px solid #ccc; height: 56px; width:56px;" align="center">
+            <i class="ss ss-logo"  style="font-size: 30pt; color: #A12130;" aria-hidden="true"></i>
+            {{/*<img src="/images/safestop-icon-512.png" alt="SafeStop" style="height:40px;">*/}}
+            </td>
+
+            <td id="bottom-bar-center-td" style="vertical-align: middle;
+            height: 56px;
+            text-align: center;
+            /*<% if request.fullpath.starts_with?('/map_view') %>*/
+            /*cursor: pointer;*/
+            /*<% end %>*/
+            background: #ffffff;"
+            data-toggle="collapse"
+            data-target="#run-data"
+            align="center">
+
+        {{/*<% if request.fullpath.starts_with?('/map_view') %>*/}}
+
+            {{/*<div class="container-fluid" style="margin:0px; padding: 0px;">*/}}
+            {{/*<div class="row">*/}}
+            {{/*<div class="col-xs-12" align="center" style="padding:0px;">*/}}
+            {{/*<div style="display: inline-block" align="left">*/}}
+            {{/*<table cellpadding="0">*/}}
+            {{/*<tr class="scheduled-data">*/}}
+            {{/*<td id="bottom-bar-scheduled" style="font-size: 15pt;"></td>*/}}
+            {{/*</tr>*/}}
+            {{/*<tr class="expected-data">*/}}
+            {{/*<td class="expected" style="font-size: 15pt;"></td>*/}}
+            {{/*</tr>*/}}
+            {{/*<tr class="expected-data">*/}}
+            {{/*<td id="bottom-bar-as-of" class="as_of" align="center" style="padding: 0px;"></td>*/}}
+            {{/*</tr>*/}}
+            {{/*<tr>*/}}
+            {{/*<td style="font-size: 8pt;" align="center">*/}}
+            {{/*<i class="fa fa-chevron-down"  style="padding:0px;" aria-hidden="true"></i>*/}}
+            {{/*</td>*/}}
+            {{/*</tr>*/}}
+            {{/*</table>*/}}
+            {{/*</div>*/}}
+            {{/*</div>*/}}
+            {{/*</div>*/}}
+            {{/*</div>*/}}
+
+        {{/*<% end %>*/}}
+
+        {{/*<% if  request.fullpath.include?('/my_stops') || request.fullpath == '/web' %>*/}}
+
+            {{/*<% if [Sti::LICENSE_5, Sti::SUB_ACCOUNT_USER].include?(@user.client_permission_group) %>*/}}
+                {{/*<% if @user.client_jurisdictions.any?{ |cj| cj.hide_manage_subscriptions == false and cj.stop_granularity == false } %>*/}}
+                    {{/*<a id="add-stop-button" href="/setup" style="font-size: 18pt; font-weight: bold; color: #A12130;">*/}}
+                    {{/*<%= t('add_a_bus_stop', locale: current_locale) %>*/}}
+                    {{/*</a>*/}}
+                {{/*<% end %>*/}}
+            {{/*<% else %>*/}}
+                {{/*<a id="add-stop-button" href="/setup" style="font-size: 18pt; font-weight: bold; color: #A12130;">*/}}
+                {{/*<%= t('add_a_bus_stop', locale: current_locale) %>*/}}
+                {{/*</a>*/}}
+            {{/*<% end %>*/}}
+
+        {{/*<% end %>*/}}
+            </td>
+
+            <td style="vertical-align: middle; border-left:1px solid #ccc; height: 56px; width:56px; text-align: center;" align="center">
+                <a href="/account"><i style="font-size: 30pt; color: #A12130;" class="ss ss-settings account" aria-hidden="true"></i></a>
+            </td>
+        </tr>
+
+        {{/*<% if request.fullpath.starts_with?('/map_view') %>*/}}
+            {{/*<tr>*/}}
+            {{/*<td colspan="3" id="map-view-info" style="background:#ffffff; border-top:1px solid #ccc;" align="center">*/}}
+
+
+            {{/*</td>*/}}
+            {{/*</tr>*/}}
+        {{/*<% end %>*/}}
+
+    </table>
+</div>
+
 
 </body>
 </html>
+
+
+<script type="text/javascript">
+
+    var all_messages = [], refreshScansTimeout, refreshAdTimeout;
+
+    $(document).ready(function () {
+
+        FastClick.attach(document.body);
+
+//     <% if request.fullpath.starts_with?('/map_view') || request.fullpath == '/my_stops' || request.fullpath == '/web' %>
+//
+//                 refresh_messages();
+//
+//         $(".message-bubble").click(function (e) {
+//             $.post('/set_viewed_alerts', {
+//                 authenticity_token: "<%= form_authenticity_token %>",
+//                 message_ids: all_messages.join(',')
+//             }, function (response) {
+//                 // console.log(response)
+//             });
+//
+//             if($("#overlay").is(':visible'))
+//             {
+//                 $('#overlay').hide();
+//             }
+//             else
+//             {
+//                 $('#overlay').show();
+//             }
+//
+//             if($("#message-empty").is(':visible') || $("#message-filled").is(':visible'))
+//             {
+//                 $("#message-close").show();
+//                 $("#message-empty").hide();
+//                 $("#message-filled").hide();
+//             }
+//             else
+//             {
+//                 $("#message-close").hide();
+//                 $("#message-empty").show();
+//                 $("#message-filled").hide();
+//             }
+//
+//
+//
+// //      $("html, body").animate({scrollTop: 0}, "slow");
+//         })
+//
+//         <% end %>
+
+    })
+
+
+    // <% if request.fullpath.starts_with?('/map_view') || request.fullpath == '/my_stops' || request.fullpath == '/web' %>
+    //
+    //         function refresh_messages() {
+    //
+    //             $.get('/alerts', {
+    //                 authenticity_token: '<%= form_authenticity_token %>'
+    //             }, function (response) {
+    //
+    //                 $("#messages").empty();
+    //
+    //                 if (response.result.unread_messages != '0') {
+    //                     //$(".message").text(response.result.unread_messages);
+    //                     //$(".fa-exclamation").show();
+    //                     $("#message-filled").show();
+    //                     $("#message-close").hide();
+    //                     $("#message-empty").hide();
+    //                 }
+    //
+    //                 for (var x = 0; x < response.result.safe_stop_messages.length; x++) {
+    //
+    //                     if (response.result.safe_stop_messages[x].priority == "info") {
+    //                         $("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#5bc0de; vertical-align: top;'><i class='fa fa-exclamation-circle'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");
+    //                     }
+    //                     else if (response.result.safe_stop_messages[x].priority == "alert") {
+    //                         $("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#d9534f; vertical-align: top;'><i class='fa fa-exclamation-triangle'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");
+    //                     }
+    //                     else if (response.result.safe_stop_messages[x].priority == "audible") {
+    //                         $("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#FCD20A; vertical-align: top;'><i class='fa fa-clock-o'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");
+    //                     }
+    //                     else if (response.result.safe_stop_messages[x].priority == "ad-offer") {
+    //                         $("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#4CB349; vertical-align: top;'><i class='fa fa-tag'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");
+    //                     }
+    //                     else if (response.result.safe_stop_messages[x].priority == "ad-other") {
+    //                         $("#messages").append("<tr><td style='padding:4px 4px 4px 4px; font-size: 16pt; color:#FCD20A; vertical-align: top;'><i class='fa fa-star'></i></td><td style='padding:4px;'>" + response.result.safe_stop_messages[x].text + "</td></tr>");
+    //                     }
+    //
+    //                     all_messages.push(response.result.safe_stop_messages[x].id);
+    //                 }
+    //             });
+    //             refreshMessagesTimeout = setTimeout(refresh_messages, 30000);
+    //         }
+    //
+    //         <% end %>
+
+    var a=document.getElementsByTagName("a");
+    for(var i=0;i<a.length;i++)
+    {
+        a[i].onclick=function()
+        {
+            window.location=this.getAttribute("href");
+            return false
+        }
+    }
+
+    $( window ).scroll(function() {
+        $( "#overlay" ).css("top",$(window).scrollTop());
+    });
+
+
+    function refresh_scans() {
+        $.get('/scans', {
+            authenticity_token: "form_authenticity_token"
+        }, function (response) {
+            if (response.length > 0) {
+                for (var x = 0; x < response.length; x++) {
+                    var id = response[x].id
+                    swal({
+                                title: "<%= t('student_scan') %>",
+                                text: response.result.scans[x].name + ' <%= t("was_scanned_at") %> ' + response.result.scans[x].date,
+                                type: "success",
+                                confirmButtonColor: "#A31F2D"
+                            },
+                            function () {
+                                $.post('/dismiss_scan', {
+                                    authenticity_token: "form_authenticity_token",
+                                    id: id
+                                }, function (response) {
+
+                                });
+                            })
+                }
+            }
+            refreshScansTimeout = setTimeout(refresh_scans, 30000);
+        });
+    }
+
+
+    function refresh_ad() {
+        refreshAdTimeout = setTimeout(refresh_ad, 30000);
+        $.post('/next_ad', {
+            authenticity_token: '<%= form_authenticity_token %>'
+        }, function (response) {
+
+            if (response.ad) {
+                $("#ad").show();
+                $("#ad-image").attr("src", response.ad.app_image);
+
+            // <% if request.fullpath == '/my_stops' || request.fullpath == '/web' %>
+            //             $("#ad-link").attr("href", '/adclick/' + response.ad.id);
+            //     $("#my-stops").css("margin-bottom", "156px");
+            //     $("#my-stops").css('height', $(window).height() - $("#bottom-bar").height() - $("#top-bar").height() + 'px');
+            //
+            // <% elsif  request.fullpath.starts_with?('/map_view') %>
+            //             $("#map").css('height', $(window).height() - $("#bottom-bar").height() - $("#top-bar").height() + 'px');
+            //     refresh_map();
+            // <% end %>
+            }
+            else{
+                $("#ad").hide();
+
+            // <% if request.fullpath == '/my_stops' || request.fullpath == '/web' %>
+            //             $("#my-stops").css('height', $(window).height() - $("#bottom-bar").height() - $("#top-bar").height() + 'px');
+            // <% elsif  request.fullpath.starts_with?('/map_view') %>
+            //             $("#map").css('height', $(window).height() - $("#bottom-bar").height() - $("#top-bar").height() + 'px');
+            //     refresh_map();
+            // <% end %>
+
+            }
+
+        });
+    }
+
+
+</script>
 {{end}}
+
+
+
+

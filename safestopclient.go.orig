@@ -11,18 +11,24 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/gorilla/sessions"
 	"github.com/schoolwheels/safestopclient/controllers"
-	"github.com/qor/i18n"
+<<<<<<< HEAD
+			"github.com/qor/i18n"
 	"github.com/qor/i18n/backends/yaml"
 	"path/filepath"
 	"github.com/gorilla/csrf"
 	"encoding/gob"
-    )
+=======
+	"github.com/schoolwheels/safestopclient/middleware"
+
+>>>>>>> 1f1d909be86711526b3d808694eb73008773837b
+)
 
 
 var sessionStore = sessions.NewCookieStore([]byte("Byte my ass 2018!"))
 
 func main() {
 
+<<<<<<< HEAD
 	gob.Register(&controllers.FlashMessage{})
 
 	var BootstrapAlertClass controllers.BootstrapAlertClass = controllers.BootstrapAlertClass{
@@ -43,6 +49,8 @@ func main() {
 	I18n.Default("Default").T("en", "french")
 	fmt.Println("french: ",french)
 
+=======
+>>>>>>> 1f1d909be86711526b3d808694eb73008773837b
 	fmt.Println("~~~~~ SafeStop Client ~~~~~")
 	fmt.Println("SSC_ENV:", os.Getenv("SSC_ENV"))
 

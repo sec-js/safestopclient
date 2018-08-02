@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/schoolwheels/safestopclient/i18n"
 	"github.com/gorilla/csrf"
+	"encoding/json"
 	)
 
 
@@ -22,6 +23,7 @@ type BootstrapAlertClass struct {
 	Light string
 	Dark string
 }
+
 
 type ControllerBase struct {
 	Name string
@@ -53,6 +55,10 @@ func (c *ControllerBase) addTemplateNoNav(name string){
 	c.addTemplate(name, name + ".html", "no_nav.html")
 }
 
+func (c *ControllerBase) addTemplateApp(name string){
+	c.addTemplate(name, name + ".html", "app.html")
+}
+
 func (c *ControllerBase) addTemplate(name string, file string, layout string){
 	if c.Templates == nil {
 		c.Templates = make(map[string]*template.Template)
@@ -61,6 +67,18 @@ func (c *ControllerBase) addTemplate(name string, file string, layout string){
 	funcMap := template.FuncMap{"mod": mod, "n": N, "t": T}
 
 	c.Templates[name] = template.Must(template.New("base.html").Funcs(funcMap).ParseFiles("views/"+c.Name+"/"+file, "views/layouts/"+layout, "views/layouts/base.html"))
+}
+
+func (c *ControllerBase) renderJSON(data interface{}, w http.ResponseWriter) {
+
+	js, err := json.Marshal(data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
 }
 
 func (c *ControllerBase) render(w http.ResponseWriter, r *http.Request, template string, data interface{} ) {

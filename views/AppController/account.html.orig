@@ -1,4 +1,5 @@
 {{define "head"}}
+<<<<<<< HEAD
 <title></title>
 {{end}}
 {{define "body"}}
@@ -251,9 +252,17 @@
     </a>
 {{end}}
 
+
 </ul>
 
 
 
+=======
+
+{{end}}
+{{define "body"}}
+
+Account
+>>>>>>> 1f1d909be86711526b3d808694eb73008773837b
 
 {{end}}

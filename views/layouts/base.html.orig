@@ -42,13 +42,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
+<<<<<<< HEAD
     {{/*<!-- Mustche-->*/}}
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
 
     {{/*<!-- FontAwesome -->*/}}
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+    {{/*<script src="//use.fontawesome.com/6e2d4f5c12.js"></script>*/}}
+    {{/*<script defer src="/javascript/fontawesome/fontawesome-all.js"></script>*/}}
+
+=======
+    {{/*<!-- FontAwesome -->*/}}
     <script src="https://use.fortawesome.com/2b5ad341.js"></script>
     {{/*<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-xyMU7RufUdPGVOZRrc2z2nRWVWBONzqa0NFctWglHmt5q5ukL22+lvHAqhqsIm3h" crossorigin="anonymous">*/}}
     {{/*<script defer src="/javascript/fontawesome/fontawesome-all.js"></script>*/}}
+>>>>>>> 1f1d909be86711526b3d808694eb73008773837b
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 
     {{/*<!-- Bootstrap DateTimePicker & Moment.js -->*/}}
@@ -69,16 +78,21 @@
     <script src="//cdn.jsdelivr.net/sweetalert2/6.4.4/sweetalert2.min.js"></script>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/sweetalert2/6.4.4/sweetalert2.min.css">
 
-    {{/*<!--  Mustache -->*/}}
-    <script src="//cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
-    
-    
+<<<<<<< HEAD
+
     {{/*<!-- FormValidation -->*/}}
     <link rel="stylesheet" href="/stylesheets/formValidation.min.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/es6-shim/0.35.3/es6-shim.min.js"></script>
     <script defer src="/javascript/FormValidation.min.js"></script>
     <script defer src="/javascript/Bootstrap.min.js"></script>
+
+
+
+
+=======
+    {{/*<!--  Mustache -->*/}}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
 
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
@@ -88,6 +102,7 @@
 
     <script src="/javascript/safe_stop_global.js"></script>
     <script src="/javascript/safe_stop_client_global.js"></script>
+>>>>>>> 1f1d909be86711526b3d808694eb73008773837b
 
     {{/*<!-- Stay Standalone -->*/}}
     {{/*<script type="text/javascript">(function(a,b,c){if(c in b&&b[c]){var d,e=a.location,f=/^(a|html)$/i;a.addEventListener("click",function(a){d=a.target;while(!f.test(d.nodeName))d=d.parentNode;"href"in d&&(chref=d.href).replace(e.href,"").indexOf("#")&&(!/^[a-z\+\.\-]+:/i.test(chref)||chref.indexOf(e.protocol+"//"+e.host)===0)&&(a.preventDefault(),e.href=d.href)},!1)}})(document,window.navigator,"standalone");</script>*/}}

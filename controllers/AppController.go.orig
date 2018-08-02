@@ -3,12 +3,12 @@ package controllers
 import (
 	"net/http"
 	"github.com/schoolwheels/safestopclient/models"
+	"github.com/gorilla/mux"
+	"encoding/json"
+	"fmt"
+	"github.com/spf13/viper"
 	"strings"
 	"reflect"
-"github.com/gorilla/mux"
-"encoding/json"
-"fmt"
-	"github.com/spf13/viper"
 )
 
 type AppController struct {
@@ -23,16 +23,26 @@ func (c *AppController) Register() {
 
 
 	//actions
-	c.addRouteWithPrefix("/", c.IndexAction)
-	c.addRouteWithPrefix("/check_availability", c.CheckAvailabilityAction)
-	c.addRouteWithPrefix("/change_locale/{locale}", c.ChangeLocaleAction)
+	c.addRouteWithPrefix("/", c.indexAction)
+	c.addRouteWithPrefix("/check_availability", c.checkAvailabilityAction)
+	c.addRouteWithPrefix("/change_locale/{locale}", c.changeLocaleAction)
 
+	c.addTemplateApp("index")
+
+	//actions
+	c.addRouteWithPrefix("/", c.IndexAction)
+	c.addAction("activate" )
+	c.addAction("account" )
+	c.addAction("faq" )
+	c.addAction("language" )
+	c.addAction("map" )
 
 }
 
 type dashData struct {
 	CurrentUserEmail string
 }
+
 
 func (c *AppController) IndexAction(w http.ResponseWriter, r *http.Request) {
 	session, _ :=  c.SessionStore.Get(r, "auth")
@@ -43,15 +53,22 @@ func (c *AppController) IndexAction(w http.ResponseWriter, r *http.Request) {
 	c.render(w, r, "index", nil)
 }
 
-func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
-	session, _ :=  c.SessionStore.Get(r, "auth")
-	email := session.Values["current_user_email"]
-	if email != nil {
-		http.Redirect(w, r, r.URL.Host+"/dashboard", http.StatusFound)
+func (c *AppController) changeLocaleAction(w http.ResponseWriter, r *http.Request){
+	vars := mux.Vars(r)
+	session, err:= c.SessionStore.Get(r, "auth")
+	session.Values["locale"] = vars["locale"]
+	err = session.Save(r, w)
+
+
+	if err != nil {
+		//http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		//return
 	}
 
-	c.render(w, r, "account", nil)
+
+	http.Redirect(w, r,"/login", http.StatusFound)
 }
+
 
 
 
@@ -61,7 +78,7 @@ type checkAvailabilityData struct {
 	Country string
 }
 
-func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.Request) {
+func (c *AppController) checkAvailabilityAction(w http.ResponseWriter, r *http.Request) {
 
 	if(r.FormValue("format") == "json"){
 		available_jurisdictions := models.JurisdictionOptions{}
@@ -99,6 +116,26 @@ func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.R
 
 
 
+
+
+
+
+
+
+
+
+
+
+func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
+	session, _ :=  c.SessionStore.Get(r, "auth")
+	email := session.Values["current_user_email"]
+	if email != nil {
+		http.Redirect(w, r, r.URL.Host+"/dashboard", http.StatusFound)
+	}
+
+	c.render(w, r, "account", nil)
+}
+
 func (c *AppController) ActivateAction(w http.ResponseWriter, r *http.Request) {
 	session, _ :=  c.SessionStore.Get(r, "auth")
 	email := session.Values["current_user_email"]
@@ -108,23 +145,6 @@ func (c *AppController) ActivateAction(w http.ResponseWriter, r *http.Request) {
 
 	c.render(w, r, "activate", nil)
 }
-
-func (c *AppController) ChangeLocaleAction(w http.ResponseWriter, r *http.Request){
-vars := mux.Vars(r)
-session, err:= c.SessionStore.Get(r, "auth")
-session.Values["locale"] = vars["locale"]
-err = session.Save(r, w)
-
-
-if err != nil {
-//http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
-//return
-}
-
-
-http.Redirect(w, r,"/login", http.StatusFound)
-}
-
 
 func (c *AppController) LanguageAction(w http.ResponseWriter, r *http.Request) {
 	c.render(w, r, "language", nil)
@@ -205,12 +225,11 @@ func structToJson(data interface{}) []byte{
 	} else{
 		return b
 	}
-}
 
 // addAction requires you to have a view named <action>.html and a method func (c *AppController) <Action>Action(http.ResponseWriter, *http.Request)
 func (c *AppController) addAction(action string){
-//TODO: determine if this can be moved to ControllerBase and if c can just be cast to the correct type.
-//fmt.Println(strings.Title(action)+"Action")
-c.addTemplateApp(action)
-c.Router.HandleFunc(c.RoutePrefix+"/"+action, reflect.ValueOf(c).MethodByName(strings.Title(action)+"Action").Interface().(func(http.ResponseWriter, *http.Request)))
+	//TODO: determine if this can be moved to ControllerBase and if c can just be cast to the correct type.
+	//fmt.Println(strings.Title(action)+"Action")
+	c.addTemplateApp(action)
+	c.Router.HandleFunc(c.RoutePrefix+"/"+action, reflect.ValueOf(c).MethodByName(strings.Title(action)+"Action").Interface().(func(http.ResponseWriter, *http.Request)))
 }

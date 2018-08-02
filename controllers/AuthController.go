@@ -73,7 +73,7 @@ func (c *AuthController) loginAction(w http.ResponseWriter, r *http.Request) {
 
 
 
-					
+
 				}
 			} else{
 				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "account_locked", "")), c.ControllerBase.BootstrapAlertClass.Danger)
