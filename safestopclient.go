@@ -11,16 +11,30 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/gorilla/sessions"
 	"github.com/schoolwheels/safestopclient/controllers"
-	"github.com/schoolwheels/safestopclient/middleware"
-
-	"github.com/qor/i18n"
+			"github.com/qor/i18n"
 	"github.com/qor/i18n/backends/yaml"
 	"path/filepath"
+	"github.com/gorilla/csrf"
+	"encoding/gob"
 )
+
 
 var sessionStore = sessions.NewCookieStore([]byte("Byte my ass 2018!"))
 
 func main() {
+
+	gob.Register(&controllers.FlashMessage{})
+
+	var BootstrapAlertClass controllers.BootstrapAlertClass = controllers.BootstrapAlertClass{
+		Primary: "primary",
+		Secondary: "secondary",
+		Success: "success",
+		Danger: "danger",
+		Warning: "warning",
+		Info: "info",
+		Light: "light",
+		Dark: "dark",
+	}
 
 	I18n := i18n.New(
 		yaml.New(filepath.Join("./config/locales")), // load translations from the YAML files in directory `config/locales`
@@ -32,6 +46,7 @@ func main() {
 	fmt.Println("~~~~~ SafeStop Client ~~~~~")
 	fmt.Println("SSC_ENV:", os.Getenv("SSC_ENV"))
 
+
 	viper.SetEnvPrefix("SSC")
 	viper.AutomaticEnv()
 	viper.SetConfigName("config")       // name of config file (without extension)
@@ -40,6 +55,10 @@ func main() {
 	if err != nil { // Handle errors reading the config file
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
+
+
+	fmt.Println(viper.GetString("db_host"))
+
 
 	//sessions setup
 	if viper.GetString("env") == "development" {
@@ -69,19 +88,24 @@ func main() {
 
 	//controllers
 	//todo: possibly handle registration from package init methods in each controller's go file
-	AuthController := controllers.AuthController{&controllers.ControllerBase{Name: "AuthController", Templates: make(map[string]*template.Template), Router: r, SessionStore: sessionStore}}
+	AuthController := controllers.AuthController{&controllers.ControllerBase{Name: "AuthController", Templates: make(map[string]*template.Template), Router: r, SessionStore: sessionStore, BootstrapAlertClass: &BootstrapAlertClass}}
 	AuthController.Register()
 
-	AppController := controllers.AppController{&controllers.ControllerBase{Name: "AppController", Templates: make(map[string]*template.Template), Router: r, SessionStore: sessionStore}}
+	AppController := controllers.AppController{&controllers.ControllerBase{Name: "AppController", Templates: make(map[string]*template.Template), Router: r, SessionStore: sessionStore, BootstrapAlertClass: &BootstrapAlertClass}}
 	AppController.Register()
 
 	http.Handle("/", r)
 	log.Println("Listening...")
 	if viper.GetString("env") == "development" {
-		log.Fatal(http.ListenAndServe(":8080", middleware.RequestLogger(r)))
+		//log.Fatal(http.ListenAndServe(":8080", middleware.RequestLogger(r)))
+
+
+		log.Fatal(http.ListenAndServe(":8080", csrf.Protect([]byte("32-byte-long-auth-key"), csrf.Secure(false))(r)))
+
+		//csrf.Protect([]byte("32-byte-long-auth-key"))(r)
 	} else {
 		// redirect every http request to https
-		go http.ListenAndServe(":8080", http.HandlerFunc(redirect))
+		go http.ListenAndServe(":8080", http.HandlerFunc(redirect), )
 		//log.Fatal(http.ListenAndServeTLS(":8443", "certs/safestopapp.com.pem", "certs/safestopapp.com-key.pem", middleware.RequestLogger(r)))
 	}
 }

@@ -5,15 +5,15 @@
     <go_parameters value="-i" />
     <envs>
       <env name="SSC_ENV" value="development" />
-      <env name="SAFE_STOP_DOMAIN" value="safestopapp.com" />
-      <env name="SAFE_STOP_SUPPORT_NUMBER" value="1-800-843-8936" />
+      <env name="SSC_DOMAIN" value="ssc.local" />
+      <env name="SSC_SUPPORT_NUMBER" value="1-800-843-8936" />
     </envs>
     <kind value="FILE" />
     <filePath value="$PROJECT_DIR$/safestopclient.go" />
     <package value="github.com/schoolwheels/safestopclient" />
     <directory value="$PROJECT_DIR$/" />
-    <method>
-      <option name="LaunchBrowser.Before.Run" url="http://localhost:8080" />
+    <method v="2">
+      <option name="LaunchBrowser.Before.Run" url="http://ssc.local:8080" />
     </method>
   </configuration>
 </component>

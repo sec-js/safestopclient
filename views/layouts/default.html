@@ -3,10 +3,27 @@
 <html>
 <head>
     {{template "base-head" .}}
-    <link rel="stylesheet" href="/stylesheets/default-layout.css" type="text/css" />
+        <link rel="stylesheet" href="/stylesheets/app.css" type="text/css" />
+        <link rel="stylesheet" href="/stylesheets/default-layout.css" type="text/css" />
+
+
+
+        <script type="text/javascript" src="/javascript/global.js"></script>
+
     {{template "head" .}}
 </head>
 <body>
+
+{{range .FlashMessages.FlashMessages}}
+
+<div class="alert alert-{{.BootstrapClass}}" role="alert">
+{{.Message}}
+</div>
+
+{{end}}
+
+
+
 <div id='wrap'>
 {{template "body" .}}
 </div>

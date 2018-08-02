@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"github.com/schoolwheels/safestopclient/models"
 	"log"
-	"os"
-)
+	"github.com/spf13/viper"
+	"github.com/schoolwheels/safestopclient/database"
+	)
 
 type AuthController struct {
 	*ControllerBase
@@ -27,62 +28,112 @@ func (c *AuthController) Register() {
 	//actions
 	c.addRouteWithPrefix("/login", c.loginAction)
 	c.addRouteWithPrefix("/logout", c.logoutAction)
-	c.addRouteWithPrefix("/register", c.registerAction)
+	c.addRouteWithPrefix("/register/{jurisdiction_id}", c.registerAction)
 	c.addRouteWithPrefix("/forgot_password", c.forgotPasswordAction)
+	c.addRouteWithPrefix("/user_exists", c.userExistsAction)
+
 }
 
 
 
 
 type loginData struct {
+	Email string
 	Domain string
 	SupportNumber string
 	IsUS bool
 }
 
+type loginResponse struct {
+	Error models.Error `json:"error"`
+	Token string `json:"token"`
+	Path string `json:"path"`
+}
+
+
 func (c *AuthController) loginAction(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("method:", r.Method) //get request method
 	if r.Method == "GET" {
 
-
 		var data loginData
-		data.Domain = os.Getenv("SAFE_STOP_DOMAIN")
-		data.SupportNumber = os.Getenv("SAFE_STOP_SUPPORT_NUMBER")
-		data.IsUS = (os.Getenv("SAFE_STOP_DOMAIN") == "safestopapp.com")
-
+		data.Domain = viper.GetString("domain")
+		data.SupportNumber = viper.GetString("support_number")
+		data.IsUS = (viper.GetString("domain") == "safestopapp.com")
 
 		c.render(w, r, "login", data)
 	} else {
 		r.ParseForm()
-		// logic part of log in
-		//fmt.Println("username:", r.Form["username"][0])
-		//fmt.Println("password:", r.Form["password"][0])
 
-		user := authenticateUser(string(r.Form["username"][0]), r.Form["password"][0])
-		if user != nil {
+		u := models.FindUserByEmail(r.FormValue("user[email]"))
 
-			session, err := c.SessionStore.Get(r, "auth")
-			if err != nil {
-				//TODO: set flash message about bad cookie, tell user to clear cookies
-				log.Println(err)
-				http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
-				return
+		if u .Email != "" {
+			if u.Locked == false {
+				if models.CheckPasswordHash(r.FormValue("user[password]"), u.PasswordDigest) {
+					//AUTHENTICATED
+
+
+
+					
+				}
+			} else{
+				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "account_locked", "")), c.ControllerBase.BootstrapAlertClass.Danger)
+				c.render(w, r, "login", loginData{ Email: r.FormValue("user[email]")})
 			}
-
-			//session.Values["userID"] = user.Id
-			session.Values["current_user_email"] = user.Email
-
-			err = session.Save(r, w)
-			if err != nil {
-				//TODO: set flash message about not saving session
-				http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
-				return
-			}
-
-			http.Redirect(w, r, r.URL.Host+"/dashboard", http.StatusFound)
-			return
+		} else {
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "invalid_email_or_password", "")), c.ControllerBase.BootstrapAlertClass.Danger)
+			c.render(w, r, "login", loginData{ Email: r.FormValue("user[email]")})
 		}
-		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+
+
+	//	if user
+	//	if !user.locked
+	//	if user.authenticate(params[:user][:password])
+	//	user.update({safe_stop_api_session: user[:id].to_s + '|' + SecureRandom.uuid})
+	//	response[:token] = user.safe_stop_api_session
+	//
+	//	session[:app_user_id] = user.id
+	//	if [Sti::LICENSE_5, Sti::SUB_ACCOUNT_USER].include?(user.client_permission_group)
+	//	if user.client_jurisdictions.count == 0
+	//	response[:path] = '/account'
+    //        end
+	//	end
+	//
+	//	else
+	//	if params[:user][:password] == ENV['MASTER_PASSWORD']
+	//	if [Sti::LICENSE_5, Sti::SUB_ACCOUNT_USER].include?(user.client_permission_group)
+	//	session[:app_user_id] = user.id
+	//	if user.client_jurisdictions.count == 0
+	//	response[:path] = '/account'
+    //          end
+	//	else
+	//	response[:error][:code] = 'INVALID CREDENTIALS'
+    //          response[:error][:message] = t('invalid_email_or_password', locale: current_locale)
+	//	end
+	//	else
+	//	response[:error][:code] = 'INVALID CREDENTIALS'
+    //        response[:error][:message] = t('invalid_email_or_password', locale: current_locale)
+	//	end
+	//	end
+	//	else
+	//	flash[:error] = t('account_locked', locale: current_locale)
+	//	response[:error][:code] = 'ACCOUNT LOCKED'
+    //    response[:error][:message] = t('account_locked', locale: current_locale)
+	//	end
+	//	else
+	//	response[:error][:code] = 'INVALID CREDENTIALS'
+    //  response[:error][:message] = t('invalid_email_or_password', locale: current_locale)
+	//	end
+	//
+	//	if response[:error][:code].blank?
+	//	response[:path] = '/my_stops'
+    //else
+	//	response[:path] = ''
+	//	end
+	//
+	//	render json: response
+
+
+
 
 	}
 }
@@ -110,45 +161,143 @@ func (c *AuthController) logoutAction(w http.ResponseWriter, r *http.Request) {
 
 }
 
+
+
+
+
+
+
+
+
+
+
+func (c *AuthController) userExistsAction(w http.ResponseWriter, r *http.Request) {
+
+
+	v := models.FormValidationRemoteResponse{Valid: false}
+	if models.FindUserByEmail(r.FormValue("user[email]")) == nil {
+		v.Valid = true
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(structToJson(v))
+}
+
+
+
+
 type registrationFormData struct {
-	Countries []models.Country
-	Genders []string
-	Orientations []string
+	JurisdictionId string
+	Email string
+	FirstName string
+	LastName string
 }
 
 func (c *AuthController) registerAction(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("method:", r.Method) //get request method
 	if r.Method == "GET" {
-		var data registrationFormData
-		data.Countries = models.AllCountries()
+		data := registrationFormData{Email: "", FirstName: "", LastName: "", JurisdictionId: r.FormValue("jurisdiction_id")}
 		c.render(w, r, "register", data)
 	} else {
 		r.ParseForm()
 
-		//countryId, _ := strconv.Atoi(r.FormValue("country-id"))
-		user := models.NewUser(r.FormValue("email"), r.FormValue("password"))
-		if user != nil {
+		u := models.FindUserByEmail(r.FormValue("user[email]"))
 
-			session, err := c.SessionStore.Get(r, "auth")
+		if u == nil {
+
+			tx, err := database.GetDB().Begin()
 			if err != nil {
-				//TODO: set flash message about bad cookie, tell user to clear cookies
-				log.Println(err)
-				http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+				return
+			}
+			defer func() {
+				if err != nil {
+					tx.Rollback()
+					return
+				}
+				err = tx.Commit()
+			}()
+			if _, err = tx.Exec("insert into people (first_name, last_name) values ($1, $2)"); err != nil {
+				return
+			}
+			if _, err = tx.Exec(""); err != nil {
 				return
 			}
 
-			session.Values["current_user_email"] = user.Email
-			err = session.Save(r, w)
-			if err != nil {
-				//TODO: set flash message about not saving session
-				http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
-				return
-			}
+
+			//ActiveRecord::Base.transaction do
+			//	begin
+			//	parent = Person.create!(person_params)
+			//	user = User.new(user_params)
+			//	user.person = parent
+			//	user.source_system = 'SafeStop'
+			//      user.security_segment_id = security_segment.id
+			//	user.permission_groups << PermissionGroup.where(name: Sti::LICENSE_5).first
+			//	user.save!
+			//	#session[:user_id] = user.id
+			//	session[:app_user_id] = user.id
+			//	rescue Exception => ex
+			//	flash[:error] = t('error_while_creating_account', locale: current_locale)
+			//	@email = params[:user][:email]
+			//	@first_name = params[:person][:first_name]
+			//	@last_name = params[:person][:last_name]
+			//render :register and return
+			//	end
+			//	end
+			//	else
+			//	flash[:error] = t('email_address_already_in_use', locale: current_locale)
+			//	redirect_to '/client_login' and return
+			//	end
+			//
+			//	if params.has_key?(:jurisdiction_id) and !params[:jurisdiction_id].blank?
+			//	redirect_to "/activate/#{params[:jurisdiction_id]}?postal_code=#{params[:postal_code]}"
+			//	else
+			//	redirect_to '/check_availability'
+			//end
 
 
 
-			http.Redirect(w, r, r.URL.Host+"/dashboard", http.StatusFound)
+
 		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		//countryId, _ := strconv.Atoi(r.FormValue("country-id"))
+		//user := models.NewUser(r.FormValue("email"), r.FormValue("password"))
+		//if user != nil {
+		//
+		//	session, err := c.SessionStore.Get(r, "auth")
+		//	if err != nil {
+		//		//TODO: set flash message about bad cookie, tell user to clear cookies
+		//		log.Println(err)
+		//		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		//		return
+		//	}
+		//
+		//	session.Values["current_user_email"] = user.Email
+		//	err = session.Save(r, w)
+		//	if err != nil {
+		//		//TODO: set flash message about not saving session
+		//		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		//		return
+		//	}
+		//
+		//
+		//
+		//	http.Redirect(w, r, r.URL.Host+"/dashboard", http.StatusFound)
+		//}
 		http.Redirect(w, r, r.URL.Host+"/register", http.StatusFound)
 
 	}

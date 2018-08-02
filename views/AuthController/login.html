@@ -1,64 +1,66 @@
 {{define "head"}}
-    <style>
-        
-        .logo{
-            width: 238px;
-            height: 44px;
-        }
 
-    </style>
-    <title></title>
+
+
+<title></title>
+
+
+<link rel="stylesheet" href="/stylesheets/login.css" type="text/css" />
+
+
 {{end}}
 {{define "body"}}
 
-
-
-<div class="container-fluid">
+<div class="container-fluid login" align="center">
     <div class="row">
-        <div class="col-sm" align="center">
-            <img class="logo" src="/images/safe_stop_logo.png">
+        <div class="col-sm">
+            <img id="logo" src="/images/safe_stop_logo.png">
         </div>
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <div class="lead" align="center">
+            <div class="lead">
                 Please sign in
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4 offset-md-4">
+        <div class="col-sm">
+            <form method="post" action="/login">
+
+            {{ .CSRFTemplateField}}
+
             <div class="form-group">
-                <input id="email" class="form-control" name="user[email]" type="text" placeholder="<%= t('email', locale: current_locale) %>">
+                <input id="email" class="form-control" name="user[email]" type="text" placeholder="{{ t .CurrentLocale "email" "Email" }}" value="{{ .ViewData.Email }}">
             </div>
             <div class="form-group">
-                <input class="form-control" name="user[password]" type="password" placeholder="<%= t('password_case_sensitive', locale: current_locale) %>">
+                <input class="form-control" name="user[password]" type="password" placeholder="{{ t .CurrentLocale "password_case_sensitive" "" }}">
             </div>
             <div class="form-group">
-                <button class="btn btn-safestop btn-block" type="submit"><%= t('sign_in', locale: current_locale) %></button>
+                <button id="login-button" class="btn btn-safe-stop btn-block" type="submit">{{ t .CurrentLocale "sign_in" "" }}</button>
             </div>
+            </form>
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-12" align="center">
-            <a href="/check_availability" class="btn btn-default btn-block"><%= t('create_an_account', locale: current_locale) %></a>
+        <div class="col-sm-12">
+            <a href="/check_availability" class="btn btn-default btn-block">{{ t .CurrentLocale "create_an_account" "" }}</a>
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-12" align="center" style="padding-top: 15px;">
-            <a href="/forgot_password?out_action=web"><%= t('forgot_password', locale: current_locale) %></a>
+        <div class="col-sm-12" style="padding-top: 20px;">
+            <a id="forgot-password" href="/forgot_password?out_action=web">{{ t .CurrentLocale "forgot_password" "" }}</a>
         </div>
     </div>
 
 
     {{if .ViewData.IsUS}}
-            IS USdfdfd
 
         <div class="row">
             <div class="col-sm text-center" style="padding-top: 30px;">
           <span id="login_help_number">
-          <%= t('ss_client_login_5', locale: current_locale) %>
-          <a href="tel://{{ .ViewData.SupportNumber }}" class='text'>{{ .ViewData.SupportNumber }}</a>
+              {{ t .CurrentLocale "ss_client_login_5" "" }}
+              <a href="tel://{{ .ViewData.SupportNumber }}" class='text'>{{ .ViewData.SupportNumber }}</a>
           </span>
             </div>
         </div>
@@ -70,29 +72,28 @@
     <div class="row">
         <div class="col-md-12 text-center">
   <span id="login_help_number">
-<% if ENV['SS_DOMAIN'] == 'safestopapp.com' %>
-    <%= t('ss_client_login_6', locale: current_locale) %>
 
-    <% else %>
-            <%= t('ss_client_login_6_ca', locale: current_locale) %>
-    <% end %>
+    {{if .ViewData.IsUS}}
+        {{ t .CurrentLocale "ss_client_login_6" "" }}
+    {{else}}
+        {{ t .CurrentLocale "ss_client_login_6_ca" "" }}
+    {{end}}
+
     <a href='mailto:support@{{ .ViewData.Domain}}'>support@{{ .ViewData.Domain }}</a>
   </span>
         </div>
     </div>
 
     <div class="row" id="add-to-home-screen" style="display: none; text-align: center; padding-top: 10px;">
-        <%= t('ss_client_login_7', locale: current_locale) %>
+        {{ t .CurrentLocale "ss_client_login_7" "" }}
     </div>
 </div>
 
-
-
-
-
-
-
-
-
+<script type="text/javascript">
+    var screen_height = window.innerHeight;
+    var form_height = $(".login").height();
+    $(".login").css('margin-top', ((screen_height / 2) - (form_height / 1.5)) + 'px');
+</script>
 
 {{end}}
+

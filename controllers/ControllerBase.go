@@ -7,7 +7,21 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/schoolwheels/safestopclient/i18n"
-)
+	"github.com/gorilla/csrf"
+	)
+
+
+
+type BootstrapAlertClass struct {
+	Primary string
+	Secondary string
+	Success string
+	Danger string
+	Warning string
+	Info string
+	Light string
+	Dark string
+}
 
 type ControllerBase struct {
 	Name string
@@ -15,7 +29,10 @@ type ControllerBase struct {
 	Templates map[string]*template.Template
 	Router *mux.Router
 	SessionStore *sessions.CookieStore
+	BootstrapAlertClass *BootstrapAlertClass
 }
+
+
 
 func funcName() string {
 	pc, _, _, _ := runtime.Caller(1)
@@ -54,6 +71,9 @@ func T(locale string, key string, value string, args ...interface{}) template.HT
 	return i18n.GetI18n().Default(value).T(locale, key, args...)
 }
 
+
+
+
 func mod(i, j int) bool {
 	return i%j == 0
 }
@@ -73,6 +93,27 @@ type CurrentUser struct {
 	Email string
 }
 
+
+
+
+type FlashMessages struct {
+	FlashMessages []FlashMessage
+}
+
+type FlashMessage struct {
+	Message string
+	BootstrapClass string
+}
+
+//append session data
+type ViewModel struct {
+	FlashMessages FlashMessages
+	CurrentUser CurrentUser
+	CurrentLocale string
+	CSRFTemplateField template.HTML
+	ViewData interface{}
+}
+
 func (c *ControllerBase) renderTemplate(w http.ResponseWriter, r *http.Request, name string, template_name string, viewModel interface{}) {
 
 	var currentUser CurrentUser
@@ -81,15 +122,14 @@ func (c *ControllerBase) renderTemplate(w http.ResponseWriter, r *http.Request, 
 		currentUser = CurrentUser {Email: session.Values["current_user_email"].(string)}
 	}
 
-	//append session data
-	type ViewModel struct {
-		CurrentUser CurrentUser
-		ViewData interface{}
-	}
 	var data = ViewModel{
 		CurrentUser:  currentUser,
+		CurrentLocale: currentLocale(c,r),
 		ViewData: viewModel,
+		CSRFTemplateField: csrf.TemplateField(r),
 	}
+	getFlash(c,r, w, &data)
+
 
 	// Ensure the template exists in the map.
 	tmpl, ok := c.Templates[name]
@@ -103,3 +143,33 @@ func (c *ControllerBase) renderTemplate(w http.ResponseWriter, r *http.Request, 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
+func currentLocale(c *ControllerBase, r *http.Request) string {
+	session, _ :=  c.SessionStore.Get(r, "auth")
+	locale := session.Values["locale"]
+	if(locale == nil || locale == ""){
+		locale = "en"
+	}
+	return locale.(string)
+}
+
+func setFlash(c *ControllerBase, r *http.Request, w http.ResponseWriter, message string , bootstrap_class string ){
+	session, _ :=  c.SessionStore.Get(r, "flash")
+	f := FlashMessage{ Message: message, BootstrapClass: bootstrap_class }
+	session.AddFlash(f, "message")
+	session.Save(r, w)
+}
+
+func getFlash(c *ControllerBase, r *http.Request, w http.ResponseWriter, data *ViewModel){
+	session, _ :=  c.SessionStore.Get(r, "flash")
+	data.FlashMessages.FlashMessages = []FlashMessage{}
+	messages := session.Flashes("message");
+	if len(messages) > 0 {
+		for i := 0; i < len(messages); i++ {
+			data.FlashMessages.FlashMessages = append(data.FlashMessages.FlashMessages, messages[i].(FlashMessage))
+		}
+	}
+	session.Save(r, w)
+}
+
+

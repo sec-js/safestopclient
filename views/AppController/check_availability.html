@@ -1,0 +1,204 @@
+{{define "head"}}
+<title></title>
+{{end}}
+{{define "body"}}
+
+
+<script id="check-availability-result-template" type="text/html">
+    {|#jurisdictions|}
+    {|#auth_info.token_valid|}
+    <a href="/activate/{|id|}" class="list-group-item">
+        <table class="list-nav-item-table">
+            <tr>
+                <td><span style="color: #555555;" class="title">{|name|}</span></td>
+                <td><i class="nav-arrow fa fa-angle-right" aria-hidden="true"></i></td>
+            </tr>
+        </table>
+    </a>
+    {|/auth_info.token_valid|}
+    {|^auth_info.token_valid|}
+    <a href="/register/{|id|}" class="list-group-item">
+        <table class="list-nav-item-table">
+            <tr>
+                <td><span style="color: #555555;" class="title">{|name|}</span></td>
+                <td><i class="nav-arrow fa fa-angle-right" aria-hidden="true"></i></td>
+            </tr>
+        </table>
+    </a>
+    {|/auth_info.token_valid|}
+    {|/jurisdictions|}
+</script>
+
+
+<script id="cant-find-my-school-template" type="text/html">
+    <a style="font-weight: bold;" href="/get_safe_stop_in_your_school/{|postal_code|}" class="list-group-item">
+        <table class="list-nav-item-table">
+            <tr>
+                <td><span class="title" style="font-weight: bold; color:#555555;">{{ t .CurrentLocale "ss_check_availability_2" "" }}</span></td>
+                <td><i class="nav-arrow fa fa-angle-right" aria-hidden="true"></i></td>
+            </tr>
+        </table>
+    </a>
+</script>
+
+
+
+<div class="container-fluid">
+    <div class=" row">
+        <div class="col h3" align="center" style="color: var(--safe-stop-red);">
+         {{ t .CurrentLocale "check_availability" "" }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col lead" align="center">
+        {{ t .CurrentLocale "ss_check_availability_partial_2" "" }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+        </div>
+    </div>
+
+
+    <form id="check-availability-form">
+
+
+        <div class="form-group">
+            <input id="postal_code" type="text" class="form-control" name="postal_code" />
+        </div>
+
+
+    {{/*<div class="form-group">*/}}
+    {{/*<input id="postal-code" autocomplete="false" class="form-control" name="postal_code" type="text" placeholder="{{ t .CurrentLocale "zip_code" "" }}" value="{{ .ViewData.PostalCode }}">*/}}
+    {{/*</div>*/}}
+        <div class="form-group row">
+            <table style="width: 100%;" class="list-table">
+                <tr>
+                    <td style="width: 50%;">
+                        <a href="/account" class="btn btn-default btn-block no-right-radius">{{ t .CurrentLocale "cancel" "" }}</a>
+                    </td>
+                    <td style="width: 50%;">
+                        <button id="check-availability-button" type="submit" class="btn btn-safe-stop btn-block no-left-radius">{{ t .CurrentLocale "submit" "" }}</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+
+
+    <div class="row">
+        <div class="col">
+            <ul class="list-group" id="check-availability-results">
+
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    var result_template = $("#check-availability-result-template").html();
+    Mustache.parse(result_template);
+
+    var cant_find_my_school_template = $("#cant-find-my-school-template").html();
+    Mustache.parse(cant_find_my_school_template);
+
+
+
+$(document).ready(function () {
+
+    FormValidation.formValidation(document.getElementById("check-availability-form"),
+            {
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger(),
+                    submitButton: new FormValidation.plugins.SubmitButton(),
+                    defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+                    bootstrap: new FormValidation.plugins.Bootstrap(),
+                    icon: new FormValidation.plugins.Icon({
+                        valid: 'fa fa-check',
+                        invalid: 'fa fa-times',
+                        validating: 'fa fa-refresh',
+                    }),
+                },
+                fields: {
+                    'postal_code': {
+                        validators: {
+                            notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'},
+                            zipCode: {country: '{{ .ViewData.Country }}', message: "{{ t .CurrentLocale "invalid_zip_code" "" }}"}
+                        }
+                    }
+                }
+            }
+    )
+
+    {{/*$('#check-availability-form').formValidation({*/}}
+        {{/*framework: 'bootstrap',*/}}
+        {{/*feedbackIcons: {*/}}
+            {{/*valid: 'glyphicon glyphicon-ok',*/}}
+            {{/*invalid: 'glyphicon glyphicon-remove',*/}}
+            {{/*validating: 'glyphicon glyphicon-refresh'*/}}
+        {{/*},*/}}
+        {{/*fields: {*/}}
+            {{/*'postal_code': {*/}}
+                {{/*validators: {*/}}
+                    {{/*notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'},*/}}
+                    {{/*zipCode: {country: '{{ .ViewData.Country }}', message: "{{ t .CurrentLocale "invalid_zip_code" "" }}"}*/}}
+                {{/*}*/}}
+            {{/*}*/}}
+        {{/*}*/}}
+    {{/*})*/}}
+
+    $("#check-availability-button").click(function (e) {
+        e.preventDefault();
+        $("#check-availability-results").empty();
+        $("#check-availability-button").prop('disabled', true);
+
+        // $('#check-availability-form').data('formValidation').validate();
+        // if ($('#check-availability-form').data('formValidation').isValid()) {
+
+            safe_stop_get("/check_availability",
+                    {
+                        format: "json",
+                        postal_code: $("#postal-code").val()
+                    },
+                    check_availability_success,
+                    check_availability_fail);
+        // }
+    });
+
+    if($("#postal-code").val() && $("#postal-code").val().length > 0){
+        $("#check-availability-button").trigger('click');
+    }
+
+});
+
+function check_availability_success(response){
+    $("#check-availability-button").prop('disabled', false);
+    if(response.jurisdictions && response.jurisdictions.length > 0){
+        $("#check-availability-results").append(Mustache.render(result_template, response));
+    }
+    else{
+        $("#check-availability-results").append(Mustache.render(cant_find_my_school_template, response));
+    }
+}
+
+function check_availability_fail(response){
+    $("#check-availability-button").prop('disabled', false);
+}
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+{{end}}

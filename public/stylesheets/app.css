@@ -1,0 +1,29 @@
+
+:root{
+    --safe-stop-red: #A12130;
+    --safe-stop-red-hover: #872131;
+}
+
+.btn-safe-stop{
+    color: #ffffff;
+    background-color: var(--safe-stop-red);
+    border-color: var(--safe-stop-red);
+}
+
+.btn-safe-stop:hover, .btn-safestop:focus{
+    background-color: var(--safe-stop-red-hover);
+    border-color: var(--safe-stop-red-hover);
+}
+
+.btn-default {
+    color: #333 !important;
+    background-color: #fff !important;
+    border-color: #ccc !important;
+}
+
+.btn-default:hover {
+    color:#333 !important;
+    background-color:#e6e6e6 !important;
+    border-color:#adadad !important;
+}
+
