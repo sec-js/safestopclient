@@ -18,7 +18,7 @@ type AppController struct {
 func (c *AppController) Register() {
 
 	//templates
-	c.addTemplate("index", "index.html", "default.html")
+	c.addTemplate("index", "index.html", "app.html")
 	c.addTemplate("check_availability", "check_availability.html", "default.html")
 
 	//actions
@@ -60,7 +60,7 @@ type checkAvailabilityData struct {
 
 func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.Request) {
 
-	if(r.FormValue("format") == "json"){
+	if r.FormValue("format") == "json" {
 		available_jurisdictions := models.JurisdictionOptions{}
 		available_jurisdictions.AuthInfo = validateToken(r.FormValue("token"))
 		available_jurisdictions.AuthInfo.RedirectToLogin = false
