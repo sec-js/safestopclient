@@ -63,7 +63,7 @@ type checkAvailabilityData struct {
 
 func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.Request) {
 
-	if(r.FormValue("format") == "json"){
+	if r.FormValue("format") == "json" {
 		available_jurisdictions := models.JurisdictionOptions{}
 		available_jurisdictions.AuthInfo = validateToken(r.FormValue("token"))
 		available_jurisdictions.AuthInfo.RedirectToLogin = false
@@ -209,8 +209,8 @@ func structToJson(data interface{}) []byte{
 
 // addAction requires you to have a view named <action>.html and a method func (c *AppController) <Action>Action(http.ResponseWriter, *http.Request)
 func (c *AppController) addAction(action string){
-//TODO: determine if this can be moved to ControllerBase and if c can just be cast to the correct type.
-//fmt.Println(strings.Title(action)+"Action")
-c.addTemplateApp(action)
-c.Router.HandleFunc(c.RoutePrefix+"/"+action, reflect.ValueOf(c).MethodByName(strings.Title(action)+"Action").Interface().(func(http.ResponseWriter, *http.Request)))
+	//TODO: determine if this can be moved to ControllerBase and if c can just be cast to the correct type.
+	//fmt.Println(strings.Title(action)+"Action")
+	c.addTemplateApp(action)
+	c.Router.HandleFunc(c.RoutePrefix+"/"+action, reflect.ValueOf(c).MethodByName(strings.Title(action)+"Action").Interface().(func(http.ResponseWriter, *http.Request)))
 }
