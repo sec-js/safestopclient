@@ -22,10 +22,21 @@ type User struct {
 	Id	int `json:"id" db:"id"`
 	Email          string `json:"email" db:"email"`
 	PasswordDigest string `json:"password_digest" db:"password_digest"`
+	SuperAdmin bool `json:"super_admin" db:"super_admin"`
+	PermissionGroups string `json:"permission_groups" db:"permission_groups"`
 	//PasswordResetKey string `json:"password_reset_key" db:"password_reset_key"'`
 	Locked bool `json:"locked" db:"locked"`
 	//Superadmin bool `json:"superadmin" db:"superadmin"`
 	//CreatedAt time.Time `json:"created_at" db:"created_at"`
+}
+
+func UpdateApiToken(user_id int, token string) bool{
+	query := "update users set api_token = $1 where id = $2;"
+	_, err := database.GetDB().Exec(query, token, user_id)
+	if err != nil {
+		return false
+	}
+	return true
 }
 
 //func NewUser(email string, password string) *User {
@@ -55,6 +66,9 @@ func FindUser(id int) *User {
 	}
 }
 
+
+
+
 func FindUserByEmail(email string) *User {
 	email = strings.Trim(email, " ")
 	email = strings.ToLower(email)
@@ -63,10 +77,18 @@ func FindUserByEmail(email string) *User {
 select id, 
 email, 
 password_digest, 
-locked  
+locked,
+super_admin,
+(select array_to_string(array_agg(a.name), ',') as permission_groups
+from permission_groups a 
+join permission_groups_users b on b.permission_group_id = a.id 
+and b.user_id = id 
+and a.security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1))
 from users 
 where lower(email) = $1
-and security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1);
+and (security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1)
+or super_admin = true)
+limit 1
 `
 	row := database.GetDB().QueryRowx(query, email)
 	if row == nil {
@@ -80,6 +102,9 @@ and security_segment_id = (select id from security_segments where name = 'SafeSt
 		return &u
 	}
 }
+
+
+
 
 func FindUserByToken(token string) *ClientUser {
 	if(token == ""){

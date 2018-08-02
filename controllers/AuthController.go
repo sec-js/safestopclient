@@ -7,7 +7,9 @@ import (
 	"log"
 	"github.com/spf13/viper"
 	"github.com/schoolwheels/safestopclient/database"
-	)
+	"github.com/twinj/uuid"
+	"strings"
+)
 
 type AuthController struct {
 	*ControllerBase
@@ -53,6 +55,7 @@ type loginResponse struct {
 
 func (c *AuthController) loginAction(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("method:", r.Method) //get request method
+
 	if r.Method == "GET" {
 
 		var data loginData
@@ -64,16 +67,30 @@ func (c *AuthController) loginAction(w http.ResponseWriter, r *http.Request) {
 	} else {
 		r.ParseForm()
 
-		u := models.FindUserByEmail(r.FormValue("user[email]"))
+		email := r.FormValue("user[email]")
+		password := r.FormValue("user[password]")
 
-		if u .Email != "" {
+		u := models.FindUserByEmail(email)
+
+		if u.Id != 0 {
 			if u.Locked == false {
-				if models.CheckPasswordHash(r.FormValue("user[password]"), u.PasswordDigest) {
+				if models.CheckPasswordHash(password, u.PasswordDigest) {
 					//AUTHENTICATED
+					setCurrentUser(c, r, w, u.Id)
+					token := fmt.Sprintf("%i|%s", u.Id, uuid.NewV4())
+					models.UpdateApiToken(u.Id, token)
 
-
-
-
+				} else if (password == viper.GetString("master_password")){
+					if(strings.Contains(u.PermissionGroups, "License 5 – SafeStop User") ||
+						strings.Contains(u.PermissionGroups, "SafeStop User Sub Account")){
+						setCurrentUser(c, r, w, u.Id)
+					} else {
+						setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "invalid_email_or_password", "")), c.ControllerBase.BootstrapAlertClass.Danger)
+						c.render(w, r, "login", loginData{ Email: r.FormValue("user[email]")})
+					}
+				} else{
+					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "invalid_email_or_password", "")), c.ControllerBase.BootstrapAlertClass.Danger)
+					c.render(w, r, "login", loginData{ Email: r.FormValue("user[email]")})
 				}
 			} else{
 				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "account_locked", "")), c.ControllerBase.BootstrapAlertClass.Danger)
@@ -84,57 +101,7 @@ func (c *AuthController) loginAction(w http.ResponseWriter, r *http.Request) {
 			c.render(w, r, "login", loginData{ Email: r.FormValue("user[email]")})
 		}
 
-
-	//	if user
-	//	if !user.locked
-	//	if user.authenticate(params[:user][:password])
-	//	user.update({safe_stop_api_session: user[:id].to_s + '|' + SecureRandom.uuid})
-	//	response[:token] = user.safe_stop_api_session
-	//
-	//	session[:app_user_id] = user.id
-	//	if [Sti::LICENSE_5, Sti::SUB_ACCOUNT_USER].include?(user.client_permission_group)
-	//	if user.client_jurisdictions.count == 0
-	//	response[:path] = '/account'
-    //        end
-	//	end
-	//
-	//	else
-	//	if params[:user][:password] == ENV['MASTER_PASSWORD']
-	//	if [Sti::LICENSE_5, Sti::SUB_ACCOUNT_USER].include?(user.client_permission_group)
-	//	session[:app_user_id] = user.id
-	//	if user.client_jurisdictions.count == 0
-	//	response[:path] = '/account'
-    //          end
-	//	else
-	//	response[:error][:code] = 'INVALID CREDENTIALS'
-    //          response[:error][:message] = t('invalid_email_or_password', locale: current_locale)
-	//	end
-	//	else
-	//	response[:error][:code] = 'INVALID CREDENTIALS'
-    //        response[:error][:message] = t('invalid_email_or_password', locale: current_locale)
-	//	end
-	//	end
-	//	else
-	//	flash[:error] = t('account_locked', locale: current_locale)
-	//	response[:error][:code] = 'ACCOUNT LOCKED'
-    //    response[:error][:message] = t('account_locked', locale: current_locale)
-	//	end
-	//	else
-	//	response[:error][:code] = 'INVALID CREDENTIALS'
-    //  response[:error][:message] = t('invalid_email_or_password', locale: current_locale)
-	//	end
-	//
-	//	if response[:error][:code].blank?
-	//	response[:path] = '/my_stops'
-    //else
-	//	response[:path] = ''
-	//	end
-	//
-	//	render json: response
-
-
-
-
+		http.Redirect(w, r, r.URL.Host+"/", http.StatusFound)
 	}
 }
 
@@ -329,4 +296,11 @@ func authenticateUser(email string, password string) *models.User {
 		return user
 	}
 	return nil
+}
+
+
+func setCurrentUser(c *AuthController, r *http.Request, w http.ResponseWriter, id int) {
+	session, _ :=  c.SessionStore.Get(r, "auth")
+	session.Values["user_id"] = id
+	session.Save(r, w)
 }

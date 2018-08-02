@@ -5,7 +5,7 @@
 FROM golang:1
 
 #RUN go get github.com/tools/godep
-RUN go get gopkg.in/gomail.v2 && go get github.com/gorilla/mux && go get github.com/gorilla/sessions && go get github.com/spf13/viper && go get github.com/golang/dep/cmd/dep && go get github.com/lib/pq && go get -u github.com/pressly/goose/cmd/goose && go get github.com/gorilla/sessions && go get golang.org/x/crypto/bcrypt && go get github.com/gorilla/csrf && go get github.com/jmoiron/sqlx && go get github.com/op/go-logging && go get github.com/gorilla/websocket && go get github.com/stripe/stripe-go && go get github.com/gorilla/csrf
+RUN go get gopkg.in/gomail.v2 && go get github.com/gorilla/mux && go get github.com/gorilla/sessions && go get github.com/spf13/viper && go get github.com/golang/dep/cmd/dep && go get github.com/lib/pq && go get -u github.com/pressly/goose/cmd/goose && go get github.com/gorilla/sessions && go get golang.org/x/crypto/bcrypt && go get github.com/gorilla/csrf && go get github.com/jmoiron/sqlx && go get github.com/op/go-logging && go get github.com/gorilla/websocket && go get github.com/stripe/stripe-go && go get github.com/gorilla/csrf && go get github.com/twinj/uuid
 #&& apt-get update && echo "postfix postfix/mailname string safestopclient.com" | debconf-set-selections && echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections && apt-get install -y postfix && service postfix reload && postfix start
 
 ENV SSC_DB_HOST=192.168.0.0

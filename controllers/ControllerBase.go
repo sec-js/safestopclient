@@ -171,6 +171,9 @@ func currentLocale(c *ControllerBase, r *http.Request) string {
 	return locale.(string)
 }
 
+
+
+
 func setFlash(c *ControllerBase, r *http.Request, w http.ResponseWriter, message string , bootstrap_class string ){
 	session, _ :=  c.SessionStore.Get(r, "flash")
 	f := FlashMessage{ Message: message, BootstrapClass: bootstrap_class }
@@ -189,5 +192,7 @@ func getFlash(c *ControllerBase, r *http.Request, w http.ResponseWriter, data *V
 	}
 	session.Save(r, w)
 }
+
+
 
 

@@ -7,6 +7,7 @@
       <env name="SSC_ENV" value="development" />
       <env name="SSC_DOMAIN" value="ssc.local" />
       <env name="SSC_SUPPORT_NUMBER" value="1-800-843-8936" />
+      <env name="SSC_MASTER_PASSWORD" value="tmjxy" />
     </envs>
     <kind value="FILE" />
     <filePath value="$PROJECT_DIR$/safestopclient.go" />
