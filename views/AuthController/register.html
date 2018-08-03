@@ -11,7 +11,11 @@
 
 
 <form id="registration-form" method="post" action="/register/{{ .ViewData.JurisdictionId}}">
-    <input type="hidden" name="postal_code" value="<%= @postal_code %>">
+    {{/*<input type="hidden" name="postal_code" value="<%= @postal_code %>">*/}}
+    {{ .CSRFTemplateField}}
+
+     <input name="jurisdiction_id" type="hidden" value="{{.ViewData.JurisdictionId}}">
+
 
     <div class="container-fluid">
         <div class="row">

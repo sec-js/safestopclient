@@ -24,7 +24,7 @@ var sessionStore = sessions.NewCookieStore([]byte("Byte my ass 2018!"))
 
 func main() {
 
-	gob.Register(&controllers.FlashMessage{})
+	gob.Register(controllers.FlashMessage{})
 
 	var BootstrapAlertClass models.BootstrapAlertClass = models.BootstrapAlertClass{
 		Primary: "primary",

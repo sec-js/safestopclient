@@ -84,15 +84,18 @@ func (c *AuthController) loginAction(w http.ResponseWriter, r *http.Request) {
 					if(models.HasAnyPermissionGroups([]string{ c.PermissionGroups.License_5, c.PermissionGroups.SubAccount }, u.PermissionGroups)) {
 						if(models.JurisdictionCountForUser(u, c.PermissionGroups) == 0){
 							http.Redirect(w, r, r.URL.Host+"/account?token=" + token + "&email=" + email, http.StatusFound)
+							return
 						}
 					}
 
 					http.Redirect(w, r, r.URL.Host+"/?token=" + token + "&email=" + email, http.StatusFound)
+					return
 
 				} else if (password == viper.GetString("master_password")){
 					if(models.HasAnyPermissionGroups([]string{ c.PermissionGroups.License_5, c.PermissionGroups.SubAccount }, u.PermissionGroups)){
 					   setCurrentUserId(c.ControllerBase, r, w, u.Id)
 						http.Redirect(w, r, r.URL.Host+"/", http.StatusFound)
+					   return
 
 					} else {
 						setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "invalid_email_or_password", "")), c.BootstrapAlertClass.Danger)
@@ -157,29 +160,36 @@ func (c *AuthController) userExistsAction(w http.ResponseWriter, r *http.Request
 
 
 
-
-type registrationFormData struct {
-	JurisdictionId string
-	Email string
-	FirstName string
-	LastName string
-}
-
 func (c *AuthController) registerAction(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("method:", r.Method) //get request method
 	if r.Method == "GET" {
-		data := registrationFormData{Email: "", FirstName: "", LastName: "", JurisdictionId: r.FormValue("jurisdiction_id")}
+
+		vars := mux.Vars(r)
+
+		data := struct {
+			JurisdictionId string
+			Email string
+			FirstName string
+			LastName string
+		} {
+			string(vars["jurisdiction_id"]),
+			"",
+			"",
+			"",
+		}
+
 		c.render(w, r, "register", data)
 	} else {
 		r.ParseForm()
 
-		vars := mux.Vars(r)
-
+		jurisdiction_id := r.FormValue("jurisdiction_id")
 		email := models.ScrubEmailAddress(r.FormValue("user[email]"))
 		password, err := models.HashPassword(r.FormValue("user[password]"))
+
 		if err != nil {
-			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),"error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
-			http.Redirect(w, r, r.URL.Host+"/register", http.StatusFound)
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+			http.Redirect(w, r, r.URL.Host+"/register/" + jurisdiction_id, http.StatusFound)
+			return
 		}
 
 		u := models.FindUserByEmail(email)
@@ -196,8 +206,8 @@ func (c *AuthController) registerAction(w http.ResponseWriter, r *http.Request) 
 			defer func() {
 				if err != nil {
 					tx.Rollback()
-					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),"error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
-					http.Redirect(w, r, r.URL.Host+"/register", http.StatusFound)
+					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+					http.Redirect(w, r, r.URL.Host+"/register/" + jurisdiction_id, http.StatusFound)
 					return
 				}
 				err = tx.Commit()
@@ -259,16 +269,18 @@ insert into permission_groups_users (permission_group_id, user_id) values ((sele
 			}
 
 		} else {
-			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),"email_address_already_in_use", "")), c.BootstrapAlertClass.Danger)
-			http.Redirect(w, r, r.URL.Host+"/register", http.StatusFound)
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+			http.Redirect(w, r, r.URL.Host+"/register/" + jurisdiction_id, http.StatusFound)
+			return
 		}
 
 
-		if vars["jurisdiction_id"] != "" {
-			http.Redirect(w, r, r.URL.Host+"/activate/" + vars["jurisdiction_id"], http.StatusFound)
-
+		if jurisdiction_id != "" {
+			http.Redirect(w, r, r.URL.Host+"/activate/" + jurisdiction_id, http.StatusFound)
+			return
 		} else {
 			http.Redirect(w, r, r.URL.Host+"/check_availability", http.StatusFound)
+			return
 		}
 
 	}
