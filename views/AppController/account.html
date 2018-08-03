@@ -3,9 +3,6 @@
 {{end}}
 {{define "body"}}
 
-
-
-
 <ul class="list-group" id="my-account" style="margin-top:50px;margin-bottom: 60px;">
 
     <a href="/language" class="account-li list-group-item">
@@ -26,7 +23,7 @@
             <tr>
                 <td>
 
-                    {{ if .ViewData.JurisdictionCount == 0 }}
+                    {{ if eq .ViewData.JurisdictionCount  0 }}
                         <span class="icon"><i class="fa fa-power-off"></i></span>
                     {{ else }}
                     <span class="icon"><i class="fa fa-graduation-cap"></i></span>
@@ -34,7 +31,7 @@
 
                 </td>
                 <td>
-                {{ if .ViewData.JurisdictionCount == 0 }}
+                {{ if eq .ViewData.JurisdictionCount 0 }}
                     {{ t .CurrentLocale "activate_account" "" }}
                 {{ else }}
                     {{ t .CurrentLocale "add_school_or_district" "" }}
@@ -45,7 +42,7 @@
         </table>
     </a>
 
-    {{ if .ViewData.JurisdictionCount > 0 }}
+    {{ if gt .ViewData.JurisdictionCount 0 }}
 
     <form method="post" action="/remove_all_stops">
         <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
@@ -68,29 +65,30 @@
         {{ end }}
 
 
-    {{ if .ViewData.RegularUser == false}}
-    <a href="/manage_notifications" class="list-group-item">
-        <table class="list-item-table">
-            <tr>
-                <td>
-                    <i class="ss ss-settings"></i>
-                </td>
-                <td>
-                {{ t .CurrentLocale "manage_notifications" "" }}
-                </td>
-            </tr>
-        </table>
-    </a>
+    {{/*{{ if .ViewData.RegularUser eq false}}*/}}
+    {{/*<a href="/manage_notifications" class="list-group-item">*/}}
+        {{/*<table class="list-item-table">*/}}
+            {{/*<tr>*/}}
+                {{/*<td>*/}}
+                    {{/*<i class="ss ss-settings"></i>*/}}
+                {{/*</td>*/}}
+                {{/*<td>*/}}
+                {{/*{{ t .CurrentLocale "manage_notifications" "" }}*/}}
+                {{/*</td>*/}}
+            {{/*</tr>*/}}
+        {{/*</table>*/}}
+    {{/*</a>*/}}
 
-    {{ else }}
-
-
+    {{/*{{ else }}*/}}
 
 
 
-    {{ end }}
 
-    <% if @user.client_permission_group == Sti::LICENSE_5 %>
+
+    {{/*{{ end }}*/}}
+
+
+    <% if @user.client_permission_group eq Sti::LICENSE_5 %>
     <a href="/manage_subscriptions" class="list-group-item">
         <table class="list-item-table">
             <tr>
@@ -105,7 +103,8 @@
     </a>
     <% end %>
 
-    <a href="//alerts.{{ .ViewData.Domain }}/" class="list-group-item">
+
+    <a href="//alerts.{{ .Domain }}/" class="list-group-item">
         <table class="list-item-table">
             <tr>
                 <td>
@@ -135,13 +134,13 @@
     </a>
 
 
-    <a href="/destroy_client_session" class="list-group-item account-li" id="logout">
+    <a href="/logout" class="list-group-item account-li" id="logout">
         <table class="list-item-table">
             <tr>
                 <td>
                     <i class="ss ss-sign-out"></i>
                 <td>
-            {{ t .CurrentLocale "sign_out" "" }}
+                    {{ t .CurrentLocale "sign_out" "" }}
                 </td>
             </tr>
         </table>
@@ -159,13 +158,13 @@
                     <i class="ss ss-email-1"></i>
                 </td>
                 <td>
-                    <a href='mailto:support@{{ .ViewData.Domain }}'>support@{{ .ViewData.Domain }}</a>
+                    <a href='mailto:support@{{ .Domain }}'>support@{{ .Domain }}</a>
                 </td>
             </tr>
         </table>
     </li>
 
-    {{ if .ViewData.Domain == "safestopapp.com" || .ViewData.Domain == "ssc.local" }}
+    {{ if (eq .Domain "safestopapp.com") or (eq .Domain "ssc.local") }}
     <li class="list-group-item account-li" id="call-us">
         <table class="list-item-table">
             <tr>
@@ -173,7 +172,7 @@
                     <i class="ss ss-call"></i>
                 </td>
                 <td>
-                    <a href='tel://{{ .ViewData.SupportNumber }}'>{{ .ViewData.SupportNumber }}</a>
+                    <a href='tel://{{ .SupportNumber }}'>{{ .SupportNumber }}</a>
                 </td>
             </tr>
         </table>
@@ -233,26 +232,124 @@
     </li>
 
 
-{{ if .ViewData.SafeStopAppIssuesActive == true }}
-    <li class="list-group-item" id="connect-with-terminal" style="background: #F7F7F7; font-size: 14pt; font-weight: bold;">
-    {{ t .CurrentLocale "connect_with_terminal" "" }}
-    </li>
+{{/*{{ if .ViewData.SafeStopAppIssuesActive eq true }}*/}}
+    {{/*<li class="list-group-item" id="connect-with-terminal" style="background: #F7F7F7; font-size: 14pt; font-weight: bold;">*/}}
+    {{/*{{ t .CurrentLocale "connect_with_terminal" "" }}*/}}
+    {{/*</li>*/}}
 
-    <a href="/report_an_app_issue" class="list-group-item account-li" id="report-lost-item">
-        <table class="list-item-table">
-            <tr>
-                <td class="icon-font">
-                    <i class="ss ss-lost-item"></i>
-                <td class="text">
-                {{ t .CurrentLocale "report_an_app_issue" "" }}
-                </td>
-            </tr>
-        </table>
-    </a>
-{{end}}
+    {{/*<a href="/report_an_app_issue" class="list-group-item account-li" id="report-lost-item">*/}}
+        {{/*<table class="list-item-table">*/}}
+            {{/*<tr>*/}}
+                {{/*<td class="icon-font">*/}}
+                    {{/*<i class="ss ss-lost-item"></i>*/}}
+                {{/*<td class="text">*/}}
+                {{/*{{ t .CurrentLocale "report_an_app_issue" "" }}*/}}
+                {{/*</td>*/}}
+            {{/*</tr>*/}}
+        {{/*</table>*/}}
+    {{/*</a>*/}}
+{{/*{{end}}*/}}
 
 </ul>
 
+
+
+
+
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('body').removeClass('app-body').addClass('app-body-scroll');
+
+        $('#logout').click(function(e){
+            e.preventDefault();
+            window.localStorage.setItem('token', undefined);
+            window.location.href = $(this).prop("href");
+        })
+
+    //     <% if @user.client_jurisdictions.count == 0 %>
+    //             swal({
+    //                 title: "<%= t("account_not_active", locale: current_locale) %>",
+    //                 text: "<%= t("account_not_active_description", locale: current_locale) %>",
+    //                 confirmButtonColor: "#A31F2D",
+    //                 type: "info"
+    //             });
+    // <% end %>
+
+        window.send_message = function( action, callback, data ) {
+            var iframe = document.createElement('iframe');
+            var req = encodeURIComponent(action) + "$" + encodeURIComponent(callback) + "$" + encodeURIComponent(data);
+            // console.log(req);
+            iframe.setAttribute( "src", "js://" + req );
+            iframe.style.display = "none";
+            document.documentElement.appendChild(iframe);
+            iframe.parentNode.removeChild(iframe);
+            iframe = null;
+        };
+
+        var is_uiwebview = /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(navigator.userAgent);
+        if (is_uiwebview) {
+            send_message( "device_model", "device_model_callback", "" );
+            send_message( "app_version", "app_version_callback", "" );
+            send_message( "os", "os_callback", "" );
+        }
+
+
+        $("#remove-all-stops").click(function (e) {
+            e.preventDefault();
+            var remove_stops_form = $(this).parent();
+            swal({
+                title: '<%= t('ss_client_account_js_4', locale: current_locale) %>',
+                type: 'warning',
+                text: '<%= t('ss_client_account_js_5', locale: current_locale) %>',
+                showCloseButton: true,
+                showCancelButton: true,
+                confirmButtonText: '<%= t('okay', locale: current_locale) %>',
+                confirmButtonColor: "#A31F2D",
+                cancelButtonText: '<%= t('cancel', locale: current_locale) %>'
+            }, function (isConfirmed) {
+
+                if (isConfirmed) {
+                    $(remove_stops_form).submit();
+                }
+            })
+        });
+
+    });
+
+
+    function device_model_callback(data) {
+        $("#native-device-model").show();
+        $("#native-device-model-value").text(data);
+        $("#system-header").show();
+    }
+
+    function app_version_callback(data) {
+        $("#native-app-version").show();
+        $("#native-app-version-value").text(data);
+        $("#system-header").show();
+    }
+
+    function os_callback(data) {
+        $("#native-os").show();
+        $("#native-os-value").text(data);
+        if (data.indexOf("iPhone") === 0) {
+            $("#native-os-icon").addClass("fa-apple");
+        }
+        else if (data.indexOf("Android") === 0) {
+            $("#native-os-icon").addClass("fa-android");
+        }
+        else {
+            $("#native-os-icon").addClass("fa-laptop")
+        }
+        $("#system-header").show();
+    }
+
+</script>
 
 
 

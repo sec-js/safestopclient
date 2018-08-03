@@ -26,7 +26,6 @@ type User struct {
 	PermissionGroups string `json:"permission_groups" db:"permission_groups"`
 	//PasswordResetKey string `json:"password_reset_key" db:"password_reset_key"'`
 	Locked bool `json:"locked" db:"locked"`
-	//Superadmin bool `json:"superadmin" db:"superadmin"`
 	//CreatedAt time.Time `json:"created_at" db:"created_at"`
 }
 
@@ -52,8 +51,22 @@ func UpdateApiToken(user_id int, token string) bool{
 
 func FindUser(id int) *User {
 
-	queryFindUser := "select * from users where id = $1;"
-	row := database.GetDB().QueryRowx(queryFindUser, id)
+	query := `
+select id, 
+email, 
+password_digest, 
+locked,
+super_admin,
+(select array_to_string(array_agg(a.name), ',') as permission_groups
+from permission_groups a 
+join permission_groups_users b on b.permission_group_id = a.id 
+and b.user_id = id 
+and a.security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1))
+from users 
+where id = $1
+limit 1
+`
+	row := database.GetDB().QueryRowx(query, id)
 	if row == nil {
 		return nil
 	} else {
@@ -148,6 +161,24 @@ func AuthenticateUser(email string, password string) *User {
 
 	return nil
 }
+
+
+
+func HasAnyPermissionGroups(permission_groups []string, user_permission_groups string ) bool {
+	has_permission_group := false
+	for i := 0; i < len(permission_groups); i++ {
+		if(strings.Contains(user_permission_groups, permission_groups[i])){
+			has_permission_group = true
+			i = len(permission_groups)
+		}
+	}
+	return has_permission_group
+}
+
+
+
+
+
 
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)

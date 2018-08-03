@@ -20,11 +20,15 @@ func (c *AppController) Register() {
 	//templates
 	c.addTemplate("index", "index.html", "app.html")
 	c.addTemplate("check_availability", "check_availability.html", "default.html")
+	c.addTemplate("account", "account.html", "app.html")
+	c.addTemplate( "language", "language.html", "app.html")
 
 	//actions
 	c.addRouteWithPrefix("/", c.IndexAction)
 	c.addRouteWithPrefix("/check_availability", c.CheckAvailabilityAction)
 	c.addRouteWithPrefix("/change_locale/{locale}", c.ChangeLocaleAction)
+	c.addRouteWithPrefix("/account", c.AccountAction)
+	c.addRouteWithPrefix( "/language", c.LanguageAction)
 }
 
 type dashData struct {
@@ -32,22 +36,42 @@ type dashData struct {
 }
 
 func (c *AppController) IndexAction(w http.ResponseWriter, r *http.Request) {
+
+	data := struct {
+		Token string
+		Email string
+	} {
+		r.FormValue("token"),
+		r.FormValue("email"),
+	}
+
+
 	session, _ :=  c.SessionStore.Get(r, "auth")
 	email := session.Values["current_user_email"]
 	if email != nil {
 		http.Redirect(w, r, r.URL.Host+"/dashboard", http.StatusFound)
 	}
-	c.render(w, r, "index", nil)
+	c.render(w, r, "index", data)
 }
 
 func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
-	session, _ :=  c.SessionStore.Get(r, "auth")
-	email := session.Values["current_user_email"]
-	if email != nil {
-		http.Redirect(w, r, r.URL.Host+"/dashboard", http.StatusFound)
+
+	uid := currentUserId(c.ControllerBase, r)
+	if(uid == 0){
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
 	}
 
-	c.render(w, r, "account", nil)
+	u := models.FindUser(uid)
+
+	data := struct {
+		JurisdictionCount int
+	}{
+		models.JurisdictionCountForUser(u, c.PermissionGroups),
+	}
+
+
+
+	c.render(w, r, "account", data)
 }
 
 
@@ -115,11 +139,18 @@ func (c *AppController) ChangeLocaleAction(w http.ResponseWriter, r *http.Reques
 		//http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
 		//return
 	}
-	http.Redirect(w, r,"/login", http.StatusFound)
+	http.Redirect(w, r,"/language", http.StatusFound)
 }
 
 
 func (c *AppController) LanguageAction(w http.ResponseWriter, r *http.Request) {
+
+	uid := currentUserId(c.ControllerBase, r)
+	if(uid == 0){
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+	}
+
+
 	c.render(w, r, "language", nil)
 }
 

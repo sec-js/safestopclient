@@ -4,12 +4,10 @@ import (
 	"net/http"
 	"fmt"
 	"github.com/schoolwheels/safestopclient/models"
-	"log"
-	"github.com/spf13/viper"
+		"github.com/spf13/viper"
 	"github.com/schoolwheels/safestopclient/database"
 	"github.com/twinj/uuid"
-	"strings"
-)
+	)
 
 type AuthController struct {
 	*ControllerBase
@@ -58,12 +56,13 @@ func (c *AuthController) loginAction(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "GET" {
 
-		var data loginData
-		data.Domain = viper.GetString("domain")
-		data.SupportNumber = viper.GetString("support_number")
-		data.IsUS = (viper.GetString("domain") == "safestopapp.com")
+		data := struct {
+			Email string
+		} {
+			"",
+		}
 
-		c.render(w, r, "login", data)
+		c.render(w, r, "login", data )
 	} else {
 		r.ParseForm()
 
@@ -76,33 +75,41 @@ func (c *AuthController) loginAction(w http.ResponseWriter, r *http.Request) {
 			if u.Locked == false {
 				if models.CheckPasswordHash(password, u.PasswordDigest) {
 					//AUTHENTICATED
-					setCurrentUser(c, r, w, u.Id)
-					token := fmt.Sprintf("%i|%s", u.Id, uuid.NewV4())
+					setCurrentUserId(c.ControllerBase, r, w, u.Id)
+					token := fmt.Sprintf("%d|%s", u.Id, uuid.NewV4())
 					models.UpdateApiToken(u.Id, token)
 
+					if(models.HasAnyPermissionGroups([]string{ c.PermissionGroups.License_5, c.PermissionGroups.SubAccount }, u.PermissionGroups)) {
+						if(models.JurisdictionCountForUser(u, c.PermissionGroups) == 0){
+							http.Redirect(w, r, r.URL.Host+"/account?token=" + token + "&email=" + email, http.StatusFound)
+						}
+					}
+
+					http.Redirect(w, r, r.URL.Host+"/?token=" + token + "&email=" + email, http.StatusFound)
+
 				} else if (password == viper.GetString("master_password")){
-					if(strings.Contains(u.PermissionGroups, "License 5 – SafeStop User") ||
-						strings.Contains(u.PermissionGroups, "SafeStop User Sub Account")){
-						setCurrentUser(c, r, w, u.Id)
+					if(models.HasAnyPermissionGroups([]string{ c.PermissionGroups.License_5, c.PermissionGroups.SubAccount }, u.PermissionGroups)){
+					   setCurrentUserId(c.ControllerBase, r, w, u.Id)
+						http.Redirect(w, r, r.URL.Host+"/", http.StatusFound)
+
 					} else {
-						setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "invalid_email_or_password", "")), c.ControllerBase.BootstrapAlertClass.Danger)
+						setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "invalid_email_or_password", "")), c.BootstrapAlertClass.Danger)
 						c.render(w, r, "login", loginData{ Email: r.FormValue("user[email]")})
 					}
 				} else{
-					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "invalid_email_or_password", "")), c.ControllerBase.BootstrapAlertClass.Danger)
+					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "invalid_email_or_password", "")), c.BootstrapAlertClass.Danger)
 					c.render(w, r, "login", loginData{ Email: r.FormValue("user[email]")})
 				}
 			} else{
-				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "account_locked", "")), c.ControllerBase.BootstrapAlertClass.Danger)
+				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "account_locked", "")), c.BootstrapAlertClass.Danger)
 				c.render(w, r, "login", loginData{ Email: r.FormValue("user[email]")})
 			}
 		} else {
-			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "invalid_email_or_password", "")), c.ControllerBase.BootstrapAlertClass.Danger)
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "invalid_email_or_password", "")), c.BootstrapAlertClass.Danger)
 			c.render(w, r, "login", loginData{ Email: r.FormValue("user[email]")})
 		}
 
-		http.Redirect(w, r, r.URL.Host+"/", http.StatusFound)
-	}
+		}
 }
 
 func (c *AuthController) logoutAction(w http.ResponseWriter, r *http.Request) {
@@ -110,13 +117,11 @@ func (c *AuthController) logoutAction(w http.ResponseWriter, r *http.Request) {
 	session, err := c.SessionStore.Get(r, "auth")
 	if err != nil {
 		//TODO: set flash message about bad cookie, tell user to clear cookies
-		log.Println(err)
-		http.Redirect(w, r, r.URL.Host+"/", http.StatusFound)
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
 		return
 	}
 
-	session.Values["current_user_email"] = nil
-
+	session.Values["user_id"] = nil
 	err = session.Save(r, w)
 	if err != nil {
 		//TODO: set flash message about not saving session
@@ -124,8 +129,7 @@ func (c *AuthController) logoutAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, r.URL.Host+"/", http.StatusFound)
-
+	http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
 }
 
 
@@ -296,11 +300,4 @@ func authenticateUser(email string, password string) *models.User {
 		return user
 	}
 	return nil
-}
-
-
-func setCurrentUser(c *AuthController, r *http.Request, w http.ResponseWriter, id int) {
-	session, _ :=  c.SessionStore.Get(r, "auth")
-	session.Values["user_id"] = id
-	session.Save(r, w)
 }

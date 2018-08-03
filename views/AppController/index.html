@@ -133,102 +133,118 @@
 
 <script type="text/javascript">
 
-var refreshTimeout;
-var refreshAdTimeout;
-var ms_template = $("#ms-template").html();
-Mustache.parse(ms_template);
+    var token = "{{ .ViewData.Token }}";
+    var email = "{{ .ViewData.Email }}";
+
+
+// var refreshTimeout;
+// var refreshAdTimeout;
+// var ms_template = $("#ms-template").html();
+// Mustache.parse(ms_template);
 
 
 $(document).ready(function () {
 
-{{ if true }} <!-- !@register.nil? and @register -->
 
-    if(isNativeiOSApp()) {
-        sendMessageToNative({
-            command: 'register_for_notifications',
-            callback: 'did_register_for_notifications_with_user_callback',
-            data: ''
-        });
-    }
-    else if (isNativeAndroidApp()) {
-        gcm_token = Android.getGCMToken();
-        gcm_user_callback(gcm_token);
+    if (token != "") {
+        window.localStorage.setItem("token", token);
     }
 
-{{ end }}
+    if (email != "") {
+        window.localStorage.setItem("email", email);
+    }
 
-$("#my-stops").height((window.innerHeight - 106) + 'px');
 
-    //refresh_stops();
-    //refresh_scans();
-    //refresh_ad();
-
-$(document).on('click', '.fa-clock-o', function(e){
-    e.stopPropagation();
-    $('.message-bubble').trigger('click');
 })
 
-});
+{{/*{{ if true }} <!-- !@register.nil? and @register -->*/}}
+
+    {{/*if(isNativeiOSApp()) {*/}}
+        {{/*sendMessageToNative({*/}}
+            {{/*command: 'register_for_notifications',*/}}
+            {{/*callback: 'did_register_for_notifications_with_user_callback',*/}}
+            {{/*data: ''*/}}
+        {{/*});*/}}
+    {{/*}*/}}
+    {{/*else if (isNativeAndroidApp()) {*/}}
+        {{/*gcm_token = Android.getGCMToken();*/}}
+        {{/*gcm_user_callback(gcm_token);*/}}
+    {{/*}*/}}
+
+{{/*{{ end }}*/}}
+
+{{/*$("#my-stops").height((window.innerHeight - 106) + 'px');*/}}
+
+    {{/*//refresh_stops();*/}}
+    {{/*//refresh_scans();*/}}
+    {{/*//refresh_ad();*/}}
+
+{{/*$(document).on('click', '.fa-clock-o', function(e){*/}}
+    {{/*e.stopPropagation();*/}}
+    {{/*$('.message-bubble').trigger('click');*/}}
+{{/*})*/}}
+
+{{/*});*/}}
 
 
-function refresh_stops() {
+{{/*function refresh_stops() {*/}}
 
-    //START PROGRESS BAR
-    progressValue = 100;
-    if (!inProgress) {
-        progress();
-        inProgress = !inProgress;
-    }
+    {{/*//START PROGRESS BAR*/}}
+    {{/*progressValue = 100;*/}}
+    {{/*if (!inProgress) {*/}}
+        {{/*progress();*/}}
+        {{/*inProgress = !inProgress;*/}}
+    {{/*}*/}}
 
-    $('#loading_spinner').show();
-    refreshTimeout = setTimeout(refresh_stops, 30000);
+    {{/*$('#loading_spinner').show();*/}}
+    {{/*refreshTimeout = setTimeout(refresh_stops, 30000);*/}}
 
-$.get('/my_stops', {
-    authenticity_token: '<%= form_authenticity_token %>',
-    format: 'json'
-}, function (response) {
-    console.log("Res", response)
+{{/*$.get('/my_stops', {*/}}
+    {{/*authenticity_token: '<%= form_authenticity_token %>',*/}}
+    {{/*format: 'json'*/}}
+{{/*}, function (response) {*/}}
+    {{/*console.log("Res", response)*/}}
 
-    $("#my-stops").empty();
-    $('#loading_spinner').hide();
+    {{/*$("#my-stops").empty();*/}}
+    {{/*$('#loading_spinner').hide();*/}}
 
-if (response.length > 0) {
-    $('#my-stops').append(Mustache.render(ms_template, {jurisdictions: response}));
-}
-else {
+{{/*if (response.length > 0) {*/}}
+    {{/*$('#my-stops').append(Mustache.render(ms_template, {jurisdictions: response}));*/}}
+{{/*}*/}}
+{{/*else {*/}}
 
-}
+{{/*}*/}}
 
-// <% if current_app_user and [Sti::LICENSE_5, Sti::SUB_ACCOUNT_USER].include?(current_app_user.client_permission_group) %>
-//         <% current_app_user.client_jurisdictions.each do |j| %>
-//         <% if j.jurisdiction_safe_stop_info.status == 'testing' %>
-//
-//         $('#my-stops').append('<li class="list-group-item text-center ms-jurisdiction"><%= j.name %></li>');
-//     $('#my-stops').append('<li class="list-group-item text-center"><%= t('ss_client_my_stops_js_1', locale: current_locale) %></li>');
-//
-// <% end %>
-// <% end %>
-// <% end %>
-
-
+{{/*// <% if current_app_user and [Sti::LICENSE_5, Sti::SUB_ACCOUNT_USER].include?(current_app_user.client_permission_group) %>*/}}
+{{/*//         <% current_app_user.client_jurisdictions.each do |j| %>*/}}
+{{/*//         <% if j.jurisdiction_safe_stop_info.status == 'testing' %>*/}}
+{{/*//*/}}
+{{/*//         $('#my-stops').append('<li class="list-group-item text-center ms-jurisdiction"><%= j.name %></li>');*/}}
+{{/*//     $('#my-stops').append('<li class="list-group-item text-center"><%= t('ss_client_my_stops_js_1', locale: current_locale) %></li>');*/}}
+{{/*//*/}}
+{{/*// <% end %>*/}}
+{{/*// <% end %>*/}}
+{{/*// <% end %>*/}}
 
 
-});
-}
 
-function refreshAd() {
-    refreshAdTimeout = setTimeout(refreshAd, 30000);
-$.post('/next_ad', {
-    authenticity_token: '<%= form_authenticity_token %>'
-}, function (response) {
-//        alert(response.ad.app_image);
-    if(response.ad) {
-        $("#ad-image").attr("src", response.ad.app_image);
-        $("#ad-link").attr("href", '/adclick/'+response.ad.id);
-        $("#my-stops").css("margin-bottom", "156px");
-    }
-});
-}
+
+{{/*});*/}}
+{{/*}*/}}
+
+{{/*function refreshAd() {*/}}
+    {{/*refreshAdTimeout = setTimeout(refreshAd, 30000);*/}}
+{{/*$.post('/next_ad', {*/}}
+    {{/*authenticity_token: '<%= form_authenticity_token %>'*/}}
+{{/*}, function (response) {*/}}
+{{/*//        alert(response.ad.app_image);*/}}
+    {{/*if(response.ad) {*/}}
+        {{/*$("#ad-image").attr("src", response.ad.app_image);*/}}
+        {{/*$("#ad-link").attr("href", '/adclick/'+response.ad.id);*/}}
+        {{/*$("#my-stops").css("margin-bottom", "156px");*/}}
+    {{/*}*/}}
+{{/*});*/}}
+{{/*}*/}}
 
 
 </script>

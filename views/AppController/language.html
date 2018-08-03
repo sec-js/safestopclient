@@ -3,6 +3,39 @@
 {{end}}
 {{define "body"}}
 
-TODO: Put stuff here.
+<ul class="list-group" style="margin-top:50px;margin-bottom: 60px;">
+    <a href="/change_locale/en" class="list-group-item" id="english">
+        <table class="list-sub-item-table">
+            <tr>
+                <td>
+                    {{ t .CurrentLocale "english" ""}}
+                </td>
+                <td>
+                    {{ if eq .CurrentLocale "fr"}}
+                    <i class="fa fa-square-o" aria-hidden="true" style="margin-right: 5px;"></i>
+                    {{ else }}
+                    <i class="fa fa-check-square-o" aria-hidden="true"> </i>
+                    {{ end }}
+                </td>
+            </tr>
+        </table>
+    </a>
+    <a href="/change_locale/fr" class="list-group-item" id="french">
+        <table class="list-sub-item-table">
+            <tr>
+                <td>
+                {{ t .CurrentLocale "french" ""}}
+                </td>
+                <td>
+                    {{ if eq .CurrentLocale "en"}}
+                    <i class="fa fa-square-o" aria-hidden="true" style="margin-right: 5px;"></i>
+                    {{ else }}
+                    <i class="fa fa-check-square-o" aria-hidden="true"> </i>
+                    {{ end }}
+                </td>
+            </tr>
+        </table>
+    </a>
+</ul>
 
 {{end}}

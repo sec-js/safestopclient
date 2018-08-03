@@ -11,6 +11,7 @@
 {{end}}
 {{define "body"}}
 
+
 <div class="container-fluid login" align="center">
     <div class="row">
         <div class="col-sm">
@@ -54,13 +55,13 @@
     </div>
 
 
-    {{if .ViewData.IsUS}}
+    {{if or (eq .Domain "safestopapp.com") (eq .Domain "ssc.local") }}
 
         <div class="row">
             <div class="col-sm text-center" style="padding-top: 30px;">
           <span id="login_help_number">
               {{ t .CurrentLocale "ss_client_login_5" "" }}
-              <a href="tel://{{ .ViewData.SupportNumber }}" class='text'>{{ .ViewData.SupportNumber }}</a>
+              <a href="tel://{{ .SupportNumber }}" class='text'>{{ .SupportNumber }}</a>
           </span>
             </div>
         </div>
@@ -73,13 +74,13 @@
         <div class="col-md-12 text-center">
   <span id="login_help_number">
 
-    {{if .ViewData.IsUS}}
+    {{if or (eq .Domain "safestopapp.com") (eq .Domain "ssc.local") }}
         {{ t .CurrentLocale "ss_client_login_6" "" }}
     {{else}}
         {{ t .CurrentLocale "ss_client_login_6_ca" "" }}
     {{end}}
 
-    <a href='mailto:support@{{ .ViewData.Domain}}'>support@{{ .ViewData.Domain }}</a>
+    <a href='mailto:support@{{ .Domain}}'>support@{{ .Domain }}</a>
   </span>
         </div>
     </div>
@@ -93,6 +94,14 @@
     var screen_height = window.innerHeight;
     var form_height = $(".login").height();
     $(".login").css('margin-top', ((screen_height / 2) - (form_height / 1.5)) + 'px');
+
+
+    $(document).ready(function(){
+        var email = window.localStorage.getItem("email");
+        $("#email").val(email);
+    })
+
+
 </script>
 
 {{end}}

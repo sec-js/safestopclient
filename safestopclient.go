@@ -16,7 +16,8 @@ import (
 	"path/filepath"
 	"github.com/gorilla/csrf"
 	"encoding/gob"
-    )
+	"github.com/schoolwheels/safestopclient/models"
+)
 
 
 var sessionStore = sessions.NewCookieStore([]byte("Byte my ass 2018!"))
@@ -25,7 +26,7 @@ func main() {
 
 	gob.Register(&controllers.FlashMessage{})
 
-	var BootstrapAlertClass controllers.BootstrapAlertClass = controllers.BootstrapAlertClass{
+	var BootstrapAlertClass models.BootstrapAlertClass = models.BootstrapAlertClass{
 		Primary: "primary",
 		Secondary: "secondary",
 		Success: "success",
@@ -34,6 +35,16 @@ func main() {
 		Info: "info",
 		Light: "light",
 		Dark: "dark",
+	}
+
+	var PermissionGroups models.PermissionGroups = models.PermissionGroups{
+		Admin: "SafeStop Admin",
+		License_1: "License 1 – Transportation Executive",
+		License_2: "License 2 – Transportation Professional",
+		License_3: "License 3 – SafeStop Administrator",
+		License_4: "License 4 – SafeStop User Plus",
+		License_5: "License 5 – SafeStop User",
+		SubAccount: "SafeStop User Sub Account",
 	}
 
 	I18n := i18n.New(
@@ -88,10 +99,10 @@ func main() {
 
 	//controllers
 	//todo: possibly handle registration from package init methods in each controller's go file
-	AuthController := controllers.AuthController{&controllers.ControllerBase{Name: "AuthController", Templates: make(map[string]*template.Template), Router: r, SessionStore: sessionStore, BootstrapAlertClass: &BootstrapAlertClass}}
+	AuthController := controllers.AuthController{ &controllers.ControllerBase{Name: "AuthController", Templates: make(map[string]*template.Template), Router: r, SessionStore: sessionStore, BootstrapAlertClass: &BootstrapAlertClass, PermissionGroups: &PermissionGroups,}}
 	AuthController.Register()
 
-	AppController := controllers.AppController{&controllers.ControllerBase{Name: "AppController", Templates: make(map[string]*template.Template), Router: r, SessionStore: sessionStore, BootstrapAlertClass: &BootstrapAlertClass}}
+	AppController := controllers.AppController{&controllers.ControllerBase{Name: "AppController", Templates: make(map[string]*template.Template), Router: r, SessionStore: sessionStore, BootstrapAlertClass: &BootstrapAlertClass, PermissionGroups: &PermissionGroups,}}
 	AppController.Register()
 
 	APIController := controllers.APIController{&controllers.ControllerBase{Name: "APIController", Templates: make(map[string]*template.Template), Router: r, SessionStore: sessionStore}}

@@ -9,20 +9,11 @@ import (
 	"github.com/schoolwheels/safestopclient/i18n"
 	"github.com/gorilla/csrf"
 	"encoding/json"
-	)
+	"github.com/schoolwheels/safestopclient/models"
+	"github.com/spf13/viper"
+)
 
 
-
-type BootstrapAlertClass struct {
-	Primary string
-	Secondary string
-	Success string
-	Danger string
-	Warning string
-	Info string
-	Light string
-	Dark string
-}
 
 
 type ControllerBase struct {
@@ -31,7 +22,8 @@ type ControllerBase struct {
 	Templates map[string]*template.Template
 	Router *mux.Router
 	SessionStore *sessions.CookieStore
-	BootstrapAlertClass *BootstrapAlertClass
+	BootstrapAlertClass *models.BootstrapAlertClass
+	PermissionGroups *models.PermissionGroups
 }
 
 
@@ -128,6 +120,8 @@ type ViewModel struct {
 	FlashMessages FlashMessages
 	CurrentUser CurrentUser
 	CurrentLocale string
+	Domain string
+	SupportNumber string
 	CSRFTemplateField template.HTML
 	ViewData interface{}
 }
@@ -143,6 +137,8 @@ func (c *ControllerBase) renderTemplate(w http.ResponseWriter, r *http.Request, 
 	var data = ViewModel{
 		CurrentUser:  currentUser,
 		CurrentLocale: currentLocale(c,r),
+		Domain: viper.GetString("domain"),
+		SupportNumber: viper.GetString("support_number"),
 		ViewData: viewModel,
 		CSRFTemplateField: csrf.TemplateField(r),
 	}
@@ -169,6 +165,22 @@ func currentLocale(c *ControllerBase, r *http.Request) string {
 		locale = "en"
 	}
 	return locale.(string)
+}
+
+
+func setCurrentUserId(c *ControllerBase, r *http.Request, w http.ResponseWriter, id int) {
+	session, _ :=  c.SessionStore.Get(r, "auth")
+	session.Values["user_id"] = id
+	session.Save(r, w)
+}
+
+func currentUserId(c *ControllerBase, r *http.Request) int {
+	session, _ :=  c.SessionStore.Get(r, "auth")
+	user_id := session.Values["user_id"]
+	if(user_id == nil || user_id == ""){
+		user_id = 0
+	}
+	return user_id.(int)
 }
 
 
