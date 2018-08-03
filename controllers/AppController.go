@@ -84,7 +84,24 @@ type checkAvailabilityData struct {
 
 func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.Request) {
 
-	if r.FormValue("format") == "json" {
+
+	if r.Method == "GET" {
+		data := checkAvailabilityData{PostalCode: r.FormValue("postal_code"), Country: "US"}
+		if(viper.GetString("domain") == "safestopapp.ca"){
+			data.Country = "CA"
+		}
+
+		c.render(w, r, "check_availability", data)
+
+	} else {
+
+	}
+
+
+
+		if r.FormValue("format") == "json" {
+
+
 		available_jurisdictions := models.JurisdictionOptions{}
 		available_jurisdictions.AuthInfo = validateToken(r.FormValue("token"))
 		available_jurisdictions.AuthInfo.RedirectToLogin = false
@@ -101,14 +118,9 @@ func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.R
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(structToJson(available_jurisdictions))
 
+
 	} else{
 
-		data := checkAvailabilityData{PostalCode: r.FormValue("postal_code"), Country: "US"}
-		if(viper.GetString("domain") == "safestopapp.ca"){
-			data.Country = "CA"
-		}
-
-		c.render(w, r, "check_availability", data)
 	}
 }
 

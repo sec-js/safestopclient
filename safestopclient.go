@@ -96,6 +96,8 @@ func main() {
 	r.PathPrefix("/media/").Handler(http.FileServer(http.Dir("./public/")))
 	r.PathPrefix("/stylesheets/").Handler(http.FileServer(http.Dir("./public/")))
 	r.PathPrefix("/javascript/").Handler(http.FileServer(http.Dir("./public/")))
+	r.PathPrefix("/vendors/").Handler(http.FileServer(http.Dir("./public/")))
+
 
 	//controllers
 	//todo: possibly handle registration from package init methods in each controller's go file
