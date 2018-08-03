@@ -119,6 +119,7 @@ type FlashMessage struct {
 type ViewModel struct {
 	FlashMessages FlashMessages
 	CurrentUser CurrentUser
+	CurrentUserId int
 	CurrentLocale string
 	Domain string
 	SupportNumber string
@@ -136,6 +137,7 @@ func (c *ControllerBase) renderTemplate(w http.ResponseWriter, r *http.Request, 
 
 	var data = ViewModel{
 		CurrentUser:  currentUser,
+		CurrentUserId: currentUserId(c,r),
 		CurrentLocale: currentLocale(c,r),
 		Domain: viper.GetString("domain"),
 		SupportNumber: viper.GetString("support_number"),

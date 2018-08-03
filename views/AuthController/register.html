@@ -10,7 +10,7 @@
 
 
 
-<form method="post" action="/register/{{ .ViewData.JurisdictionId}}">
+<form id="registration-form" method="post" action="/register/{{ .ViewData.JurisdictionId}}">
     <input type="hidden" name="postal_code" value="<%= @postal_code %>">
 
     <div class="container-fluid">
@@ -31,16 +31,16 @@
         <div  class="row">
             <div class="col-sm-12">
                 <div class="form-group">
-                    <input class="form-control" name="user[email]" type="text" placeholder="{{ t .CurrentLocale "email" "" }}" value="{{ .ViewData.Email }}">
+                    <input id="email" class="form-control" name="user[email]" type="text" placeholder="{{ t .CurrentLocale "email" "" }}" value="{{ .ViewData.Email }}">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" name="ec" type="text" placeholder="{{ t .CurrentLocale "confirm_email" "" }}">
+                    <input id="email-confirmation" class="form-control" name="ec" type="text" placeholder="{{ t .CurrentLocale "confirm_email" "" }}">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" name="user[password]" type="password" placeholder="{{ t .CurrentLocale "password" "" }}">
+                    <input id="password" class="form-control" name="user[password]" type="password" placeholder="{{ t .CurrentLocale "password" "" }}">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" name="user[password_confirmation]" type="password" placeholder="{{ t .CurrentLocale "confirm_password" "" }}">
+                    <input id="password-confirmation" class="form-control" name="user[password_confirmation]" type="password" placeholder="{{ t .CurrentLocale "confirm_password" "" }}">
                 </div>
                 <div class="form-group">
                     <input class="form-control" name="person[first_name]" type="text" placeholder="{{ t .CurrentLocale "first_name" "" }}" value="{{ .ViewData.FirstName }}">
@@ -60,7 +60,7 @@
                     <table style="width: 100%;">
                         <tr>
                             <td style="width: 50%;">
-                                <a href="/login" class="btn btn-default btn-block no-right-radius">{{ t .CurrentLocale "cancel" "" }}</a>
+                                <a href="/check_availability" class="btn btn-default btn-block no-right-radius">{{ t .CurrentLocale "cancel" "" }}</a>
                             </td>
                             <td style="width: 50%;">
                                 <button class="btn btn-safe-stop btn-block no-left-radius" type="submit">{{ t .CurrentLocale "register" "" }}</button>
@@ -76,69 +76,100 @@
 <script type="text/javascript">
 
     $(document).ready(function(){
-        var screen_height = window.innerHeight;
-        var form_height = $("form").height();
-        $("form").css('margin-top', ((screen_height / 2) - (form_height / 1.5)) + 'px');
 
-        $('form').formValidation({
-            framework: 'bootstrap',
-            feedbackIcons: {
-                valid: 'glyphicon glyphicon-ok',
-                invalid: 'glyphicon glyphicon-remove',
-                validating: 'glyphicon glyphicon-refresh'
-            },
-            fields: {
-                'person[first_name]': {validators: {notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'}}},
-                'person[last_name]': {validators: {notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'}}},
-                'user[email]': {
-                    validators: {
-                        regexp: {
-                            regexp: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                            message: '{{ t .CurrentLocale "invalid_email_format" "" }}'
+        var screen_height = window.innerHeight;
+        var form_height = $("#registration-form").height();
+        $("#registration-form").css('margin-top', ((screen_height / 2) - (form_height / 1.5)) + 'px');
+
+
+
+        FormValidation.formValidation(
+                document.getElementById("registration-form"),
+                {
+                    fields: {
+                        'person[first_name]': {validators: {notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'}}},
+                        'person[last_name]': {validators: {notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'}}},
+                        'user[email]': {
+                            validators: {
+                                remote: {
+                                    message: '{{ t .CurrentLocale "email_address_already_in_use" "" }}',
+                                    url: '/user_exists',
+                                    type: 'POST',
+                                    delay: 100,
+                                },
+                                regexp: {
+                                    regexp: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                                    message: '{{ t .CurrentLocale "invalid_email_format" "" }}'
+                                },
+                                notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'},
+                                identical: {
+                                    compare: function() {
+                                        return $("#email-confirmation").val() == undefined ? "" : $("#email-confirmation").val();
+                                    },
+                                    message: '{{ t .CurrentLocale "email_addresses_do_not_match" "" }}'
+                                }
+                            }
                         },
-                        notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'},
-                        identical: {field: 'ec', message: '{{ t .CurrentLocale "email_addresses_do_not_match" "" }}'},
-                        remote: {
-                            message: '{{ t .CurrentLocale "email_address_already_in_use" "" }}',
-                            url: '/user_exists',
-                            type: 'GET',
-                            delay: 100
-                        }
-                    }
-                },
-                'ec': {
-                    validators: {
-                        notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'},
-                        identical: {field: 'user[email]', message: '{{ t .CurrentLocale "email_addresses_do_not_match" "" }}'}
-                    }
-                },
-                'user[password]': {
-                    validators: {
-                        notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'},
-                        regexp: {
-                            regexp: /^(?=.*[0-9])(?=.*[A-Z])[a-zA-Z0-9!@#$%^&*]{6,16}$/,
-                            message: '{{ t .CurrentLocale "invalid_password_format" "" }}'
+                        'ec': {
+                            validators: {
+                                notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'},
+                                identical: {
+                                    compare: function() {
+                                        return $("#email").val() == undefined ? "" : $("#email").val();
+                                    },
+                                    message: '{{ t .CurrentLocale "email_addresses_do_not_match" "" }}'
+                                }
+                            }
                         },
-                        identical: {field: 'user[password_confirm]', message: '{{ t .CurrentLocale "passwords_do_not_match" "" }}'}
-                    }
-                },
-                'user[password_confirmation]': {
-                    validators: {
-                        notEmpty: {message: 'Please confirm your password'},
-                        identical: {field: 'user[password]', message: '{{ t .CurrentLocale "passwords_do_not_match" "" }}'}
-                    }
-                },
-                'terms_and_policy[]': {
-                    validators: {
-                        choice: {
-                            min: 1,
-                            max: 1,
-                            message: '{{ t .CurrentLocale "must_agree_to_terms_and_policy" "" }}'
+                        'user[password]': {
+                            validators: {
+                                notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'},
+                                regexp: {
+                                    regexp: /^(?=.*[0-9])(?=.*[A-Z])[a-zA-Z0-9!@#$%^&*]{6,16}$/,
+                                    message: '{{ t .CurrentLocale "invalid_password_format" "" }}'
+                                },
+                                identical: {
+                                    compare: function() {
+                                        return $("#password-confirmation").val() == undefined ? "" : $("#password-confirmation").val();
+                                    },
+                                    message: '{{ t .CurrentLocale "passwords_do_not_match" "" }}'}
+                            }
+                        },
+                        'user[password_confirmation]': {
+                            validators: {
+                                notEmpty: {message: 'Please confirm your password'},
+                                identical: {
+                                    compare: function() {
+                                        return $("#password").val() == undefined ? "" : $("#password").val();
+                                    },
+                                    message: '{{ t .CurrentLocale "passwords_do_not_match" "" }}'}
+                            }
+                        },
+                        'terms_and_policy[]': {
+                            validators: {
+                                choice: {
+                                    min: 1,
+                                    max: 1,
+                                    message: '{{ t .CurrentLocale "must_agree_to_terms_and_policy" "" }}'
+                                }
+                            }
                         }
+                    },
+                    plugins: {
+                        trigger: new FormValidation.plugins.Trigger(),
+                        submitButton: new FormValidation.plugins.SubmitButton(),
+                        defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+                        bootstrap: new FormValidation.plugins.Bootstrap(),
+                        icon: new FormValidation.plugins.Icon({
+                            valid: 'fa fa-check',
+                            invalid: 'fa fa-times',
+                            validating: 'fa fa-refresh',
+                        }),
                     }
                 }
-            }
-        });
+        )
+
+
     });
 
 </script>

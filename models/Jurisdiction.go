@@ -8,8 +8,6 @@ import (
 
 
 type JurisdictionOptions struct {
-	AuthInfo AuthInfo `json:"auth_info"`
-	Error Error `json:"error"`
 	Jurisdictions []JurisdictionOption `json:"jurisdictions"`
 }
 
@@ -19,7 +17,8 @@ type JurisdictionOption struct {
 	Name string `json:"name" db:"name"`
 }
 
-func AvailableJurisdictionsForState(resp *JurisdictionOptions, state_id int) {
+func AvailableJurisdictionsForState(state_id int) *JurisdictionOptions {
+	j := JurisdictionOptions{}
 
 	query := `
 select a.id, a.name 
@@ -37,7 +36,6 @@ order by a.name
 	rows, err := database.GetDB().Queryx(query, state_id)
 	if err != nil {
 		fmt.Print(err)
-		resp.Error.Msg = err.Error()
 	}
 
 	if rows != nil {
@@ -47,9 +45,11 @@ order by a.name
 			if err != nil {
 				fmt.Print(err)
 			}
-			resp.Jurisdictions = append(resp.Jurisdictions, r)
+			j.Jurisdictions = append(j.Jurisdictions, r)
 		}
 	}
+
+	return &j
 }
 
 func JurisdictionCountForUser(u *User, pg *PermissionGroups) int {

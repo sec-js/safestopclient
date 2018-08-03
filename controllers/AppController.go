@@ -8,8 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"encoding/json"
 	"fmt"
-	"github.com/spf13/viper"
-)
+	)
 
 type AppController struct {
 	*ControllerBase
@@ -76,52 +75,50 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 
 
 
-//CHECK AVAILABILITY
-type checkAvailabilityData struct {
-	PostalCode string
-	Country string
-}
-
 func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.Request) {
 
 
 	if r.Method == "GET" {
-		data := checkAvailabilityData{PostalCode: r.FormValue("postal_code"), Country: "US"}
-		if(viper.GetString("domain") == "safestopapp.ca"){
-			data.Country = "CA"
+
+		data := struct {
+			PostalCode string
+			Jurisdictions *models.JurisdictionOptions
+			JurisdictionCount int
+		} {
+			r.FormValue("postal_code"),
+			&models.JurisdictionOptions{},
+			-1,
 		}
 
 		c.render(w, r, "check_availability", data)
 
 	} else {
 
-	}
-
-
-
-		if r.FormValue("format") == "json" {
-
-
-		available_jurisdictions := models.JurisdictionOptions{}
-		available_jurisdictions.AuthInfo = validateToken(r.FormValue("token"))
-		available_jurisdictions.AuthInfo.RedirectToLogin = false
-
 		postal_code := r.FormValue("postal_code")
+		jurisdictions := &models.JurisdictionOptions{}
+
 		pcr := models.PostalCodeReferenceForPostalCode(postal_code)
 		if(pcr != nil){
 			s := models.StateForAbbreviation(pcr.StateCode)
 			if(s != nil){
-				models.AvailableJurisdictionsForState(&available_jurisdictions, s.Id)
+				jurisdictions = models.AvailableJurisdictionsForState(s.Id)
 			}
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(structToJson(available_jurisdictions))
+		data := struct {
+			PostalCode string
+			Jurisdictions *models.JurisdictionOptions
+			JurisdictionCount int
+		} {
+			r.FormValue("postal_code"),
+			jurisdictions,
+			len(jurisdictions.Jurisdictions),
+		}
 
-
-	} else{
+		c.render(w, r, "check_availability", data)
 
 	}
+
 }
 
 

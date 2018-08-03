@@ -80,11 +80,33 @@ limit 1
 }
 
 
+func EmailExists(email string) bool {
+	email_ct := 0
+	email = ScrubEmailAddress(email)
+
+
+	query := `
+select count(*)
+from users 
+where lower(email) = $1
+and (security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1) or super_admin = true)
+`
+	row := database.GetDB().QueryRowx(query, email)
+	if row == nil {
+		return true
+	} else {
+		err := row.Scan(&email_ct)
+		if err != nil {
+			return true
+		}
+		return (email_ct > 0)
+	}
+
+}
 
 
 func FindUserByEmail(email string) *User {
-	email = strings.Trim(email, " ")
-	email = strings.ToLower(email)
+	email = ScrubEmailAddress(email)
 
 	query := `
 select id, 
@@ -116,6 +138,12 @@ limit 1
 	}
 }
 
+
+func ScrubEmailAddress(email string) string {
+	email = strings.Trim(email, " ")
+	email = strings.ToLower(email)
+	return email
+}
 
 
 
@@ -174,10 +202,6 @@ func HasAnyPermissionGroups(permission_groups []string, user_permission_groups s
 	}
 	return has_permission_group
 }
-
-
-
-
 
 
 func HashPassword(password string) (string, error) {

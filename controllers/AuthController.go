@@ -7,7 +7,9 @@ import (
 		"github.com/spf13/viper"
 	"github.com/schoolwheels/safestopclient/database"
 	"github.com/twinj/uuid"
-	)
+		"errors"
+	"github.com/gorilla/mux"
+)
 
 type AuthController struct {
 	*ControllerBase
@@ -143,11 +145,11 @@ func (c *AuthController) logoutAction(w http.ResponseWriter, r *http.Request) {
 
 
 func (c *AuthController) userExistsAction(w http.ResponseWriter, r *http.Request) {
-
-
-	v := models.FormValidationRemoteResponse{Valid: false}
-	if models.FindUserByEmail(r.FormValue("user[email]")) == nil {
-		v.Valid = true
+	r.ParseForm()
+	v := struct {
+		Valid bool `json:"valid"`
+	} {
+		!models.EmailExists(r.FormValue("user[email]")),
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(structToJson(v))
@@ -171,9 +173,21 @@ func (c *AuthController) registerAction(w http.ResponseWriter, r *http.Request) 
 	} else {
 		r.ParseForm()
 
-		u := models.FindUserByEmail(r.FormValue("user[email]"))
+		vars := mux.Vars(r)
+
+		email := models.ScrubEmailAddress(r.FormValue("user[email]"))
+		password, err := models.HashPassword(r.FormValue("user[password]"))
+		if err != nil {
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),"error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+			http.Redirect(w, r, r.URL.Host+"/register", http.StatusFound)
+		}
+
+		u := models.FindUserByEmail(email)
 
 		if u == nil {
+
+			person_id := 0
+			user_id := 0
 
 			tx, err := database.GetDB().Begin()
 			if err != nil {
@@ -182,94 +196,80 @@ func (c *AuthController) registerAction(w http.ResponseWriter, r *http.Request) 
 			defer func() {
 				if err != nil {
 					tx.Rollback()
+					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),"error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+					http.Redirect(w, r, r.URL.Host+"/register", http.StatusFound)
 					return
 				}
 				err = tx.Commit()
 			}()
-			if _, err = tx.Exec("insert into people (first_name, last_name) values ($1, $2)"); err != nil {
+
+			person_query := `
+	insert into people (first_name, last_name, created_at, updated_at) values ($1, $2, now(), now()) returning id
+`
+			row := tx.QueryRow(person_query, r.FormValue("person[first_name]"), r.FormValue("person[last_name]"))
+			if row == nil {
+				err = errors.New("No person_id returned")
+				return
+			} else {
+				err := row.Scan(&person_id)
+				if err != nil {
+					err = errors.New("Failed to scan person_id")
+					return
+				}
+			}
+
+			user_query := `
+insert into users (
+	email, 
+	password_digest, 
+	source_system, 
+	security_segment_id, 
+	created_at, 
+	updated_at
+) values (
+$1,
+$2,
+'SafeStop',
+(select id from security_segments where name = 'SafeStop' limit 1),
+now(),
+now()
+)
+`
+			row = tx.QueryRow(user_query,
+				email,
+				password)
+			if row == nil {
+				err = errors.New("No user_id returned")
+				return
+			} else {
+				err := row.Scan(&user_id)
+				if err != nil {
+					err = errors.New("Failed to scan user_id")
+					return
+				}
+			}
+
+			permission_group_query := `
+insert into permission_groups_users (permission_group_id, user_id) values ((select id from permission_groups where name = $1 limit 1),$2)
+`
+			_, err = tx.Query(permission_group_query, c.PermissionGroups.License_5, user_id)
+			if err != nil {
+				err = errors.New("Failed to insert permission group")
 				return
 			}
-			if _, err = tx.Exec(""); err != nil {
-				return
-			}
 
-
-			//ActiveRecord::Base.transaction do
-			//	begin
-			//	parent = Person.create!(person_params)
-			//	user = User.new(user_params)
-			//	user.person = parent
-			//	user.source_system = 'SafeStop'
-			//      user.security_segment_id = security_segment.id
-			//	user.permission_groups << PermissionGroup.where(name: Sti::LICENSE_5).first
-			//	user.save!
-			//	#session[:user_id] = user.id
-			//	session[:app_user_id] = user.id
-			//	rescue Exception => ex
-			//	flash[:error] = t('error_while_creating_account', locale: current_locale)
-			//	@email = params[:user][:email]
-			//	@first_name = params[:person][:first_name]
-			//	@last_name = params[:person][:last_name]
-			//render :register and return
-			//	end
-			//	end
-			//	else
-			//	flash[:error] = t('email_address_already_in_use', locale: current_locale)
-			//	redirect_to '/client_login' and return
-			//	end
-			//
-			//	if params.has_key?(:jurisdiction_id) and !params[:jurisdiction_id].blank?
-			//	redirect_to "/activate/#{params[:jurisdiction_id]}?postal_code=#{params[:postal_code]}"
-			//	else
-			//	redirect_to '/check_availability'
-			//end
-
-
-
-
+		} else {
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),"email_address_already_in_use", "")), c.BootstrapAlertClass.Danger)
+			http.Redirect(w, r, r.URL.Host+"/register", http.StatusFound)
 		}
 
 
+		if vars["jurisdiction_id"] != "" {
+			http.Redirect(w, r, r.URL.Host+"/activate/" + vars["jurisdiction_id"], http.StatusFound)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		//countryId, _ := strconv.Atoi(r.FormValue("country-id"))
-		//user := models.NewUser(r.FormValue("email"), r.FormValue("password"))
-		//if user != nil {
-		//
-		//	session, err := c.SessionStore.Get(r, "auth")
-		//	if err != nil {
-		//		//TODO: set flash message about bad cookie, tell user to clear cookies
-		//		log.Println(err)
-		//		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
-		//		return
-		//	}
-		//
-		//	session.Values["current_user_email"] = user.Email
-		//	err = session.Save(r, w)
-		//	if err != nil {
-		//		//TODO: set flash message about not saving session
-		//		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
-		//		return
-		//	}
-		//
-		//
-		//
-		//	http.Redirect(w, r, r.URL.Host+"/dashboard", http.StatusFound)
-		//}
-		http.Redirect(w, r, r.URL.Host+"/register", http.StatusFound)
+		} else {
+			http.Redirect(w, r, r.URL.Host+"/check_availability", http.StatusFound)
+		}
 
 	}
 }

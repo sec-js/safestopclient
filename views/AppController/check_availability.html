@@ -3,46 +3,6 @@
 {{end}}
 {{define "body"}}
 
-
-<script id="check-availability-result-template" type="text/html">
-    {|#jurisdictions|}
-    {|#auth_info.token_valid|}
-    <a href="/activate/{|id|}" class="list-group-item">
-        <table class="list-nav-item-table">
-            <tr>
-                <td><span style="color: #555555;" class="title">{|name|}</span></td>
-                <td><i class="nav-arrow fa fa-angle-right" aria-hidden="true"></i></td>
-            </tr>
-        </table>
-    </a>
-    {|/auth_info.token_valid|}
-    {|^auth_info.token_valid|}
-    <a href="/register/{|id|}" class="list-group-item">
-        <table class="list-nav-item-table">
-            <tr>
-                <td><span style="color: #555555;" class="title">{|name|}</span></td>
-                <td><i class="nav-arrow fa fa-angle-right" aria-hidden="true"></i></td>
-            </tr>
-        </table>
-    </a>
-    {|/auth_info.token_valid|}
-    {|/jurisdictions|}
-</script>
-
-
-<script id="cant-find-my-school-template" type="text/html">
-    <a style="font-weight: bold;" href="/get_safe_stop_in_your_school/{|postal_code|}" class="list-group-item">
-        <table class="list-nav-item-table">
-            <tr>
-                <td><span class="title" style="font-weight: bold; color:#555555;">{{ t .CurrentLocale "ss_check_availability_2" "" }}</span></td>
-                <td><i class="nav-arrow fa fa-angle-right" aria-hidden="true"></i></td>
-            </tr>
-        </table>
-    </a>
-</script>
-
-
-
 <div class="container-fluid">
     <div class=" row">
         <div class="col h3" align="center" style="color: var(--safe-stop-red);">
@@ -57,9 +17,7 @@
     <div class="row">
         <div class="col">
             <form id="check-availability-form" action="/check_availability" method="post">
-
             {{ .CSRFTemplateField}}
-
                 <div class="form-group">
                     <input id="postal-code" autocomplete="false" class="form-control" name="postal_code" type="text" placeholder="{{ t .CurrentLocale "zip_code" "" }}" value="{{ .ViewData.PostalCode }}">
                 </div>
@@ -81,70 +39,97 @@
         </div>
     </div>
 
-
     <div class="row">
         <div class="col">
             <ul class="list-group" id="check-availability-results">
+                {{if eq .ViewData.JurisdictionCount -1}}
 
+                {{ else if eq .ViewData.JurisdictionCount 0}}
+                    <a style="font-weight: bold;" href="/get_safe_stop_in_your_school/{{ .ViewData.PostalCode }}" class="list-group-item">
+                        <table class="list-nav-item-table">
+                            <tr>
+                                <td><span class="title" style="font-weight: bold; color:#555555;">{{ t .CurrentLocale "ss_check_availability_2" "" }}</span></td>
+                                <td><i class="nav-arrow fa fa-angle-right" aria-hidden="true"></i></td>
+                            </tr>
+                        </table>
+                    </a>
+                {{else if gt .ViewData.JurisdictionCount 0}}
+
+                    {{ if gt .CurrentUserId 0 }}
+                        {{range .ViewData.Jurisdictions.Jurisdictions}}
+                            <a href="/activate/{{ .Id }}" class="list-group-item">
+                                <table class="list-nav-item-table">
+                                    <tr>
+                                        <td><span style="color: #555555;" class="title">{{ .Name }}</span></td>
+                                        <td><i class="nav-arrow fa fa-angle-right" aria-hidden="true"></i></td>
+                                    </tr>
+                                </table>
+                            </a>
+                        {{end}}
+                    {{ else }}
+                        {{range .ViewData.Jurisdictions.Jurisdictions}}
+                            <a href="/register/{{ .Id }}" class="list-group-item">
+                                <table class="list-nav-item-table">
+                                    <tr>
+                                        <td><span style="color: #555555;" class="title">{{ .Name }}</span></td>
+                                        <td><i class="nav-arrow fa fa-angle-right" aria-hidden="true"></i></td>
+                                    </tr>
+                                </table>
+                            </a>
+                        {{end}}
+                    {{ end }}
+
+                    <a style="font-weight: bold;" href="/get_safe_stop_in_your_school/{{ .ViewData.PostalCode }}" class="list-group-item">
+                        <table class="list-nav-item-table">
+                            <tr>
+                                <td><span class="title" style="font-weight: bold; color:#555555;">{{ t .CurrentLocale "ss_check_availability_2" "" }}</span></td>
+                                <td><i class="nav-arrow fa fa-angle-right" aria-hidden="true"></i></td>
+                            </tr>
+                        </table>
+                    </a>
+                {{ end }}
             </ul>
         </div>
     </div>
 </div>
 
-
 <script>
 
-    var result_template = $("#check-availability-result-template").html();
-    Mustache.parse(result_template);
+    $(document).ready(function () {
 
-    var cant_find_my_school_template = $("#cant-find-my-school-template").html();
-    Mustache.parse(cant_find_my_school_template);
+        {{if or (eq .Domain "safestopapp.com") (eq .Domain "ssc.local") }}
+            var country_code = 'US';
+        {{else }}
+            var country_code = "CA";
+        {{end}}
 
-
-
-$(document).ready(function () {
-
-    {{if or (eq .Domain "safestopapp.com") (eq .Domain "ssc.local") }}
-        var country_code = 'US';
-    {{else }}
-        var country_code = "CA";
-    {{end}}
-
-    FormValidation.formValidation(
-        document.getElementById("check-availability-form"),
-        {
-            fields: {
-                'postal_code': {
-                    validators: {
-                        notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'},
-                        zipCode: {country: country_code, message: "{{ t .CurrentLocale "invalid_zip_code" "" }}"}
+        FormValidation.formValidation(
+            document.getElementById("check-availability-form"),
+            {
+                fields: {
+                    'postal_code': {
+                        validators: {
+                            notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'},
+                            zipCode: {country: country_code, message: "{{ t .CurrentLocale "invalid_zip_code" "" }}"}
+                        }
                     }
+                },
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger(),
+                    submitButton: new FormValidation.plugins.SubmitButton(),
+                    defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+                    bootstrap: new FormValidation.plugins.Bootstrap(),
+                    icon: new FormValidation.plugins.Icon({
+                        valid: 'fa fa-check',
+                        invalid: 'fa fa-times',
+                        validating: 'fa fa-refresh',
+                    }),
                 }
-            },
-            plugins: {
-                trigger: new FormValidation.plugins.Trigger(),
-                submitButton: new FormValidation.plugins.SubmitButton(),
-                defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
-                bootstrap: new FormValidation.plugins.Bootstrap(),
-                icon: new FormValidation.plugins.Icon({
-                    valid: 'fa fa-check',
-                    invalid: 'fa fa-times',
-                    validating: 'fa fa-refresh',
-                }),
             }
-        }
-    )
+        )
 
-
-    if($("#postal-code").val() && $("#postal-code").val().length > 0){
-        $("#check-availability-button").trigger('click');
-    }
-
-});
-
+    });
 </script>
-
-
 
 
 {{end}}

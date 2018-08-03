@@ -1,9 +1,5 @@
 package models
 
-type FormValidationRemoteResponse struct {
-	Valid bool `json:"valid"`
-}
-
 type AuthInfo struct {
 	User *ClientUser `json:"user"`
 	TokenValid bool `json:"token_valid"`
