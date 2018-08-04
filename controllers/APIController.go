@@ -116,6 +116,6 @@ func (c *APIController) EmailExistsAction(w http.ResponseWriter, r *http.Request
 //http://ssc.local:8080/api/next_registration_ad?jurisdiction_id=172
 func (c *APIController) TestAction(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	c.renderJSON(models.ActivateJurisdiction(172), w)
+	c.renderJSON(models.ActivateJurisdiction(57), w)
 }
 

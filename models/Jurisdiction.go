@@ -162,8 +162,8 @@ func ActivateJurisdiction(id int) interface{} {
 
 	query := `
 select a.id,
-a.registration_text,
-a.registration_image_url,
+coalesce(a.registration_text, '') as registration_text,
+coalesce(a.registration_image_url, '') as registration_image_url,
 b.name as registration_type,
 a.student_registration_label as registration_label
 from jurisdictions a
