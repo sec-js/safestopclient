@@ -121,3 +121,25 @@ and d.id = $1
 
 	return jurisdiction_count
 }
+
+
+func SchoolCodeExists(school_code string, jurisdiction_id int) bool {
+	code_ct := 0
+	query := `
+select count(*)
+from jurisdictions 
+where gate_key = $1
+and id = $2
+and active = true
+`
+	row := database.GetDB().QueryRowx(query, school_code, jurisdiction_id)
+	if row == nil {
+		return true
+	} else {
+		err := row.Scan(&code_ct)
+		if err != nil {
+			return true
+		}
+		return (code_ct > 0)
+	}
+}

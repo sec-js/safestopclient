@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"github.com/schoolwheels/safestopclient/models"
 		"github.com/spf13/viper"
-	"github.com/schoolwheels/safestopclient/database"
-	"github.com/twinj/uuid"
-		"errors"
-	"github.com/gorilla/mux"
+		"github.com/twinj/uuid"
+			"github.com/gorilla/mux"
 )
 
 type AuthController struct {
@@ -192,80 +190,16 @@ func (c *AuthController) registerAction(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		u := models.FindUserByEmail(email)
+		email_exists := models.EmailExists(email)
 
-		if u == nil {
+		if email_exists == false {
 
-			person_id := 0
-			user_id := 0
-
-			tx, err := database.GetDB().Begin()
-			if err != nil {
-				return
-			}
-			defer func() {
-				if err != nil {
-					tx.Rollback()
-					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
-					http.Redirect(w, r, r.URL.Host+"/register/" + jurisdiction_id, http.StatusFound)
-					return
-				}
-				err = tx.Commit()
-			}()
-
-			person_query := `
-	insert into people (first_name, last_name, created_at, updated_at) values ($1, $2, now(), now()) returning id
-`
-			row := tx.QueryRow(person_query, r.FormValue("person[first_name]"), r.FormValue("person[last_name]"))
-			if row == nil {
-				err = errors.New("No person_id returned")
-				return
+			user_id, reg_err := models.RegisterUser(email, password, r.FormValue("person[first_name]"), r.FormValue("person[last_name]"))
+			if reg_err != nil {
+				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  reg_err.Error(), "")), c.BootstrapAlertClass.Danger)
+				http.Redirect(w, r, r.URL.Host+"/register/" + jurisdiction_id, http.StatusFound)
 			} else {
-				err := row.Scan(&person_id)
-				if err != nil {
-					err = errors.New("Failed to scan person_id")
-					return
-				}
-			}
-
-			user_query := `
-insert into users (
-	email, 
-	password_digest, 
-	source_system, 
-	security_segment_id, 
-	created_at, 
-	updated_at
-) values (
-$1,
-$2,
-'SafeStop',
-(select id from security_segments where name = 'SafeStop' limit 1),
-now(),
-now()
-)
-`
-			row = tx.QueryRow(user_query,
-				email,
-				password)
-			if row == nil {
-				err = errors.New("No user_id returned")
-				return
-			} else {
-				err := row.Scan(&user_id)
-				if err != nil {
-					err = errors.New("Failed to scan user_id")
-					return
-				}
-			}
-
-			permission_group_query := `
-insert into permission_groups_users (permission_group_id, user_id) values ((select id from permission_groups where name = $1 limit 1),$2)
-`
-			_, err = tx.Query(permission_group_query, c.PermissionGroups.License_5, user_id)
-			if err != nil {
-				err = errors.New("Failed to insert permission group")
-				return
+				setCurrentUserId(c.ControllerBase, r, w, user_id)
 			}
 
 		} else {

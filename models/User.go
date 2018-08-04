@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/schoolwheels/safestopclient/database"
 	"strings"
+	"github.com/pkg/errors"
 )
 
 type ClientUser struct {
@@ -48,6 +49,79 @@ func UpdateApiToken(user_id int, token string) bool{
 //		Superadmin: false,
 //	}
 //}
+
+func RegisterUser(email string, password string, first_name string, last_name string) (int, error) {
+
+	person_id := 0
+	user_id := 0
+
+	tx, err := database.GetDB().Begin()
+	if err != nil {
+		return 0, err
+	}
+
+
+	person_query := `
+	insert into people (first_name, last_name, created_at, updated_at) values ($1, $2, now(), now()) returning id
+`
+	row := tx.QueryRow(person_query, first_name, last_name)
+	if row == nil {
+		tx.Rollback()
+		return 0, errors.New("Person id not returned")
+	} else {
+		err := row.Scan(&person_id)
+		if err != nil {
+			tx.Rollback()
+			return 0, errors.New("Person id scan failed")
+		}
+	}
+
+	user_query := `
+insert into users (
+	email, 
+	password_digest, 
+	source_system, 
+	security_segment_id, 
+	created_at, 
+	updated_at
+) values (
+$1,
+$2,
+'SafeStop',
+(select id from security_segments where name = 'SafeStop' limit 1),
+now(),
+now()
+) returning id
+`
+	row = tx.QueryRow(user_query,
+		email,
+		password)
+	if row == nil {
+		tx.Rollback()
+		return 0, errors.New("User id not returned")
+	} else {
+		err := row.Scan(&user_id)
+		if err != nil {
+			tx.Rollback()
+			return 0, errors.New("User id scan failed")
+		}
+	}
+
+	permission_group_query := `
+insert into permission_groups_users (permission_group_id, user_id) values ((select id from permission_groups where name = $1 limit 1),$2)
+`
+	_, err = tx.Exec(permission_group_query, "License 5 – SafeStop User", user_id)
+	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+
+	tx.Commit()
+	return user_id, err
+}
+
+
+
 
 func FindUser(id int) *User {
 
@@ -103,6 +177,17 @@ and (security_segment_id = (select id from security_segments where name = 'SafeS
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 func FindUserByEmail(email string) *User {
