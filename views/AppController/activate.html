@@ -4,7 +4,7 @@
 {{define "body"}}
 
 
-<form id="activate-form" class="form" method="post" action="/activate/{{ .ViewData.JurisdictionId }}">
+<form id="activate-form" class="form" method="post" action="/activate/{{ .ViewData.Jurisdiction.Id }}">
 
 {{ .CSRFTemplateField}}
 
@@ -12,33 +12,33 @@
 
         <div class="row">
             <div class="col-sm-12 text-center" style="margin-top: 30px; margin-bottom: 10px;">
-                <img class="img-fluid" style="max-width: 90%" src="{{ .ViewData.RegistrationImageUrl }}">
+                <img class="img-fluid" style="max-width: 90%" src="{{ .ViewData.Jurisdiction.RegistrationImageUrl }}">
             </div>
         </div>
 
         <div class="row">
             <div class="col-sm-12 text-center" style="padding-top: 10px; padding-bottom: 10px;">
-                {{ .ViewData.RegistrationText }}
+            {{ .ViewData.Jurisdiction.RegistrationText }}
             </div>
         </div>
 
         <div class="row">
             <div class="col-sm-12 h3 text-center" style="color: #A12130;">
-                {{ t .CurrentLocale "ss_register_1" "" }}
+            {{ t .CurrentLocale "ss_register_1" "" }}
             </div>
         </div>
 
         <div class="row">
             <div class="col-sm-12 lead text-center" style="margin-top: 20px;">
-                {{ t .CurrentLocale "ss_register_5" "" }}
+            {{ t .CurrentLocale "ss_register_5" "" }}
             </div>
         </div>
         <div class="row">
             <div class="col-sm-12">
 
-                {{ if  eq .ViewData.RegistrationType "Student Identifier" }}
+            {{ if  eq .ViewData.Jurisdiction.RegistrationType "Student Identifier" }}
 
-                {{ if eq .ViewData.RegistrationLabel "student_identifier"}}
+            {{ if eq .ViewData.Jurisdiction.RegistrationLabel "student_identifier"}}
 
                 <div class="student-id-description text-center">{{ t .CurrentLocale "student_id_description" "" }}</div>
                 <div class="form-group">
@@ -54,29 +54,29 @@
                     <input id="student-identifier-3" class="form-control" name="student_information[][sis_identifier]" placeholder="{{ t .CurrentLocale "ss_register_student_4" "" }}">
                 </div>
 
-                {{ else }}
+            {{ else }}
 
                 <div class="form-group">
                     <input id="student-identifier-0" class="form-control" name="student_information[][sis_identifier]" placeholder="{{ t .CurrentLocale "access_code" "" }}">
                 </div>
 
-                {{ end }}
+            {{ end }}
 
 
-                {{ else if eq RegistrationType "Access Code" }}
+            {{ else if eq .ViewData.Jurisdiction.RegistrationType "Access Code" }}
 
                 <div class="form-group">
                     <input id="jurisdiction-gate-key" class="form-control" name="jurisdiction[gate_key]" placeholder="{{ t .CurrentLocale "access_code" "" }}">
                 </div>
 
 
-                {{ else if eq RegistrationType "Access Code + Student Identifier" }}
+            {{ else if eq .ViewData.Jurisdiction.RegistrationType "Access Code + Student Identifier" }}
 
                 <div class="form-group">
                     <input id="jurisdiction-gate-key" class="form-control" name="jurisdiction[gate_key]" placeholder="{{ t .CurrentLocale "school_code" "" }}">
                 </div>
 
-                <div class="student-id-description text-center"><%= t('student_id_description', locale: current_locale) %></div>
+                <div class="student-id-description text-center">{{ t .CurrentLocale "student_id_description" "" }}</div>
                 <div class="form-group">
                     <input id="student-identifier-0" class="form-control" name="student_information[][sis_identifier]" placeholder="{{ t .CurrentLocale "student_1_description" "" }}">
                 </div>
@@ -90,7 +90,7 @@
                     <input id="student-identifier-3" class="form-control" name="student_information[][sis_identifier]" placeholder="{{ t .CurrentLocale "ss_register_student_4" "" }}">
                 </div>
 
-                {{ end }}
+            {{ end }}
 
                 <div class="form-group">
                     <table style="width: 100%;">
@@ -109,12 +109,12 @@
     </div>
 </form>
 
-{{/*<% if @ad %>*/}}
-{{/*<div align="center" style="padding-bottom: 45px;">*/}}
-    {{/*<div style="color: dimgrey; font-size: 8pt;">Sponsored by:</div>*/}}
-    {{/*<a href="/adclick/<%= @ad.id %>" target="_blank"><img src="<%= @ad.login_image %>"></a>*/}}
-{{/*</div>*/}}
-{{/*<% end %>*/}}
+{{ if ne .ViewData.Jurisdiction.Ad.Id 0}}
+<div align="center" style="padding-bottom: 45px;">
+<div style="color: dimgrey; font-size: 8pt;">Sponsored by:</div>
+<a href="/adclick/{{ .ViewData.Jurisdiction.Ad.Id }}" target="_blank"><img src="{{ .ViewData.Jurisdiction.Ad.LoginImageUrl }}"></a>
+</div>
+{{ end }}
 
 <script type="text/javascript">
 
@@ -124,15 +124,11 @@
             e.stopPropagation();
             e.preventDefault();
             var id_or_code = $('#' + $(this).data('sis_identifier')).val();
-            var source = '{{ .ViewData.JurisdictionId }}';
+            var source = '{{ .ViewData.Jurisdiction.Id }}';
             var base_url = '/failed_registration_attempt'
             var url = base_url + '?id_or_code=' + id_or_code + '&jurisdiction_id=' + source;
             window.open(url, '_self');
         })
-
-
-
-
 
 
         FormValidation.formValidation(
@@ -140,115 +136,116 @@
                 {
                     fields: {
 
+                    {{ if eq .ViewData.Jurisdiction.RegistrationLabel "student_identifier"}}
+                        '#student-identifier-0': {
+                            selector: '#student-identifier-0',
+                            validators: {
+                                notEmpty: {message: "Student identification number is required"},
+                                remote: {
+                                    message: "Sorry! The security information you entered (either a Student ID or an Access Code) is not valid.<br><br> If you are trying to register with a Student ID, please click <a data-sis_identifier='student-identifier-0' class='failed-registration-attempt' style='cursor:pointer;'>HERE</a> to request that yours be added to our system. If you are trying to register with an Access Code, contact the individual or office listed on the previous page for assistance.",
+                                    url: '/api/student_exists',
+                                    type: 'post',
+                                    delay: 100,
+                                    data: function (validator, $field, value) {
+                                        return {
+                                            jurisdiction_id: {{ .ViewData.Jurisdiction.Id }},
+                                            sis_identifier: $("#student-identifier-0").val()
+                                        };
+                                    }
+                                }
+                            }
+                        },
+                    {{ else }}
+                        '#student-identifier-0': {
+                            selector: '#student-identifier-0',
+                            validators: {
+                                notEmpty: {message: "{{ t .CurrentLocale "required" "" }}"},
+                                remote: {
+                                    message: "Sorry! The security information you entered (either a Student ID or an Access Code) is not valid.<br><br> If you are trying to register with a Student ID, please click <a data-sis_identifier='student-identifier-0' class='failed-registration-attempt' style='cursor:pointer;'>HERE</a> to request that yours be added to our system. If you are trying to register with an Access Code, contact the individual or office listed on the previous page for assistance.",
+                                    url: '/api/student_exists',
+                                    type: 'post',
+                                    delay: 100,
+                                    data: function (validator, $field, value) {
+                                        return {
+                                            jurisdiction_id: {{ .ViewData.Jurisdiction.Id }},
+                                            sis_identifier: $("#student-identifier-0").val()
+                                        };
+                                    }
+                                }
+                            }
+                        },
+                    {{ end }}
 
-        {{ if .ViewData.RegistrationLabel "student_identifier"}}
+                        '#student-identifier-1': {
+                            selector: '#student-identifier-1',
+                            validators: {
+                                remote: {
+                                    message: "Sorry! The security information you entered (either a Student ID or an Access Code) is not valid.<br><br> If you are trying to register with a Student ID, please click <a data-sis_identifier='student-identifier-1' class='failed-registration-attempt' style='cursor:pointer;'>HERE</a> to request that yours be added to our system. If you are trying to register with an Access Code, contact the individual or office listed on the previous page for assistance.",
+                                    url: '/api/student_exists',
+                                    type: 'post',
+                                    delay: 100,
+                                    data: function (validator, $field, value) {
+                                        return {
+                                            jurisdiction_id: {{ .ViewData.Jurisdiction.Id}},
+                                            sis_identifier: $('#student-identifier-1').val()
+                                        };
+                                    }
+                                }
+                            }
+                        },
+                        '#student-identifier-2': {
+                            selector: '#student-identifier-2',
+                            validators: {
+                                remote: {
+                                    message: "Sorry! The security information you entered (either a Student ID or an Access Code) is not valid.<br><br> If you are trying to register with a Student ID, please click <a data-sis_identifier='student-identifier-2' class='failed-registration-attempt' style='cursor:pointer;'>HERE</a> to request that yours be added to our system. If you are trying to register with an Access Code, contact the individual or office listed on the previous page for assistance.",
+                                    url: '/api/student_exists',
+                                    type: 'post',
+                                    delay: 100,
+                                    data: function (validator, $field, value) {
+                                        return {
+                                            jurisdiction_id: {{ .ViewData.Jurisdiction.Id }},
+                                            sis_identifier: $("#student-identifier-2").val()
+                                        };
+                                    }
+                                }
+                            }
+                        },
+                        '#student-identifier-3': {
+                            selector: '#student-identifier-3',
+                            validators: {
+                                remote: {
+                                    message: "Sorry! The security information you entered (either a Student ID or an Access Code) is not valid.<br><br> If you are trying to register with a Student ID, please click <a data-sis_identifier='student-identifier-3' class='failed-registration-attempt' style='cursor:pointer;'>HERE</a> to request that yours be added to our system. If you are trying to register with an Access Code, contact the individual or office listed on the previous page for assistance.",
+                                    url: '/api/student_exists',
+                                    type: 'post',
+                                    delay: 100,
+                                    data: function (validator, $field, value) {
+                                        return {
+                                            jurisdiction_id: {{ .ViewData.Jurisdiction.Id }},
+                                            sis_identifier: $("#student-identifier-3").val()
+                                        };
+                                    }
+                                }
+                            }
+                        },
+                        'jurisdiction[gate_key]': {
+                            selector: '#jurisdiction-gate-key',
+                            validators: {
+                                notEmpty: {message: "Invalid school code"},
+                                remote: {
+                                    message: "Sorry! The security information you entered (either a Student ID or an Access Code) is not valid.<br><br> If you are trying to register with a Student ID, please click <a data-sis_identifier='jurisdiction-gate-key' class='failed-registration-attempt' style='cursor:pointer;'>HERE</a> to request that yours be added to our system. If you are trying to register with an Access Code, contact the individual or office listed on the previous page for assistance.",
+                                    url: '/api/school_code_exists',
+                                    type: 'GET',
+                                    delay: 100,
+                                    data: function (validator, $field, value) {
+                                        return {
+                                            jurisdiction_id: {{ .ViewData.Jurisdiction.Id }},
+                                            school_code: $("#jurisdiction-gate-key").val()
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
-
-            '#student-identifier-0': {
-            selector: '#student-identifier-0',
-                    validators: {
-                notEmpty: {message: "Student identification number is required"},
-                remote: {
-                    message: "Sorry! The security information you entered (either a Student ID or an Access Code) is not valid.<br><br> If you are trying to register with a Student ID, please click <a data-sis_identifier='student-identifier-0' class='failed-registration-attempt' style='cursor:pointer;'>HERE</a> to request that yours be added to our system. If you are trying to register with an Access Code, contact the individual or office listed on the previous page for assistance.",
-                            url: '/api/student_exists',
-                            type: 'post',
-                            delay: 100,
-                            data: function (validator, $field, value) {
-                        return {
-                            authenticity_token: '<%= form_authenticity_token %>',
-                            jurisdiction_id: {{ .ViewData.JurisdictionId }},
-                                sis_identifier: $("#student-identifier-0").val()
-                    };
-                    }
-                }
-            }
-        },
-            {{ else }}
-        '#student-identifier-0': {
-            selector: '#student-identifier-0',
-                    validators: {
-                notEmpty: {message: "<%= t('required', locale: current_locale) %>"},
-                remote: {
-                    message: "Sorry! The security information you entered (either a Student ID or an Access Code) is not valid.<br><br> If you are trying to register with a Student ID, please click <a data-sis_identifier='student-identifier-0' class='failed-registration-attempt' style='cursor:pointer;'>HERE</a> to request that yours be added to our system. If you are trying to register with an Access Code, contact the individual or office listed on the previous page for assistance.",
-                            url: '/api/student_exists',
-                            type: 'post',
-                            delay: 100,
-                            data: function (validator, $field, value) {
-                        return {
-                            authenticity_token: '<%= form_authenticity_token %>',
-                            jurisdiction_id: {{ .ViewData.JurisdictionId }},
-                                sis_identifier: $("#student-identifier-0").val()
-                    };
-                    }
-                }
-            }
-        },
-            {{ end }}
-
-        '#student-identifier-1': {
-            selector: '#student-identifier-1',
-                    validators: {
-                remote: {
-                    message: "Sorry! The security information you entered (either a Student ID or an Access Code) is not valid.<br><br> If you are trying to register with a Student ID, please click <a data-sis_identifier='student-identifier-1' class='failed-registration-attempt' style='cursor:pointer;'>HERE</a> to request that yours be added to our system. If you are trying to register with an Access Code, contact the individual or office listed on the previous page for assistance.",
-                            url: '/api/student_exists',
-                            type: 'post',
-                            delay: 100,
-                            data: function (validator, $field, value) {
-                        return {
-                            jurisdiction_id: {{ .ViewData.JurisdictionId}},
-                            sis_identifier: $('#student-identifier-1').val()
-                    };
-                    }
-                }
-            }
-        },
-        '#student-identifier-2': {
-            selector: '#student-identifier-2',
-                    validators: {
-                remote: {
-                    message: "Sorry! The security information you entered (either a Student ID or an Access Code) is not valid.<br><br> If you are trying to register with a Student ID, please click <a data-sis_identifier='student-identifier-2' class='failed-registration-attempt' style='cursor:pointer;'>HERE</a> to request that yours be added to our system. If you are trying to register with an Access Code, contact the individual or office listed on the previous page for assistance.",
-                            url: '/api/student_exists',
-                            type: 'post',
-                            delay: 100,
-                            data: function (validator, $field, value) {
-                        return {
-                            jurisdiction_id: {{ .ViewData.JurisdictionId }},
-                                sis_identifier: $("#student-identifier-2").val()
-                    };
-                    }
-                }
-            }
-        },
-        '#student-identifier-3': {
-            selector: '#student-identifier-3',
-                    validators: {
-                remote: {
-                    message: "Sorry! The security information you entered (either a Student ID or an Access Code) is not valid.<br><br> If you are trying to register with a Student ID, please click <a data-sis_identifier='student-identifier-3' class='failed-registration-attempt' style='cursor:pointer;'>HERE</a> to request that yours be added to our system. If you are trying to register with an Access Code, contact the individual or office listed on the previous page for assistance.",
-                            url: '/api/student_exists',
-                            type: 'post',
-                            delay: 100,
-                            data: function (validator, $field, value) {
-                        return {
-                            jurisdiction_id: {{ .ViewData.JurisdictionId }},
-                                sis_identifier: $("#student-identifier-3").val()
-                    };
-                    }
-                }
-            }
-        },
-        'jurisdiction[gate_key]': {
-            selector: '#jurisdiction-gate-key',
-                    validators: {
-                notEmpty: {message: "Invalid school code"},
-                remote: {
-                    message: "Sorry! The security information you entered (either a Student ID or an Access Code) is not valid.<br><br> If you are trying to register with a Student ID, please click <a data-sis_identifier='jurisdiction-gate-key' class='failed-registration-attempt' style='cursor:pointer;'>HERE</a> to request that yours be added to our system. If you are trying to register with an Access Code, contact the individual or office listed on the previous page for assistance.",
-                    url: function (validator, $field, value) {
-                        return '/school_code_exists/{{ .ViewData.Jurisdiction }}/' + $("#jurisdiction-gate-key").val();
-                    },
-                    type: 'POST',
-                    delay: 100,
-                    data: function (validator, $field, value) {
-                        return {};
                     },
                     plugins: {
                         trigger: new FormValidation.plugins.Trigger(),
@@ -262,9 +259,6 @@
                         }),
                     }
                 })
-
-
-
 
 
     });

@@ -16,8 +16,12 @@ func (c *APIController) Register() {
 
 	//actions
 	c.addRouteWithPrefix("/version", c.versionAction)
-	c.addRouteWithPrefix("/student_exists", c.studentExistsAction)
-	c.addRouteWithPrefix("/school_code_exists", c.schoolCodeExistsAction)
+	c.addRouteWithPrefix("/student_exists", c.StudentExistsAction)
+	c.addRouteWithPrefix("/school_code_exists", c.SchoolCodeExistsAction)
+	c.addRouteWithPrefix("/email_exists", c.EmailExistsAction)
+
+	c.addRouteWithPrefix("/test", c.TestAction)
+
 
 }
 
@@ -47,7 +51,7 @@ func (c *APIController) versionAction(w http.ResponseWriter, r *http.Request) {
 
 
 //http://ssc.local:8080/api/student_exists?sis_identifier=112408&jurisdiction_id%20=%2015
-func (c *APIController) studentExistsAction(w http.ResponseWriter, r *http.Request) {
+func (c *APIController) StudentExistsAction(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	r.ParseForm()
 
@@ -59,20 +63,20 @@ func (c *APIController) studentExistsAction(w http.ResponseWriter, r *http.Reque
 		} {
 			false,
 		}
-		w.Write(structToJson(v))
+		c.renderJSON(v, w)
 	} else {
 		v := struct {
 			Valid bool `json:"valid"`
 		} {
 			models.StudentIdentifierExists(sis_identifier, jurisdiction_id),
 		}
-		w.Write(structToJson(v))
+
+		c.renderJSON(v, w)
 	}
 }
 
-
 //http://ssc.local:8080/api/school_code_exists?school_code=MACC48&jurisdiction_id=214
-func (c *APIController) schoolCodeExistsAction(w http.ResponseWriter, r *http.Request) {
+func (c *APIController) SchoolCodeExistsAction(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	r.ParseForm()
 
@@ -84,15 +88,34 @@ func (c *APIController) schoolCodeExistsAction(w http.ResponseWriter, r *http.Re
 		} {
 			false,
 		}
-		w.Write(structToJson(v))
+		c.renderJSON(v, w)
 	} else {
 		v := struct {
 			Valid bool `json:"valid"`
 		} {
 			models.SchoolCodeExists(school_code, jurisdiction_id),
 		}
-		w.Write(structToJson(v))
+		c.renderJSON(v, w)
 	}
 }
 
+//http://ssc.local:8080/api/email_exists?user[email]=acook@ridesta.comfff
+func (c *APIController) EmailExistsAction(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	v := struct {
+		Valid bool `json:"valid"`
+	} {
+		!models.EmailExists(r.FormValue("user[email]")),
+	}
+	w.Header().Set("Content-Type", "application/json")
+	c.renderJSON(v, w)
+}
+
+
+
+//http://ssc.local:8080/api/next_registration_ad?jurisdiction_id=172
+func (c *APIController) TestAction(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	c.renderJSON(models.ActivateJurisdiction(172), w)
+}
 

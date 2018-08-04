@@ -143,3 +143,48 @@ and active = true
 		return (code_ct > 0)
 	}
 }
+
+
+
+
+func ActivateJurisdiction(id int) interface{} {
+
+	j := struct {
+		Id int `json:"id" db:"id"`
+		RegistrationText string `json:"registration_text" db:"registration_text"`
+		RegistrationImageUrl string `json:"registration_image_url" db:"registration_image_url"`
+		RegistrationType string `json:"registration_type" db:"registration_type"`
+		RegistrationLabel string `json:"registration_label" db:"registration_label"`
+		Ad interface{}
+	} {
+
+	}
+
+	query := `
+select a.id,
+a.registration_text,
+a.registration_image_url,
+b.name as registration_type,
+a.student_registration_label as registration_label
+from jurisdictions a
+join safe_stop_registration_types b on a.safe_stop_registration_type_id = b.id
+where a.active = true
+and a.id = $1;
+`
+	err := database.GetDB().QueryRowx(query, id).StructScan(&j)
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	j.Ad = NextRegistrationAd(id)
+
+	return j
+}
+
+
+
+
+
+
+
+

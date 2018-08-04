@@ -30,7 +30,6 @@ func (c *AuthController) Register() {
 	c.addRouteWithPrefix("/logout", c.logoutAction)
 	c.addRouteWithPrefix("/register/{jurisdiction_id}", c.registerAction)
 	c.addRouteWithPrefix("/forgot_password", c.forgotPasswordAction)
-	c.addRouteWithPrefix("/user_exists", c.userExistsAction)
 
 }
 
@@ -143,18 +142,6 @@ func (c *AuthController) logoutAction(w http.ResponseWriter, r *http.Request) {
 
 
 
-
-
-func (c *AuthController) userExistsAction(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	v := struct {
-		Valid bool `json:"valid"`
-	} {
-		!models.EmailExists(r.FormValue("user[email]")),
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(structToJson(v))
-}
 
 
 

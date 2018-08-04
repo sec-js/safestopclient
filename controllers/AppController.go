@@ -6,9 +6,8 @@ import (
 	"strings"
 	"reflect"
 	"github.com/gorilla/mux"
-	"encoding/json"
-	"fmt"
-	)
+	"strconv"
+)
 
 type AppController struct {
 	*ControllerBase
@@ -21,6 +20,7 @@ func (c *AppController) Register() {
 	c.addTemplate("check_availability", "check_availability.html", "default.html")
 	c.addTemplate("account", "account.html", "app.html")
 	c.addTemplate( "language", "language.html", "app.html")
+	c.addTemplate( "activate", "activate.html", "default.html")
 
 	//actions
 	c.addRouteWithPrefix("/", c.IndexAction)
@@ -28,6 +28,7 @@ func (c *AppController) Register() {
 	c.addRouteWithPrefix("/change_locale/{locale}", c.ChangeLocaleAction)
 	c.addRouteWithPrefix("/account", c.AccountAction)
 	c.addRouteWithPrefix( "/language", c.LanguageAction)
+	c.addRouteWithPrefix("/activate/{jurisdiction_id}", c.ActivateAction)
 }
 
 type dashData struct {
@@ -130,13 +131,30 @@ func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.R
 
 
 func (c *AppController) ActivateAction(w http.ResponseWriter, r *http.Request) {
-	session, _ :=  c.SessionStore.Get(r, "auth")
-	email := session.Values["current_user_email"]
-	if email != nil {
-		http.Redirect(w, r, r.URL.Host+"/dashboard", http.StatusFound)
+
+	vars := mux.Vars(r)
+
+
+	if vars["jurisdiction_id"] != ""{
+
+		id, err := strconv.Atoi(vars["jurisdiction_id"])
+		if err != nil {
+			//REDIRECT
+		}
+
+		data := struct {
+			Jurisdiction interface{}
+			PostalCode string
+		} {
+			models.ActivateJurisdiction(id),
+			"29483",
+		}
+		c.render(w, r, "activate", data)
+
+	} else {
+		//REDIRECT
 	}
 
-	c.render(w, r, "activate", nil)
 }
 
 func (c *AppController) ChangeLocaleAction(w http.ResponseWriter, r *http.Request){
@@ -230,15 +248,6 @@ func validateToken(token string) models.AuthInfo {
 	return a
 }
 
-func structToJson(data interface{}) []byte{
-	b, err := json.Marshal(data)
-	if err != nil {
-		fmt.Println(err)
-		return []byte{}
-	} else{
-		return b
-	}
-}
 
 // addAction requires you to have a view named <action>.html and a method func (c *AppController) <Action>Action(http.ResponseWriter, *http.Request)
 func (c *AppController) addAction(action string){
