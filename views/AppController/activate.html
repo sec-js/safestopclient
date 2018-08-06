@@ -4,9 +4,13 @@
 {{define "body"}}
 
 
-<form id="activate-form" class="form" method="post" action="/activate/{{ .ViewData.Jurisdiction.Id }}">
+<form id="activate-form" class="form" method="post" action="/activate/{{ .ViewData.Jurisdiction.Id }}?postal_code={{.ViewData.PostalCode}}">
 
 {{ .CSRFTemplateField}}
+
+
+    <input type="hidden" name="registration_type" value="{{ .ViewData.Jurisdiction.RegistrationType }}">
+
 
     <div class="container-fluid">
 

@@ -122,6 +122,190 @@ insert into permission_groups_users (permission_group_id, user_id) values ((sele
 
 
 
+func ActivateStudentIdentifierSubscription(jurisdiction_id int, product_id int, user_id int, student_identifiers []string) (bool, error) {
+
+	one_student_successful := false
+
+	previous_identifier := ""
+	for i := 0; i < len(student_identifiers); i++ {
+
+		if len(student_identifiers[i]) > 0 && student_identifiers[i] != previous_identifier {
+
+			tx, err := database.GetDB().Begin()
+			if err != nil {
+				continue
+			}
+
+			student_id := 0
+			student_id_query := `
+			select id from student_informations where deleted = false and jurisdiction_id = $1 and sis_identifier = $2
+`
+			row := tx.QueryRow(student_id_query, jurisdiction_id, student_identifiers[i])
+			if row == nil {
+				tx.Rollback()
+				continue
+			} else {
+				err := row.Scan(&student_id)
+				if err != nil {
+					tx.Rollback()
+					continue
+				}
+
+				relationship_query := `
+insert into personal_relationships (person_id, person_related_id, personal_relationship_type, created_at, updated_at) 
+values (
+(select person_id from users where id = $1 limit 1), 
+(select person_id from student_informations where id = $2 limit 1), 
+1, 
+now(), 
+now())
+`
+				_, err = tx.Query(relationship_query, user_id, student_id)
+				if err != nil {
+					tx.Rollback()
+					continue
+				}
+
+
+				user_stops_query := `
+insert into bus_route_stop_users (user_id, bus_route_stop_id, created_at, updated_at) (
+select $1, id, now(), now() from bus_route_stops a 
+join bus_route_stops_student_informations b on a.id = b.bus_route_stop_id
+where b.student_information_id = $2
+and a.deleted = false
+and a.id not in (select bus_route_stop_id from bus_route_stop_users where user_id = $1)
+)
+`
+				_, err = tx.Query(user_stops_query, user_id, student_id)
+				if err != nil {
+					tx.Rollback()
+					continue
+				}
+
+				tx.Commit()
+				one_student_successful = true
+
+			}
+		}
+
+	}
+
+	if one_student_successful == true {
+
+		subscription_query := `
+insert into subscriptions (start_date, end_date, user_id, product_id, active, created_at, updated_at) 
+values (
+(select postgresql_name from time_zones where id = (select time_zone_id from jurisdictions where id = $1)), 
+(select effective_end_date from products where id = $2), 
+$3, 
+now(), 
+now()
+)`
+		_, err := database.GetDB().Query(subscription_query, jurisdiction_id, product_id, user_id)
+		if err != nil {
+			return false, errors.New("Subscription creation failed")
+		}
+
+		return true, nil
+
+	} else {
+		return false, errors.New("No students assigned")
+	}
+
+
+}
+
+func ActivateAccessCodeSubscription(jurisdiction_id int, product_id int, currentUserId int) (bool, error) {
+
+	tx, err := database.GetDB().Begin()
+	if err != nil {
+		return false, err
+	}
+
+	person_id := 0
+	person_query := `
+	insert into people (first_name, last_name, created_at, updated_at) values (select to_hex(round(random() * 2^32 - 1)::BIGINT), select to_hex(round(random() * 2^32 - 1)::BIGINT), now(), now()) returning id
+`
+	row := tx.QueryRow(person_query)
+	if row == nil {
+		tx.Rollback()
+		return false, errors.New("Person id not returned")
+	} else {
+		err := row.Scan(&person_id)
+		if err != nil {
+			tx.Rollback()
+			return false, errors.New("Person id scan failed")
+		}
+	}
+
+
+	student_information_id := 0
+	student_query := `
+	insert into student_informations (jurisdiction_id, person_id, created_at, updated_at) values ($1, $2, now(), now()) returning id
+`
+	row = tx.QueryRow(student_query)
+	if row == nil {
+		tx.Rollback()
+		return false, errors.New("StudentInformation id not returned")
+	} else {
+		err := row.Scan(&student_information_id)
+		if err != nil {
+			tx.Rollback()
+			return false, errors.New("StudentInformation id scan failed")
+		}
+	}
+
+	relationship_query := `insert into personal_relationships (person_id, person_related_id, personal_relationship_type, created_at, updated_at) values ($1, $2, 1, now(), now())`
+	_, err = tx.Query(relationship_query, currentUserId, person_id)
+	if row == nil {
+		tx.Rollback()
+		return false, errors.New("StudentInformation id not returned")
+	}
+
+	subscription_query := `
+insert into subscriptions (start_date, end_date, user_id, product_id, active, created_at, updated_at) 
+values (
+(select postgresql_name from time_zones where id = (select time_zone_id from jurisdictions where id = $1)), 
+(select effective_end_date from products where id = $2), 
+$3, 
+now(), 
+now()
+)`
+	_, err = tx.Query(subscription_query, jurisdiction_id, product_id, currentUserId)
+	if row == nil {
+		tx.Rollback()
+		return false, errors.New("Subscription creation failed")
+	}
+
+	tx.Commit()
+	return true, nil
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 func FindUser(id int) *User {
 

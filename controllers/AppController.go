@@ -7,7 +7,8 @@ import (
 	"reflect"
 	"github.com/gorilla/mux"
 	"strconv"
-)
+	"github.com/schoolwheels/safestopclient/database"
+	)
 
 type AppController struct {
 	*ControllerBase
@@ -21,6 +22,7 @@ func (c *AppController) Register() {
 	c.addTemplate("account", "account.html", "app.html")
 	c.addTemplate( "language", "language.html", "app.html")
 	c.addTemplate( "activate", "activate.html", "default.html")
+	c.addTemplate("faq", "faq.html", "default.html")
 
 	//actions
 	c.addRouteWithPrefix("/", c.IndexAction)
@@ -29,6 +31,7 @@ func (c *AppController) Register() {
 	c.addRouteWithPrefix("/account", c.AccountAction)
 	c.addRouteWithPrefix( "/language", c.LanguageAction)
 	c.addRouteWithPrefix("/activate/{jurisdiction_id}", c.ActivateAction)
+	c.addRouteWithPrefix("/faq", c.FaqAction)
 }
 
 type dashData struct {
@@ -102,7 +105,7 @@ func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.R
 		if(pcr != nil){
 			s := models.StateForAbbreviation(pcr.StateCode)
 			if(s != nil){
-				jurisdictions = models.AvailableJurisdictionsForState(s.Id)
+				jurisdictions = models.AvailableJurisdictionsForState(s.Id, postal_code)
 			}
 		}
 
@@ -133,28 +136,97 @@ func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.R
 func (c *AppController) ActivateAction(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
+	postal_code := r.FormValue("postal_code")
 
-
-	if vars["jurisdiction_id"] != ""{
-
-		id, err := strconv.Atoi(vars["jurisdiction_id"])
-		if err != nil {
-			//REDIRECT
-		}
-
-		data := struct {
-			Jurisdiction interface{}
-			PostalCode string
-		} {
-			models.ActivateJurisdiction(id),
-			"29483",
-		}
-		c.render(w, r, "activate", data)
-
-	} else {
-		//REDIRECT
+	user_id := currentUserId(c.ControllerBase, r)
+	if user_id == 0 {
+		//REDIRECT AND RETURN
+		http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
+		return
 	}
 
+
+	if r.Method == "GET" {
+
+		if vars["jurisdiction_id"] != "" {
+
+			id, err := strconv.Atoi(vars["jurisdiction_id"])
+			if err != nil {
+				//REDIRECT
+				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "jurisdiction_not_available", "")), c.BootstrapAlertClass.Danger)
+				http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
+				return
+			}
+
+			data := struct {
+				Jurisdiction interface{}
+				PostalCode   string
+			}{
+				models.ActivateJurisdiction(id),
+				r.FormValue("postal_code"),
+			}
+			c.render(w, r, "activate", data)
+
+		} else {
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "jurisdiction_not_available", "")), c.BootstrapAlertClass.Danger)
+			http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
+			return
+		}
+
+	} else {
+
+		r.ParseForm()
+
+		if vars["jurisdiction_id"] != "" {
+
+			registration_type := r.FormValue("registration_type")
+
+			jurisdiction_id, err := strconv.Atoi(vars["jurisdiction_id"])
+			if err != nil {
+				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "jurisdiction_not_available", "")), c.BootstrapAlertClass.Danger)
+				http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
+				return
+			}
+
+			product_id := models.ActiveProductIdForJurisdiction(jurisdiction_id)
+			if product_id == 0 {
+				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "jurisdiction_has_no_products", "")), c.BootstrapAlertClass.Danger)
+				http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
+				return
+			}
+
+			if registration_type == "Student Identifier" || registration_type == "Access Code + Student Identifier" {
+
+				student_identifiers := r.Form["student_information[][sis_identifier]"]
+				subscription_created, err := models.ActivateStudentIdentifierSubscription(jurisdiction_id, product_id, user_id, student_identifiers)
+				if !subscription_created || err != nil {
+					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+					http.Redirect(w, r, r.URL.Host+"/activate/" + string(jurisdiction_id) + "?postal_code=" + postal_code, http.StatusFound)
+					return
+				}
+
+			} else {
+
+				subscription_created, err := models.ActivateAccessCodeSubscription(jurisdiction_id, product_id, user_id)
+				if !subscription_created || err != nil {
+					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+					http.Redirect(w, r, r.URL.Host+"/activate/" + string(jurisdiction_id) + "?postal_code=" + postal_code, http.StatusFound)
+					return
+				}
+
+			}
+
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "you_have_successfully_registered_for", "")), c.BootstrapAlertClass.Info)
+			http.Redirect(w, r, r.URL.Host+ "/", http.StatusFound)
+			return
+
+		} else {
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "jurisdiction_not_available", "")), c.BootstrapAlertClass.Danger)
+			http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
+			return
+		}
+
+	}
 }
 
 func (c *AppController) ChangeLocaleAction(w http.ResponseWriter, r *http.Request){
@@ -193,13 +265,31 @@ func (c *AppController) MapAction(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *AppController) FaqAction(w http.ResponseWriter, r *http.Request) {
-	session, _ :=  c.SessionStore.Get(r, "auth")
-	email := session.Values["current_user_email"]
-	if email != nil {
-		http.Redirect(w, r, r.URL.Host+"/dashboard", http.StatusFound)
+
+    type FAQ struct{
+		Question string `db:"question"`
+		Answer string `db:"answer"`
 	}
 
-	c.render(w, r, "faq", nil)
+	data := struct{
+		Faq []FAQ
+	} {
+
+	}
+
+	query := `select question, answer from frequently_asked_questions`
+	rows, err := database.GetDB().Queryx(query)
+	if err != nil {
+
+	} else {
+		for rows.Next() {
+			d := FAQ{}
+			rows.StructScan(&d)
+			data.Faq = append(data.Faq, d)
+		}
+	}
+
+	c.render(w, r, "faq", data)
 }
 
 

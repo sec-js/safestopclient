@@ -57,7 +57,7 @@
 
                     {{ if gt .CurrentUserId 0 }}
                         {{range .ViewData.Jurisdictions.Jurisdictions}}
-                            <a href="/activate/{{ .Id }}" class="list-group-item">
+                            <a href="{{ .ActivateUrl }}" class="list-group-item">
                                 <table class="list-nav-item-table">
                                     <tr>
                                         <td><span style="color: #555555;" class="title">{{ .Name }}</span></td>
@@ -68,7 +68,7 @@
                         {{end}}
                     {{ else }}
                         {{range .ViewData.Jurisdictions.Jurisdictions}}
-                            <a href="/register/{{ .Id }}" class="list-group-item">
+                            <a href="{{ .RegisterUrl }}" class="list-group-item">
                                 <table class="list-nav-item-table">
                                     <tr>
                                         <td><span style="color: #555555;" class="title">{{ .Name }}</span></td>

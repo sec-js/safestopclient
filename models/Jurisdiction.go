@@ -15,13 +15,19 @@ type JurisdictionOption struct {
 	*ModelBase
 	Id	int `json:"id" db:"id"`
 	Name string `json:"name" db:"name"`
+	RegisterUrl string `json:"register_url" db:"register_url"`
+	ActivateUrl string `json:"activate_url" db:"activate_url"`
+
 }
 
-func AvailableJurisdictionsForState(state_id int) *JurisdictionOptions {
+func AvailableJurisdictionsForState(state_id int, postal_code string) *JurisdictionOptions {
 	j := JurisdictionOptions{}
 
 	query := `
-select a.id, a.name 
+select a.id, 
+a.name,
+'/activate/' || a.id || '?postal_code=' || $2 as activate_url,
+'/register/' || a.id || '?postal_code=' || $2 as register_url
 from jurisdictions a
 join products b on b.jurisdiction_id = a.id
 join time_zones c on c.id = a.time_zone_id
@@ -33,7 +39,7 @@ and b.availability_start_date <= now() at time zone c.postgresql_name
 and b.availability_end_date >= now() at time zone c.postgresql_name
 order by a.name
 `
-	rows, err := database.GetDB().Queryx(query, state_id)
+	rows, err := database.GetDB().Queryx(query, state_id, postal_code)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -180,6 +186,31 @@ and a.id = $1;
 
 	return j
 }
+
+
+func ActiveProductIdForJurisdiction(jurisdiction_id int) int {
+	product_id := 0
+
+	query := `
+select a.id
+from products a 
+join jurisdictions b on a.jurisdiction_id = b.id
+join time_zones c on c.id = b.time_zone_id
+where a.jurisdiction_id = $1
+and a.availability_start_date <= NOW() at time zone c.postgresql_name
+and a.availability_end_date > NOW() at time zone c.postgresql_name
+and a.active = 't'
+and a.product_type = 'ss'
+`
+
+	err := database.GetDB().QueryRow(query, jurisdiction_id).Scan(&product_id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return product_id
+}
+
 
 
 
