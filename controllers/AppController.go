@@ -23,6 +23,7 @@ func (c *AppController) Register() {
 	c.addTemplate( "language", "language.html", "app.html")
 	c.addTemplate( "activate", "activate.html", "default.html")
 	c.addTemplate("faq", "faq.html", "default.html")
+	c.addTemplate("failed_registration_attempt", "failed_registration_attempt.html", "default.html")
 
 	//actions
 	c.addRouteWithPrefix("/", c.IndexAction)
@@ -32,6 +33,7 @@ func (c *AppController) Register() {
 	c.addRouteWithPrefix( "/language", c.LanguageAction)
 	c.addRouteWithPrefix("/activate/{jurisdiction_id}", c.ActivateAction)
 	c.addRouteWithPrefix("/faq", c.FaqAction)
+	c.addRouteWithPrefix("/failed_registration_attempt", c.FailedRegistrationAttemptAction)
 }
 
 type dashData struct {
@@ -291,6 +293,47 @@ func (c *AppController) FaqAction(w http.ResponseWriter, r *http.Request) {
 
 	c.render(w, r, "faq", data)
 }
+
+
+
+func (c *AppController) FailedRegistrationAttemptAction(w http.ResponseWriter, r *http.Request) {
+
+	user_id := currentUserId(c.ControllerBase, r)
+	if user_id == 0 {
+
+	} else {
+
+		u := models.FindUser(user_id)
+
+		if r.Method == "GET" {
+
+			data := struct{
+				User *models.User
+				IdOrCodeAttempted string
+				JurisdictionId string
+			} {
+				u,
+				r.FormValue("id_or_code"),
+				r.FormValue("jurisdiction_id"),
+			}
+
+			c.render(w, r, "failed_registration_attempt", data)
+
+		} else {
+
+		}
+	}
+
+
+
+
+
+
+}
+
+
+
+
 
 
 // Redirects

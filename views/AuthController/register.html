@@ -96,7 +96,7 @@
                             validators: {
                                 remote: {
                                     message: '{{ t .CurrentLocale "email_address_already_in_use" "" }}',
-                                    url: '/email_exists',
+                                    url: '/api/email_exists',
                                     type: 'POST',
                                     delay: 100,
                                 },

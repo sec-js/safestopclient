@@ -27,6 +27,8 @@ type User struct {
 	PermissionGroups string `json:"permission_groups" db:"permission_groups"`
 	//PasswordResetKey string `json:"password_reset_key" db:"password_reset_key"'`
 	Locked bool `json:"locked" db:"locked"`
+	FirstName string `json:"first_name" db:"first_name"`
+	LastName string `json:"last_name" db:"last_name"`
 	//CreatedAt time.Time `json:"created_at" db:"created_at"`
 }
 
@@ -80,6 +82,7 @@ func RegisterUser(email string, password string, first_name string, last_name st
 insert into users (
 	email, 
 	password_digest, 
+	person_id,
 	source_system, 
 	security_segment_id, 
 	created_at, 
@@ -87,6 +90,7 @@ insert into users (
 ) values (
 $1,
 $2,
+$3,
 'SafeStop',
 (select id from security_segments where name = 'SafeStop' limit 1),
 now(),
@@ -95,7 +99,8 @@ now()
 `
 	row = tx.QueryRow(user_query,
 		email,
-		password)
+		password,
+		person_id)
 	if row == nil {
 		tx.Rollback()
 		return 0, errors.New("User id not returned")
@@ -310,18 +315,21 @@ now()
 func FindUser(id int) *User {
 
 	query := `
-select id, 
+select a.id, 
 email, 
 password_digest, 
-locked,
-super_admin,
+coalesce(locked, false) as locked,
+coalesce(super_admin, false) as super_admin,
 (select array_to_string(array_agg(a.name), ',') as permission_groups
 from permission_groups a 
 join permission_groups_users b on b.permission_group_id = a.id 
-and b.user_id = id 
-and a.security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1))
-from users 
-where id = $1
+and b.user_id = a.id 
+and a.security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1)),
+coalesce(b.first_name, '') as first_name,
+coalesce(b.last_name, '') as last_name
+from users a 
+join people b on b.id = a.person_id
+where a.id = $1
 limit 1
 `
 	row := database.GetDB().QueryRowx(query, id)

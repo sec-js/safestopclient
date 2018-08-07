@@ -3,6 +3,117 @@
 {{end}}
 {{define "body"}}
 
-TODO: Put stuff here.
+
+<form action="/process_failed_registration_attempt" method="post" style="margin-bottom:20px;">
+{{ .CSRFTemplateField}}
+
+    <input type="hidden" name="safe_stop_failed_registration_attempt[jurisdiction_id]" value="{{ .ViewData.JurisdictionId }}">
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 h3" align="center" style="color: #A12130;">
+            {{ t .CurrentLocale "student_id_or_school_code_not_valid" ""}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+
+                <div class="form-group">
+                    <input type="text" class="form-control" name="safe_stop_failed_registration_attempt[last_name]" value="{{ .ViewData.User.LastName }}" placeholder="{{ t .CurrentLocale "your_last_name" ""}}">
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" name="safe_stop_failed_registration_attempt[first_name]" value="{{ .ViewData.User.FirstName }}" placeholder="{{ t .CurrentLocale "your_first_name" ""}}">
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" name="safe_stop_failed_registration_attempt[email]" value="{{ .ViewData.User.Email }}" placeholder="{{ t .CurrentLocale "email" ""}}">
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" name="safe_stop_failed_registration_attempt[student_last_name]" placeholder="{{ t .CurrentLocale "student_rider_last_name" ""}}">
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" name="safe_stop_failed_registration_attempt[student_first_name]" placeholder="{{ t .CurrentLocale "student_rider_first_name" ""}}">
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" name="safe_stop_failed_registration_attempt[id_or_code_attempted]" value="{{ .ViewData.IdOrCodeAttempted}}" placeholder="{{ t .CurrentLocale "code_or_id_attempted_to_use" ""}}">
+                </div>
+
+                <div class="form-group">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 50%;">
+                                <a href="/activate/{{ .ViewData.JurisdictionId }}" class="btn btn-default btn-block no-right-radius">{{ t .CurrentLocale "cancel" ""}}</a>
+                            </td>
+                            <td style="width: 50%;">
+                                <button class="btn btn-safestop btn-block no-left-radius" type="submit">{{ t .CurrentLocale "submit" ""}}</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('form').formValidation({
+            framework: 'bootstrap',
+            excluded: false,
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                'safe_stop_failed_registration_attempt[last_name]': {
+                    validators: {
+                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
+                    }
+                },
+                'safe_stop_failed_registration_attempt[first_name]': {
+                    validators: {
+                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
+                    }
+                },
+                'safe_stop_failed_registration_attempt[id_or_code_attempted]': {
+                    validators: {
+                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
+                    }
+                },
+                'safe_stop_failed_registration_attempt[student_first_name]': {
+                    validators: {
+                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
+                    }
+                },
+                'safe_stop_failed_registration_attempt[student_last_name]': {
+                    validators: {
+                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
+                    }
+                },
+                'safe_stop_failed_registration_attempt[email]': {
+                    validators: {
+                        regexp: {
+                            regexp: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                            message: "Invalid email format"
+                        },
+                        notEmpty: {message: '<%= t('invalid_email_format', locale: current_locale) %>'}
+                    }
+                }
+            }
+        });
+    })
+
+</script>
+
+
+
 
 {{end}}
