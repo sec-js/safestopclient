@@ -129,8 +129,9 @@
             e.preventDefault();
             var id_or_code = $('#' + $(this).data('sis_identifier')).val();
             var source = '{{ .ViewData.Jurisdiction.Id }}';
+            var postal_code = '{{ .ViewData.PostalCode }}'
             var base_url = '/failed_registration_attempt'
-            var url = base_url + '?id_or_code=' + id_or_code + '&jurisdiction_id=' + source;
+            var url = base_url + '?id_or_code=' + id_or_code + '&jurisdiction_id=' + source + '&postal_code=' + postal_code;
             window.open(url, '_self');
         })
 

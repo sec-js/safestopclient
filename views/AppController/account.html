@@ -42,11 +42,10 @@
         </table>
     </a>
 
-    {{ if gt .ViewData.JurisdictionCount 0 }}
+    {{ if eq .ViewData.HasJurisdictions true }}
 
     <form method="post" action="/remove_all_stops">
-        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
-
+    {{ .CSRFTemplateField }}
         <li class="account-li list-group-item " id="remove-all-stops">
             <table class="list-item-table">
                 <tr>
@@ -59,36 +58,28 @@
                 </tr>
             </table>
         </li>
-
     </form>
 
-        {{ end }}
+{{ end }}
 
 
-    {{/*{{ if .ViewData.RegularUser eq false}}*/}}
-    {{/*<a href="/manage_notifications" class="list-group-item">*/}}
-        {{/*<table class="list-item-table">*/}}
-            {{/*<tr>*/}}
-                {{/*<td>*/}}
-                    {{/*<i class="ss ss-settings"></i>*/}}
-                {{/*</td>*/}}
-                {{/*<td>*/}}
-                {{/*{{ t .CurrentLocale "manage_notifications" "" }}*/}}
-                {{/*</td>*/}}
-            {{/*</tr>*/}}
-        {{/*</table>*/}}
-    {{/*</a>*/}}
-
-    {{/*{{ else }}*/}}
-
+    {{ if eq .ViewData.ViewManageNotifications true}}
+        <a href="/manage_notifications" class="list-group-item">
+            <table class="list-item-table">
+                <tr>
+                    <td>
+                        <i class="ss ss-settings"></i>
+                    </td>
+                    <td>
+                    {{ t .CurrentLocale "manage_notifications" "" }}
+                    </td>
+                </tr>
+            </table>
+        </a>
+    {{ end }}
 
 
-
-
-    {{/*{{ end }}*/}}
-
-
-    <% if @user.client_permission_group eq Sti::LICENSE_5 %>
+    {{ if eq .ViewData.ViewManageSubscriptions true}}
     <a href="/manage_subscriptions" class="list-group-item">
         <table class="list-item-table">
             <tr>
@@ -101,24 +92,29 @@
             </tr>
         </table>
     </a>
-    <% end %>
+    {{ end }}
 
 
-    <a href="//alerts.{{ .Domain }}/" class="list-group-item">
-        <table class="list-item-table">
-            <tr>
-                <td>
-                    <i class="fa fa-bell-o"></i>
-                </td>
-                <td>
-                {{ t .CurrentLocale "send_alert" "" }}
-                </td>
-            </tr>
-        </table>
-    </a>
 
 
-    <% end %>
+
+
+
+    {{/*CAN SEND ALERTS*/}}
+    {{/*<a href="//alerts.{{ .Domain }}/" class="list-group-item">*/}}
+        {{/*<table class="list-item-table">*/}}
+            {{/*<tr>*/}}
+                {{/*<td>*/}}
+                    {{/*<i class="fa fa-bell-o"></i>*/}}
+                {{/*</td>*/}}
+                {{/*<td>*/}}
+                {{/*{{ t .CurrentLocale "send_alert" "" }}*/}}
+                {{/*</td>*/}}
+            {{/*</tr>*/}}
+        {{/*</table>*/}}
+    {{/*</a>*/}}
+
+
 
     <a href="/faq" target="_blank" class="list-group-item">
         <table class="list-item-table">
@@ -232,23 +228,93 @@
     </li>
 
 
-{{/*{{ if .ViewData.SafeStopAppIssuesActive eq true }}*/}}
-    {{/*<li class="list-group-item" id="connect-with-terminal" style="background: #F7F7F7; font-size: 14pt; font-weight: bold;">*/}}
-    {{/*{{ t .CurrentLocale "connect_with_terminal" "" }}*/}}
-    {{/*</li>*/}}
+    {{ if eq .ViewData.HasJurisdictions true }}
+    {{range .ViewData.Jurisdictions.Jurisdictions }}
 
-    {{/*<a href="/report_an_app_issue" class="list-group-item account-li" id="report-lost-item">*/}}
+        {{ if ne .Phone "Not Set"}}
+        <li class="list-group-item" style="background: #F7F7F7; font-size: 14pt; font-weight: bold">
+            CONNECT WITH {{ .Name }}
+        </li>
+        <li class="list-group-item" id="call-us">
+            <table class="list-item-table">
+                <tr>
+                    <td>
+                        <i class="ss ss-call"></i>
+                    </td>
+                    <td>
+                        <a href='{{ .Phone }}'>{{ .Phone }}</a>
+                    </td>
+                </tr>
+            </table>
+        </li>
+        {{ end }}
+    {{ end }}
+    {{ end }}
+
+
+
+
+
+
+
+{{ if eq .ViewData.HasJurisdictions true }}
+    <li class="list-group-item" id="connect-with-terminal" style="background: #F7F7F7; font-size: 14pt; font-weight: bold;">
+    {{ t .CurrentLocale "connect_with_terminal" "" }}
+    </li>
+
+    <a href="/report_an_app_issue" class="list-group-item account-li" id="report-lost-item">
+        <table class="list-item-table">
+            <tr>
+                <td class="icon-font">
+                    <i class="ss ss-lost-item"></i>
+                <td class="text">
+                {{ t .CurrentLocale "report_an_app_issue" "" }}
+                </td>
+            </tr>
+        </table>
+    </a>
+
+
+    {{/*<% if @user.client_jurisdictions.any? { |j| j.safe_stop_lost_item_reports_active == true } %>*/}}
+    {{/*<a href="/lost_item_report" class="list-group-item account-li" id="report-lost-item">*/}}
         {{/*<table class="list-item-table">*/}}
             {{/*<tr>*/}}
                 {{/*<td class="icon-font">*/}}
                     {{/*<i class="ss ss-lost-item"></i>*/}}
                 {{/*<td class="text">*/}}
-                {{/*{{ t .CurrentLocale "report_an_app_issue" "" }}*/}}
+                    {{/*<%= t('report_lost_item', locale: current_locale) %>*/}}
                 {{/*</td>*/}}
             {{/*</tr>*/}}
         {{/*</table>*/}}
     {{/*</a>*/}}
-{{/*{{end}}*/}}
+    {{/*<% end %>*/}}
+
+    {{/*<% if @user.client_jurisdictions.any? { |j| j.safe_stop_bullying_reports_active == true } %>*/}}
+
+    {{/*<a href="/incident_report" class="list-group-item account-li">*/}}
+        {{/*<table class="list-item-table">*/}}
+            {{/*<tr>*/}}
+                {{/*<td class="icon-font">*/}}
+                    {{/*<i class="ss ss-megaphone" style="font-size: 25pt;"></i>*/}}
+                {{/*<td class="text">*/}}
+                    {{/*<%= t('report_incident', locale: current_locale) %>*/}}
+                {{/*</td>*/}}
+            {{/*</tr>*/}}
+        {{/*</table>*/}}
+    {{/*</a>*/}}
+
+    {{/*<% end %>*/}}
+
+
+
+
+
+
+
+
+
+
+{{end}}
 
 </ul>
 
@@ -263,7 +329,7 @@
 
     $(document).ready(function () {
 
-        $('body').removeClass('app-body').addClass('app-body-scroll');
+        $('body').removeClass('app-body').css("overflow-y", "scroll");
 
         $('#logout').click(function(e){
             e.preventDefault();
@@ -271,14 +337,14 @@
             window.location.href = $(this).prop("href");
         })
 
-    //     <% if @user.client_jurisdictions.count == 0 %>
-    //             swal({
-    //                 title: "<%= t("account_not_active", locale: current_locale) %>",
-    //                 text: "<%= t("account_not_active_description", locale: current_locale) %>",
-    //                 confirmButtonColor: "#A31F2D",
-    //                 type: "info"
-    //             });
-    // <% end %>
+        {{ if eq .ViewData.JurisdictionCount 0 }}
+                swal({
+                    title: '{{ t .CurrentLocale "account_not_active" "" }}',
+                    text: '{{ t .CurrentLocale "account_not_active_description" "" }}',
+                    confirmButtonColor: "#A31F2D",
+                    type: "info"
+                });
+        {{ end }}
 
         window.send_message = function( action, callback, data ) {
             var iframe = document.createElement('iframe');
@@ -303,22 +369,20 @@
             e.preventDefault();
             var remove_stops_form = $(this).parent();
             swal({
-                title: '<%= t('ss_client_account_js_4', locale: current_locale) %>',
+                title: '{{ t .CurrentLocale "ss_client_account_js_4" "" }}',
                 type: 'warning',
-                text: '<%= t('ss_client_account_js_5', locale: current_locale) %>',
+                text: '{{ t .CurrentLocale "ss_client_account_js_5" "" }}',
                 showCloseButton: true,
                 showCancelButton: true,
-                confirmButtonText: '<%= t('okay', locale: current_locale) %>',
+                confirmButtonText: '{{ t .CurrentLocale "okay" "" }}',
                 confirmButtonColor: "#A31F2D",
-                cancelButtonText: '<%= t('cancel', locale: current_locale) %>'
-            }, function (isConfirmed) {
-
-                if (isConfirmed) {
-                    $(remove_stops_form).submit();
+                cancelButtonText: '{{ t .CurrentLocale "cancel" "" }}'
+            }).then((result) => {
+                if (result) {
+                   $(remove_stops_form).submit();
                 }
             })
         });
-
     });
 
 

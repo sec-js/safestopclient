@@ -3,6 +3,165 @@
 {{end}}
 {{define "body"}}
 
-TODO: Put stuff here.
+
+
+
+<ul class="list-group" style="margin-bottom: 0px;">
+
+    <li id="scan-li" class="list-group-item">
+        <table class="list-nav-item-table">
+            <tr>
+                <td><span class="title">{{ t .CurrentLocale "manage_student_scanning" "" }}</span></td>
+                <td>
+                    <i class='nav-arrow fa fa-angle-right'></i>
+                </td>
+            </tr>
+        </table>
+    </li>
+
+    <li class="list-group-item" style="display: none;">
+        <form class="form" method="post" action="/add_scan_notification_subscription">
+        {{ .CSRFTemplateField }}
+
+            <input type="hidden" name="out_action" value="/manage_notifications" >
+
+            <div class="form-group">
+                <select name="jurisdiction_id" class="form-control">
+                    {{ range .ViewData.Jurisdictions.Jurisdictions }}
+                        {{ if and (eq .Active true) (eq .StudentScanning true) }}
+                            <option value="{{ .Id }}">{{ .Name }}</option>
+                        {{ end }}
+                    {{ end }}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <input id="name" class="form-control" type="text" name="name" autocomplete="off" placeholder="{{ t .CurrentLocale "student_name" "" }}">
+            </div>
+            <div class="form-group">
+                <input id="code" class="form-control" type="text" name="code" autocomplete="off" placeholder="{{ t .CurrentLocale "scan_code" "" }}">
+            </div>
+            <div class="form-group">
+                <button class="btn btn-block btn-safestop" id="add-student-button">{{ t .CurrentLocale "add_scan_code" "" }}</button>
+            </div>
+        </form>
+    </li>
+
+
+{{ if eq .ViewData.HasNotificationSubscriptions true }}
+    {{ range .ViewData.NotificationSubscriptions.Subscriptions }}
+        <li class="list-group-item scan-li">
+            <form action="/remove_scan_notification_subscription" method="post">
+                {{ $.CSRFTemplateField }}
+                    <input type="hidden" name="out_action" value="/manage_notifications" >
+                    <input type="hidden" value="{{ .Id }}" name="id">
+            </form>
+            <table class="list-sub-item-table">
+                <tr>
+                    <td>
+                    {{ .Name }}
+                    </td>
+                    <td>
+                        <i class='fa fa-check-square-o remove-student'></i>
+                    </td>
+                </tr>
+            </table>
+        </li>
+    {{ end }}
+{{ end }}
+
+</ul>
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        $(document).on("click", ".scan-li", function(e){
+            e.stopPropagation();
+            var student_li = $(this);
+            var alert_name = $(student_li).find('.list-sub-item-table td:eq(0)').html().trim();
+            swal({
+                        title: '{{ t .CurrentLocale "are_you_sure" "" }}',
+                        text: '{{ t .CurrentLocale "ss_client_subscription_details_js_3" "" }}' + alert_name,
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#A31F2D",
+                        confirmButtonText: "Okay",
+                        cancelButtonText: "Cancel",
+                        closeOnConfirm: true,
+                        closeOnCancel: true
+                    }).then((result) => {
+                        if (result) {
+                            $(student_li).find('form').submit();
+                        }
+            })
+        })
+
+
+        $("#scan-li").click(function (e) {
+            var form_li = $(this).parent().children().eq(1);
+            var i = $(this).find('i');
+            if ($(i).hasClass('fa-angle-right')) {
+                $(i).removeClass('fa-angle-right')
+                $(i).addClass('fa-angle-down')
+                $(form_li).show();
+            }
+            else {
+                $(i).removeClass('fa-angle-down')
+                $(i).addClass('fa-angle-right')
+                $(form_li).hide();
+            }
+        });
+
+        // window.send_message = function (action, callback, data) {
+        //     var iframe = document.createElement('iframe');
+        //     var req = encodeURIComponent(action) + "$" + encodeURIComponent(callback) + "$" + encodeURIComponent(data);
+        //     iframe.setAttribute("src", "js://" + req);
+        //     iframe.style.display = "none";
+        //     document.documentElement.appendChild(iframe);
+        //     iframe.parentNode.removeChild(iframe);
+        //     iframe = null;
+        // };
+        //
+        // var is_uiwebview = /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(navigator.userAgent);
+        // if (is_uiwebview) {
+        //     send_message("device_model", "device_model_callback", "");
+        //     send_message("app_version", "app_version_callback", "");
+        //     send_message("os", "os_callback", "");
+        // }
+
+    });
+
+
+    // function device_model_callback(data) {
+    //     $("#native-device-model").show();
+    //     $("#native-device-model-value").text(data);
+    //     $("#system-header").show();
+    // }
+    //
+    // function app_version_callback(data) {
+    //     $("#native-app-version").show();
+    //     $("#native-app-version-value").text(data);
+    //     $("#system-header").show();
+    // }
+    //
+    // function os_callback(data) {
+    //     $("#native-os").show();
+    //     $("#native-os-value").text(data);
+    //     if (data.indexOf("iPhone") === 0) {
+    //         $("#native-os-icon").addClass("fa-apple");
+    //     }
+    //     else if (data.indexOf("Android") === 0) {
+    //         $("#native-os-icon").addClass("fa-android");
+    //     }
+    //     else {
+    //         $("#native-os-icon").addClass("fa-laptop")
+    //     }
+    //     $("#system-header").show();
+    // }
+
+</script>
 
 {{end}}

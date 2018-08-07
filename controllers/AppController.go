@@ -24,6 +24,8 @@ func (c *AppController) Register() {
 	c.addTemplate( "activate", "activate.html", "default.html")
 	c.addTemplate("faq", "faq.html", "default.html")
 	c.addTemplate("failed_registration_attempt", "failed_registration_attempt.html", "default.html")
+	c.addTemplate("report_an_app_issue", "report_an_app_issue.html", "default.html")
+	c.addTemplate( "manage_notifications", "manage_notifications.html", "default.html")
 
 	//actions
 	c.addRouteWithPrefix("/", c.IndexAction)
@@ -34,6 +36,12 @@ func (c *AppController) Register() {
 	c.addRouteWithPrefix("/activate/{jurisdiction_id}", c.ActivateAction)
 	c.addRouteWithPrefix("/faq", c.FaqAction)
 	c.addRouteWithPrefix("/failed_registration_attempt", c.FailedRegistrationAttemptAction)
+	c.addRouteWithPrefix("/report_an_app_issue", c.AppIssueAction)
+	c.addRouteWithPrefix( "/remove_all_stops", c.RemoveAllStopsAction)
+	c.addRouteWithPrefix( "/manage_notifications", c.ManageNotificationsAction)
+	c.addRouteWithPrefix( "/add_scan_notification_subscription", c.AddScanNotificationSubscriptionAction)
+	c.addRouteWithPrefix( "/remove_scan_notification_subscription", c.RemoveScanNotificationSubscriptionAction)
+
 }
 
 type dashData struct {
@@ -55,6 +63,7 @@ func (c *AppController) IndexAction(w http.ResponseWriter, r *http.Request) {
 	email := session.Values["current_user_email"]
 	if email != nil {
 		http.Redirect(w, r, r.URL.Host+"/dashboard", http.StatusFound)
+		return
 	}
 	c.render(w, r, "index", data)
 }
@@ -64,17 +73,66 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 	uid := currentUserId(c.ControllerBase, r)
 	if(uid == 0){
 		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
 	}
 
 	u := models.FindUser(uid)
+	cj := models.ClientJurisdictionForUser(u, c.ControllerBase.PermissionGroups)
 
-	data := struct {
-		JurisdictionCount int
-	}{
-		models.JurisdictionCountForUser(u, c.PermissionGroups),
+	has_jurisdictions := false
+	if cj != nil && len(cj.Jurisdictions) > 0 {
+		has_jurisdictions = true
+	}
+
+	view_manage_notifications := models.HasAnyPermissionGroups([]string{
+		c.PermissionGroups.Admin,
+		c.PermissionGroups.License_3,
+		c.PermissionGroups.License_4,
+	}, u.PermissionGroups)
+
+	if u.SuperAdmin == true {
+		view_manage_notifications = true
+	}
+
+	view_manage_subscriptions := models.HasAnyPermissionGroups([]string{
+		c.PermissionGroups.License_5,
+	}, u.PermissionGroups)
+
+	view_lost_item_reports := false
+	for i := 0; i < len(cj.Jurisdictions); i++ {
+		if cj.Jurisdictions[i].HasLostItemReports == true {
+			view_lost_item_reports = true
+			break
+		}
+	}
+
+	view_incident_reports := false
+	for i := 0; i < len(cj.Jurisdictions); i++ {
+		if cj.Jurisdictions[i].HasIncidentReports == true {
+			view_incident_reports = true
+			break
+		}
 	}
 
 
+
+	data := struct {
+		JurisdictionCount int
+		HasJurisdictions bool
+		Jurisdictions *models.ClientJurisdictions
+		ViewManageNotifications bool
+		ViewManageSubscriptions bool
+		ViewReportLostItem bool
+		ViewReportIncident bool
+	}{
+		len(cj.Jurisdictions),
+		has_jurisdictions,
+		cj,
+		view_manage_notifications,
+		view_manage_subscriptions,
+		view_lost_item_reports,
+		view_incident_reports,
+	}
 
 	c.render(w, r, "account", data)
 }
@@ -168,6 +226,7 @@ func (c *AppController) ActivateAction(w http.ResponseWriter, r *http.Request) {
 				r.FormValue("postal_code"),
 			}
 			c.render(w, r, "activate", data)
+			return
 
 		} else {
 			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "jurisdiction_not_available", "")), c.BootstrapAlertClass.Danger)
@@ -249,6 +308,7 @@ func (c *AppController) LanguageAction(w http.ResponseWriter, r *http.Request) {
 	uid := currentUserId(c.ControllerBase, r)
 	if(uid == 0){
 		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
 	}
 
 
@@ -299,40 +359,206 @@ func (c *AppController) FaqAction(w http.ResponseWriter, r *http.Request) {
 func (c *AppController) FailedRegistrationAttemptAction(w http.ResponseWriter, r *http.Request) {
 
 	user_id := currentUserId(c.ControllerBase, r)
+	jurisdiction_id := r.FormValue("jurisdiction_id")
+	postal_code := r.FormValue("postal_code")
+
 	if user_id == 0 {
-
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
 	} else {
-
 		u := models.FindUser(user_id)
-
 		if r.Method == "GET" {
-
-			data := struct{
-				User *models.User
-				IdOrCodeAttempted string
-				JurisdictionId string
-			} {
-				u,
-				r.FormValue("id_or_code"),
-				r.FormValue("jurisdiction_id"),
+			data := models.FailedRegistrationAttempt{
+				JurisdictionId: jurisdiction_id,
+				FirstName: u.FirstName,
+				LastName: u.LastName,
+				Email: u.Email,
+				IdOrCodeAttempted: r.FormValue("id_or_code"),
+				PostalCode: postal_code,
 			}
-
 			c.render(w, r, "failed_registration_attempt", data)
-
+			return
 		} else {
+			if jurisdiction_id != "" {
+				data := models.FailedRegistrationAttempt{
+					JurisdictionId: jurisdiction_id,
+					FirstName: r.FormValue("first_name"),
+					LastName: r.FormValue("last_name"),
+					Email: r.FormValue("email"),
+					StudentFirstName: r.FormValue("student_first_name"),
+					StudentLastName: r.FormValue("student_last_name"),
+					IdOrCodeAttempted: r.FormValue("id_or_code_attempted"),
+				}
+				success := models.InsertFailedRegistrationAttempt(&data)
+				if success == true {
 
+					//TODO SEND FAILED REGISTRATION ATTEMPT EMAIL
+
+					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
+					http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
+					return
+				} else {
+					c.render(w, r, "failed_registration_attempt", data)
+					return
+				}
+			} else {
+				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error", "")), c.BootstrapAlertClass.Info)
+				http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
+				return
+			}
 		}
 	}
+}
 
 
+func (c *AppController) AppIssueAction(w http.ResponseWriter, r *http.Request) {
 
+	user_id := currentUserId(c.ControllerBase, r)
 
+	if user_id == 0 {
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
 
+	u := models.FindUser(user_id)
+	cj := models.ClientJurisdictionForUser(u, c.ControllerBase.PermissionGroups)
+	jurisdiction_id := 0
 
+	if cj == nil || len(cj.Jurisdictions) == 0 || cj.Jurisdictions[0].Id == 0 {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	jurisdiction_id = cj.Jurisdictions[0].Id
+
+		if r.Method == "GET" {
+			data := models.AppIssue{
+				JurisdictionId: jurisdiction_id,
+				UserId: user_id,
+			}
+			c.render(w, r, "report_an_app_issue", data)
+			return
+		} else {
+			data := models.AppIssue{
+				JurisdictionId: jurisdiction_id,
+				UserId: user_id,
+				IssueType: r.FormValue("issue_type"),
+				Description: r.FormValue("description"),
+			}
+			success := models.InsertAppIssue(&data)
+			if success == true {
+				//TODO SEND APP ISSUE EMAIL
+				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
+				http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+				return
+			} else {
+				c.render(w, r, "report_an_app_issue", data)
+				return
+			}
+		}
 }
 
 
 
+
+
+
+func (c *AppController) RemoveAllStopsAction(w http.ResponseWriter, r *http.Request) {
+
+	user_id := currentUserId(c.ControllerBase, r)
+	if user_id == 0 {
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	query := `delete from bus_route_stop_users where user_id = $1`
+	_, err := database.GetDB().Exec(query, user_id)
+	if err != nil {
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r), "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	http.Redirect(w, r, r.URL.Host+"/", http.StatusFound)
+}
+
+
+
+func (c *AppController) ManageNotificationsAction(w http.ResponseWriter, r *http.Request) {
+
+	user_id := currentUserId(c.ControllerBase, r)
+	if(user_id == 0){
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	u := models.FindUser(user_id)
+	cj := models.ClientJurisdictionForUser(u, c.ControllerBase.PermissionGroups)
+	sns := models.ScanNotificationSubscriptionsForUser(user_id)
+
+	data := struct {
+		Jurisdictions *models.ClientJurisdictions
+		NotificationSubscriptions *models.ScanNotificationSubscriptions
+		HasNotificationSubscriptions bool
+	} {
+		cj,
+		sns,
+		(len(sns.Subscriptions) > 0),
+	}
+
+	c.render(w, r, "manage_notifications", data)
+}
+
+
+func (c *AppController) AddScanNotificationSubscriptionAction(w http.ResponseWriter, r *http.Request) {
+
+	user_id := currentUserId(c.ControllerBase, r)
+	if(user_id == 0){
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	jurisdiction_id := 0
+	if len(r.FormValue("jurisdiction_id")) > 0 {
+		jurisdiction_id, _ = strconv.Atoi(r.FormValue("jurisdiction_id"))
+	}
+
+	s := models.ScanNotificationSubscription{}
+	s.Name = r.FormValue("name")
+	s.Code = r.FormValue("code")
+	s.UserId = user_id
+	s.JurisdictionId = jurisdiction_id
+
+	added_scan_notification_subscription := models.InsertScanNotificationSubscriptions(&s)
+
+	if added_scan_notification_subscription == false {
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+	}
+
+	http.Redirect(w, r, r.URL.Host+ r.FormValue("out_action"), http.StatusFound)
+}
+
+func (c *AppController) RemoveScanNotificationSubscriptionAction(w http.ResponseWriter, r *http.Request) {
+
+	user_id := currentUserId(c.ControllerBase, r)
+	if(user_id == 0){
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	id := 0
+	if len(r.FormValue("id")) > 0 {
+		id, _ = strconv.Atoi(r.FormValue("id"))
+	}
+
+	deleted_scan_notification_subscription := models.DeleteScanNotificationSubscriptions(id)
+
+	if deleted_scan_notification_subscription == false {
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+	}
+
+	http.Redirect(w, r, r.URL.Host+ r.FormValue("out_action"), http.StatusFound)
+}
 
 
 
@@ -344,6 +570,7 @@ func (c *AppController) redirectToJoinIfNotALoggedIn(w http.ResponseWriter, r *h
 	email := session.Values["current_user_email"]
 	if email == nil {
 		http.Redirect(w, r, r.URL.Host+"/join", http.StatusFound)
+		return
 	}
 }
 
@@ -352,6 +579,7 @@ func (c *AppController) redirectToLoginIfNotLoggedIn(w http.ResponseWriter, r *h
 	email := session.Values["current_user_email"]
 	if email == nil {
 		http.Redirect(w, r, r.URL.Host+"/join", http.StatusFound)
+		return
 	}
 }
 

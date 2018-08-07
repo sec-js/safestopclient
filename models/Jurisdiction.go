@@ -4,7 +4,7 @@ import (
 	"github.com/schoolwheels/safestopclient/database"
 	"fmt"
 	"log"
-)
+	)
 
 
 type JurisdictionOptions struct {
@@ -129,6 +129,170 @@ and d.id = $1
 }
 
 
+
+
+
+
+
+type ClientJurisdictions struct {
+	Jurisdictions []ClientJurisdiction
+}
+
+type ClientJurisdiction struct {
+	Id int `json:"id" db:"id"`
+	Name string `json:"name" db:"name"`
+	Phone string `json:"phone" db:"phone"`
+	HasLostItemReports bool `json:"has_lost_item_reports" db:"has_lost_item_reports"`
+	HasIncidentReports bool `json:"has_incident_reports" db:"has_incident_reports"`
+	Active bool `json:"active" db:"active"`
+	StudentScanning bool `json:"student_scanning" db:"student_scanning"`
+}
+
+
+func ClientJurisdictionForUser(u *User, pg *PermissionGroups) *ClientJurisdictions {
+
+	client_jurisdictions := ClientJurisdictions{}
+
+	query := ``
+
+	if((u.SuperAdmin == true) || HasAnyPermissionGroups([]string{ pg.Admin}, u.PermissionGroups)) {
+		query = `
+select a.id, 
+a.name, 
+coalesce(a.phone, '') as phone, 
+coalesce(safe_stop_bullying_reports_active, false) as has_incident_reports,
+coalesce(safe_stop_lost_item_reports_active, false) as has_lost_item_reports,
+coalesce(active, false) as active,
+coalesce(a.student_scanning, false) as student_scanning
+from jurisdictions a
+where a.active = true
+order by name;
+`
+		rows, err := database.GetDB().Queryx(query)
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			if rows != nil {
+				for rows.Next() {
+					j := ClientJurisdiction{}
+					err = rows.StructScan(&j)
+					if err != nil {
+						log.Fatal(err)
+					} else {
+						client_jurisdictions.Jurisdictions = append(client_jurisdictions.Jurisdictions, j)
+					}
+				}
+			}
+		}
+
+		return &client_jurisdictions
+
+
+	} else if (HasAnyPermissionGroups([]string{ pg.License_1, pg.License_2, pg.License_3, pg.License_4}, u.PermissionGroups)){
+		query = `
+select a.id, 
+a.name, 
+coalesce(a.phone, '') as phone,
+coalesce(safe_stop_bullying_reports_active, false) as has_incident_reports,
+coalesce(safe_stop_lost_item_reports_active, false) as has_lost_item_reports,
+coalesce(active, false) as active,
+coalesce(a.student_scanning, false) as student_scanning
+from jurisdictions a 
+join jurisdictional_restrictions b on a.id = b.jurisdiction_id
+where b.user_id = $1
+order by name;
+`
+	} else {
+		query = `
+select distinct id, 
+name, 
+coalesce(phone, '') as phone,
+coalesce(safe_stop_bullying_reports_active, false) as has_incident_reports,
+coalesce(safe_stop_lost_item_reports_active, false) as has_lost_item_reports,
+coalesce(active, false) as active,
+coalesce(a.student_scanning, false) as student_scanning
+from (
+select a.id, 
+a.name, 
+a.phone, 
+a.safe_stop_lost_item_reports_active, 
+a.safe_stop_bullying_reports_active,
+a.active,
+a.student_scanning
+from jurisdictions a
+join products b on b.jurisdiction_id = a.id
+join subscriptions c on b.id = c.product_id
+join subscription_sub_accounts d on c.id = d.subscription_id
+join users e on d.user_id = e.id
+join time_zones f on f.id = a.time_zone_id
+where c.start_date <= (now() at time zone f.postgresql_name)::date
+and c.end_date >= (now() at time zone f.postgresql_name)::date
+and c.active = 't'
+and b.product_type = 'ss'
+and e.id = $1
+
+union all
+
+select a.id, 
+a.name, 
+a.phone, 
+a.safe_stop_lost_item_reports_active, 
+a.safe_stop_bullying_reports_active,
+a.active,
+a.student_scanning
+from jurisdictions a
+join products b on b.jurisdiction_id = a.id
+join subscriptions c on b.id = c.product_id
+join users d on c.user_id = d.id
+join time_zones e on e.id = a.time_zone_id
+where c.start_date <= (now() at time zone e.postgresql_name)::date
+and c.end_date >= (now() at time zone e.postgresql_name)::date
+and c.active = 't'
+and b.product_type = 'ss'
+and d.id = $1
+
+) z
+order by z.name
+`
+	}
+
+	rows, err := database.GetDB().Queryx(query, u.Id)
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		if rows != nil {
+			for rows.Next() {
+				j := ClientJurisdiction{}
+				err = rows.StructScan(&j)
+				if err != nil {
+
+				} else {
+					client_jurisdictions.Jurisdictions = append(client_jurisdictions.Jurisdictions, j)
+				}
+			}
+		}
+	}
+
+	return &client_jurisdictions
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 func SchoolCodeExists(school_code string, jurisdiction_id int) bool {
 	code_ct := 0
 	query := `
@@ -187,7 +351,6 @@ and a.id = $1;
 	return j
 }
 
-
 func ActiveProductIdForJurisdiction(jurisdiction_id int) int {
 	product_id := 0
 
@@ -202,7 +365,6 @@ and a.availability_end_date > NOW() at time zone c.postgresql_name
 and a.active = 't'
 and a.product_type = 'ss'
 `
-
 	err := database.GetDB().QueryRow(query, jurisdiction_id).Scan(&product_id)
 	if err != nil {
 		log.Fatal(err)

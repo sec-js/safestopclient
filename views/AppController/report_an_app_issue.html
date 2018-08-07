@@ -3,6 +3,94 @@
 {{end}}
 {{define "body"}}
 
-TODO: Put stuff here.
+<form id="app-issue-form" action="/report_an_app_issue" method="post" style="margin-bottom:20px;">
+
+{{ .CSRFTemplateField }}
+
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-sm-12 h3" align="center" style="color: #A12130;">
+            {{ t .CurrentLocale "report_an_app_issue" "" }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+
+                <input type="hidden" class="form-control" name="jurisdiction_id" value="{{ .ViewData.JurisdictionId }}"/>
+
+                <div class="form-group">
+                    <select class="form-control" name="issue_type">
+                        <option value="Bus Not Updating" selected>{{ t .CurrentLocale "my_bus_does_not_appear_to_be_updating" "" }}</option>
+                        <option value="Incorrect Routing Information">{{ t .CurrentLocale "my_routing_information_is_wrong" "" }}</option>
+                        <option value="Inaccurate ETA">{{ t .CurrentLocale "my_eta_is_inaccurate" "" }}</option>
+                        <option value="Other">{{ t .CurrentLocale "other" "" }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <textarea style="height: 75px;" class="form-control" name="description" placeholder="{{ t .CurrentLocale "detailed_description" "" }}"></textarea>
+                </div>
+
+
+                <div class="form-group">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 50%;">
+                                <a href="/account" class="btn btn-default btn-block no-right-radius">{{ t .CurrentLocale "cancel" "" }}</a>
+                            </td>
+                            <td style="width: 50%;">
+                                <button class="btn btn-safestop btn-block no-left-radius" type="submit">{{ t .CurrentLocale "submit" "" }}</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+
+</form>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+
+        FormValidation.formValidation(
+                document.getElementById("app-issue-form"),
+                {
+                    fields: {
+                        'issue_type': {
+                            validators: {
+                                notEmpty: {message: "{{ t .CurrentLocale "required" "" }}"}
+                            }
+                        },
+                        'description': {
+                            validators: {
+                                notEmpty: {message: "{{ t .CurrentLocale "required" "" }}"}
+                            }
+                        },
+                    },
+                    plugins: {
+                        trigger: new FormValidation.plugins.Trigger(),
+                        submitButton: new FormValidation.plugins.SubmitButton(),
+                        defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+                        bootstrap: new FormValidation.plugins.Bootstrap(),
+                        icon: new FormValidation.plugins.Icon({
+                            valid: 'fa fa-check',
+                            invalid: 'fa fa-times',
+                            validating: 'fa fa-refresh',
+                        })
+                    }
+                })
+
+
+    })
+
+</script>
 
 {{end}}
