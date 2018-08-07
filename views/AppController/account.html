@@ -274,45 +274,19 @@
         </table>
     </a>
 
-
-    {{/*<% if @user.client_jurisdictions.any? { |j| j.safe_stop_lost_item_reports_active == true } %>*/}}
-    {{/*<a href="/lost_item_report" class="list-group-item account-li" id="report-lost-item">*/}}
-        {{/*<table class="list-item-table">*/}}
-            {{/*<tr>*/}}
-                {{/*<td class="icon-font">*/}}
-                    {{/*<i class="ss ss-lost-item"></i>*/}}
-                {{/*<td class="text">*/}}
-                    {{/*<%= t('report_lost_item', locale: current_locale) %>*/}}
-                {{/*</td>*/}}
-            {{/*</tr>*/}}
-        {{/*</table>*/}}
-    {{/*</a>*/}}
-    {{/*<% end %>*/}}
-
-    {{/*<% if @user.client_jurisdictions.any? { |j| j.safe_stop_bullying_reports_active == true } %>*/}}
-
-    {{/*<a href="/incident_report" class="list-group-item account-li">*/}}
-        {{/*<table class="list-item-table">*/}}
-            {{/*<tr>*/}}
-                {{/*<td class="icon-font">*/}}
-                    {{/*<i class="ss ss-megaphone" style="font-size: 25pt;"></i>*/}}
-                {{/*<td class="text">*/}}
-                    {{/*<%= t('report_incident', locale: current_locale) %>*/}}
-                {{/*</td>*/}}
-            {{/*</tr>*/}}
-        {{/*</table>*/}}
-    {{/*</a>*/}}
-
-    {{/*<% end %>*/}}
-
-
-
-
-
-
-
-
-
+    {{ if eq .ViewData.ViewReportLostItem true }}
+        <a href="/lost_item_report" class="list-group-item account-li" id="report-lost-item">
+            <table class="list-item-table">
+                <tr>
+                    <td class="icon-font">
+                        <i class="ss ss-lost-item"></i>
+                    <td class="text">
+                        {{ t .CurrentLocale "report_lost_item" "" }}
+                    </td>
+                </tr>
+            </table>
+        </a>
+    {{ end }}
 
 {{end}}
 

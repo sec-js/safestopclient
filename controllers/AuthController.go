@@ -43,11 +43,12 @@ type loginData struct {
 	IsUS bool
 }
 
-type loginResponse struct {
-	Error models.Error `json:"error"`
-	Token string `json:"token"`
-	Path string `json:"path"`
-}
+//
+//type loginResponse struct {
+//	//Error models.Error `json:"error"`
+//	Token string `json:"token"`
+//	Path string `json:"path"`
+//}
 
 
 func (c *AuthController) loginAction(w http.ResponseWriter, r *http.Request) {

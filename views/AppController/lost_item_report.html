@@ -3,6 +3,110 @@
 {{end}}
 {{define "body"}}
 
-TODO: Put stuff here.
+
+
+
+<form id="lost-item-report-form" action="/lost_item_report" method="post" style="margin-bottom:20px;">
+
+{{ .CSRFTemplateField}}
+
+    <input type="hidden" name="summary" value="SafeStop - Lost Item On Bus">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 h3" align="center" style="color: #A12130;">
+                {{ t .CurrentLocale "report_lost_item" "" }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" style="padding-top: 10px;">
+
+
+                <div class="form-group">
+                    <input class="form-control" id="first_name" name="student_first_name" placeholder="{{ t .CurrentLocale "student_rider_first_name" "" }}">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" id="last_name" name="student_last_name" placeholder="{{ t .CurrentLocale "student_rider_last_name" "" }}">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" id="date-occurred" name="date_occurred" placeholder="{{ t .CurrentLocale "lost_date" "" }}">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" name="phone_number" placeholder="{{ t .CurrentLocale "phone" "" }}">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" name="route_identifier" placeholder="{{ t .CurrentLocale "route_name" "" }}">
+                </div>
+                <div class="form-group">
+                    <textarea style="height: 75px;" class="form-control" name="details" placeholder="{{ t .CurrentLocale "detailed_description" "" }}"></textarea>
+                </div>
+                <div class="form-group">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 50%;">
+                                <a href="/account" class="btn btn-default btn-block no-right-radius"><%= t('cancel', locale: current_locale) %></a>
+                            </td>
+                            <td style="width: 50%;">
+                                <button class="btn btn-safestop btn-block no-left-radius" type="submit"><%= t('submit', locale: current_locale) %></button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('form').formValidation({
+            framework: 'bootstrap',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                'incident[incident_involved_students_attributes[0][student_first_name]': {validators: {notEmpty: {message: '<%= t('required', locale: current_locale) %>'}}},
+                'incident[incident_involved_students_attributes[0][student_last_name]': {validators: {notEmpty: {message: '<%= t('required', locale: current_locale) %>'}}},
+                'incident[incident_involved_students_attributes[0][phone_number]': {
+                    validators: {
+                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
+                    }
+                },
+                'incident[details]': {
+                    validators: {
+                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
+                    }
+                },
+                'incident[route_identifier]': {
+                    validators: {
+                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
+                    }
+                },
+                'incident[date_occurred]': {
+                    validators: {
+                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
+                    }
+                }
+            }
+        });
+
+        $('#date-occurred').datetimepicker({format: 'YYYY-MM-DD'})
+                .on('dp.change', function (e) {
+                    $('form').data('formValidation').resetField('incident[date_occurred]');
+                    $('form').data('formValidation').validateField('incident[date_occurred]');
+                });
+    })
+
+</script>
+
+
+
+
+
+
+
 
 {{end}}

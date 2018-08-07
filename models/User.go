@@ -11,7 +11,7 @@ import (
 
 type ClientUser struct {
 	*ModelBase
-	Error Error `json:"error"`
+	//Error Error `json:"error"`
 	Id	int `json:"id" db:"id"`
 	Email string `json:"email" db:"email"`
 }

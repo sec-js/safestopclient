@@ -106,16 +106,6 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	view_incident_reports := false
-	for i := 0; i < len(cj.Jurisdictions); i++ {
-		if cj.Jurisdictions[i].HasIncidentReports == true {
-			view_incident_reports = true
-			break
-		}
-	}
-
-
-
 	data := struct {
 		JurisdictionCount int
 		HasJurisdictions bool
@@ -123,7 +113,6 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 		ViewManageNotifications bool
 		ViewManageSubscriptions bool
 		ViewReportLostItem bool
-		ViewReportIncident bool
 	}{
 		len(cj.Jurisdictions),
 		has_jurisdictions,
@@ -131,7 +120,6 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 		view_manage_notifications,
 		view_manage_subscriptions,
 		view_lost_item_reports,
-		view_incident_reports,
 	}
 
 	c.render(w, r, "account", data)
@@ -599,15 +587,15 @@ func (c *AppController) getCurrentUser(r *http.Request) *models.User {
 
 
 
-func validateToken(token string) models.AuthInfo {
-	a := models.AuthInfo{}
-	u := models.FindUserByToken(token)
-	if(u != nil){
-		a.User = u
-		a.TokenValid = true
-	}
-	return a
-}
+//func validateToken(token string) models.AuthInfo {
+//	a := models.AuthInfo{}
+//	u := models.FindUserByToken(token)
+//	if(u != nil){
+//		a.User = u
+//		a.TokenValid = true
+//	}
+//	return a
+//}
 
 
 // addAction requires you to have a view named <action>.html and a method func (c *AppController) <Action>Action(http.ResponseWriter, *http.Request)
