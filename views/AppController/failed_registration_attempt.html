@@ -4,7 +4,7 @@
 {{define "body"}}
 
 
-<form action="/process_failed_registration_attempt" method="post" style="margin-bottom:20px;">
+<form id="failed-registration-attempt-form" action="/process_failed_registration_attempt" method="post" style="margin-bottom:20px;">
 {{ .CSRFTemplateField}}
 
     <input type="hidden" name="safe_stop_failed_registration_attempt[jurisdiction_id]" value="{{ .ViewData.JurisdictionId }}">
@@ -64,6 +64,74 @@
 
     $(document).ready(function () {
 
+
+
+
+
+        FormValidation.formValidation(
+                document.getElementById("failed-registration-attempt-form"),
+                {
+                    fields: {
+                        'safe_stop_failed_registration_attempt[last_name]': {
+                            validators: {
+                                notEmpty: {message: "{{ t .CurrentLocale "required" "" }}"}
+                            }
+                        },
+                        'safe_stop_failed_registration_attempt[first_name]': {
+                            validators: {
+                                notEmpty: {message: "{{ t .CurrentLocale "required" "" }}"}
+                            }
+                        },
+                        'safe_stop_failed_registration_attempt[id_or_code_attempted]': {
+                            validators: {
+                                notEmpty: {message: "{{ t .CurrentLocale "required" "" }}"}
+                            }
+                        },
+                        'safe_stop_failed_registration_attempt[student_first_name]': {
+                            validators: {
+                                notEmpty: {message: "{{ t .CurrentLocale "required" "" }}"}
+                            }
+                        },
+                        'safe_stop_failed_registration_attempt[student_last_name]': {
+                            validators: {
+                                notEmpty: {message: "{{ t .CurrentLocale "required" "" }}"}
+                            }
+                        },
+                        'safe_stop_failed_registration_attempt[email]': {
+                            validators: {
+                                regexp: {
+                                    regexp: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                                    message: "Invalid email format"
+                                },
+                                notEmpty: {message: '{{ t .CurrentLocale "invalid_email_format" ""}}'}
+                            }
+                        }
+                    },
+                    plugins: {
+                        trigger: new FormValidation.plugins.Trigger(),
+                        submitButton: new FormValidation.plugins.SubmitButton(),
+                        defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+                        bootstrap: new FormValidation.plugins.Bootstrap(),
+                        icon: new FormValidation.plugins.Icon({
+                            valid: 'fa fa-check',
+                            invalid: 'fa fa-times',
+                            validating: 'fa fa-refresh',
+                        }),
+                    }
+                }
+        )
+
+
+
+
+
+
+
+
+
+
+
+
         $('form').formValidation({
             framework: 'bootstrap',
             excluded: false,
@@ -72,42 +140,7 @@
                 invalid: 'glyphicon glyphicon-remove',
                 validating: 'glyphicon glyphicon-refresh'
             },
-            fields: {
-                'safe_stop_failed_registration_attempt[last_name]': {
-                    validators: {
-                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
-                    }
-                },
-                'safe_stop_failed_registration_attempt[first_name]': {
-                    validators: {
-                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
-                    }
-                },
-                'safe_stop_failed_registration_attempt[id_or_code_attempted]': {
-                    validators: {
-                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
-                    }
-                },
-                'safe_stop_failed_registration_attempt[student_first_name]': {
-                    validators: {
-                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
-                    }
-                },
-                'safe_stop_failed_registration_attempt[student_last_name]': {
-                    validators: {
-                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
-                    }
-                },
-                'safe_stop_failed_registration_attempt[email]': {
-                    validators: {
-                        regexp: {
-                            regexp: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                            message: "Invalid email format"
-                        },
-                        notEmpty: {message: '<%= t('invalid_email_format', locale: current_locale) %>'}
-                    }
-                }
-            }
+
         });
     })
 
