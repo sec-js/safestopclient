@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/schoolwheels/safestopclient/database"
-	"fmt"
+		"log"
 )
 
 type PostalCodeReference struct {
@@ -18,14 +18,12 @@ type PostalCodeReference struct {
 func PostalCodeReferenceForPostalCode(postal_code string) *PostalCodeReference {
 	query := "select id, postal_code, state_code, city, latitude, longitude from postal_code_to_city_states where postal_code = $1 limit 1;"
 	row := database.GetDB().QueryRowx(query, postal_code)
-	if row == nil {
+
+	r := PostalCodeReference{}
+	err := row.StructScan(&r)
+	if err != nil {
+		log.Println(err)
 		return nil
-	} else {
-		r := PostalCodeReference{}
-		err := row.StructScan(&r)
-		if err != nil {
-			fmt.Print(err)
-		}
-		return &r
 	}
+	return &r
 }

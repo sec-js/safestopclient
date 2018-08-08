@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/schoolwheels/safestopclient/database"
-	"fmt"
+		"log"
 )
 
 type State struct {
@@ -16,14 +16,12 @@ type State struct {
 func StateForAbbreviation(abbreviation string) *State {
 	query := "select id, name, abbreviation, country_id from states where abbreviation = $1 limit 1;"
 	row := database.GetDB().QueryRowx(query, abbreviation)
-	if row == nil {
+
+	r := State{}
+	err := row.StructScan(&r)
+	if err != nil {
+		log.Println(err)
 		return nil
-	} else {
-		r := State{}
-		err := row.StructScan(&r)
-		if err != nil {
-			fmt.Print(err)
-		}
-		return &r
 	}
+	return &r
 }

@@ -29,6 +29,7 @@ type User struct {
 	Locked bool `json:"locked" db:"locked"`
 	FirstName string `json:"first_name" db:"first_name"`
 	LastName string `json:"last_name" db:"last_name"`
+	PersonId int `json:"person_id" db:"person_id"`
 	//CreatedAt time.Time `json:"created_at" db:"created_at"`
 }
 
@@ -127,7 +128,7 @@ insert into permission_groups_users (permission_group_id, user_id) values ((sele
 
 
 
-func ActivateStudentIdentifierSubscription(jurisdiction_id int, product_id int, user_id int, student_identifiers []string) (bool, error) {
+func ActivateStudentIdentifierSubscription(jurisdiction_id int, product_id int, user *User, student_identifiers []string) (bool, error) {
 
 	one_student_successful := false
 
@@ -157,7 +158,7 @@ func ActivateStudentIdentifierSubscription(jurisdiction_id int, product_id int, 
 				}
 
 				relationship_query := `
-insert into personal_relationships (person_id, person_related_id, personal_relationship_type, created_at, updated_at) 
+insert into personal_relationships (person_id, person_related_id, personal_relationship_type_id, created_at, updated_at) 
 values (
 (select person_id from users where id = $1 limit 1), 
 (select person_id from student_informations where id = $2 limit 1), 
@@ -165,7 +166,7 @@ values (
 now(), 
 now())
 `
-				_, err = tx.Query(relationship_query, user_id, student_id)
+				_, err = tx.Query(relationship_query, user.PersonId, student_id)
 				if err != nil {
 					tx.Rollback()
 					continue
@@ -181,7 +182,7 @@ and a.deleted = false
 and a.id not in (select bus_route_stop_id from bus_route_stop_users where user_id = $1)
 )
 `
-				_, err = tx.Query(user_stops_query, user_id, student_id)
+				_, err = tx.Query(user_stops_query, user.Id, student_id)
 				if err != nil {
 					tx.Rollback()
 					continue
@@ -206,7 +207,7 @@ $3,
 now(), 
 now()
 )`
-		_, err := database.GetDB().Query(subscription_query, jurisdiction_id, product_id, user_id)
+		_, err := database.GetDB().Query(subscription_query, jurisdiction_id, product_id, user.Id)
 		if err != nil {
 			return false, errors.New("Subscription creation failed")
 		}
@@ -220,7 +221,7 @@ now()
 
 }
 
-func ActivateAccessCodeSubscription(jurisdiction_id int, product_id int, currentUserId int) (bool, error) {
+func ActivateAccessCodeSubscription(jurisdiction_id int, product_id int, user *User) (bool, error) {
 
 	tx, err := database.GetDB().Begin()
 	if err != nil {
@@ -229,7 +230,7 @@ func ActivateAccessCodeSubscription(jurisdiction_id int, product_id int, current
 
 	person_id := 0
 	person_query := `
-	insert into people (first_name, last_name, created_at, updated_at) values (select to_hex(round(random() * 2^32 - 1)::BIGINT), select to_hex(round(random() * 2^32 - 1)::BIGINT), now(), now()) returning id
+	insert into people (first_name, last_name, created_at, updated_at) values ((select to_hex(round(random() * 2^32 - 1)::BIGINT)), (select to_hex(round(random() * 2^32 - 1)::BIGINT)), now(), now()) returning id
 `
 	row := tx.QueryRow(person_query)
 	if row == nil {
@@ -248,7 +249,7 @@ func ActivateAccessCodeSubscription(jurisdiction_id int, product_id int, current
 	student_query := `
 	insert into student_informations (jurisdiction_id, person_id, created_at, updated_at) values ($1, $2, now(), now()) returning id
 `
-	row = tx.QueryRow(student_query)
+	row = tx.QueryRow(student_query, jurisdiction_id, person_id)
 	if row == nil {
 		tx.Rollback()
 		return false, errors.New("StudentInformation id not returned")
@@ -260,24 +261,26 @@ func ActivateAccessCodeSubscription(jurisdiction_id int, product_id int, current
 		}
 	}
 
-	relationship_query := `insert into personal_relationships (person_id, person_related_id, personal_relationship_type, created_at, updated_at) values ($1, $2, 1, now(), now())`
-	_, err = tx.Query(relationship_query, currentUserId, person_id)
-	if row == nil {
+	relationship_query := `insert into personal_relationships (person_id, person_related_id, personal_relationship_type_id, created_at, updated_at) values ($1, $2, 1, now(), now())`
+	_, err = tx.Exec(relationship_query, user.PersonId, person_id)
+	if err != nil {
 		tx.Rollback()
 		return false, errors.New("StudentInformation id not returned")
 	}
 
 	subscription_query := `
-insert into subscriptions (start_date, end_date, user_id, product_id, active, created_at, updated_at) 
+insert into subscriptions (start_date, end_date, user_id, product_id, active, created_at, updated_at)
 values (
-(select postgresql_name from time_zones where id = (select time_zone_id from jurisdictions where id = $1)), 
-(select effective_end_date from products where id = $2), 
-$3, 
-now(), 
+now() at time zone (select postgresql_name from time_zones where id = (select time_zone_id from jurisdictions where id = $1) limit 1),
+(select effective_end_date from products where id = $2),
+$3,
+$2,
+true,
+now(),
 now()
 )`
-	_, err = tx.Query(subscription_query, jurisdiction_id, product_id, currentUserId)
-	if row == nil {
+	_, err = tx.Exec(subscription_query, jurisdiction_id, product_id, user.Id)
+	if err != nil {
 		tx.Rollback()
 		return false, errors.New("Subscription creation failed")
 	}
@@ -316,6 +319,7 @@ func FindUser(id int) *User {
 
 	query := `
 select a.id, 
+a.person_id as person_id,
 email, 
 password_digest, 
 coalesce(locked, false) as locked,
@@ -323,7 +327,7 @@ coalesce(super_admin, false) as super_admin,
 (select array_to_string(array_agg(a.name), ',') as permission_groups
 from permission_groups a 
 join permission_groups_users b on b.permission_group_id = a.id 
-and b.user_id = a.id 
+and b.user_id = $1
 and a.security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1)),
 coalesce(b.first_name, '') as first_name,
 coalesce(b.last_name, '') as last_name

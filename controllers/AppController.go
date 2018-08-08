@@ -26,6 +26,9 @@ func (c *AppController) Register() {
 	c.addTemplate("failed_registration_attempt", "failed_registration_attempt.html", "default.html")
 	c.addTemplate("report_an_app_issue", "report_an_app_issue.html", "default.html")
 	c.addTemplate( "manage_notifications", "manage_notifications.html", "default.html")
+	c.addTemplate( "manage_subscriptions", "manage_subscriptions.html", "default.html")
+
+	c.addTemplate("lost_item_report", "lost_item_report.html", "default.html")
 
 	//actions
 	c.addRouteWithPrefix("/", c.IndexAction)
@@ -39,8 +42,12 @@ func (c *AppController) Register() {
 	c.addRouteWithPrefix("/report_an_app_issue", c.AppIssueAction)
 	c.addRouteWithPrefix( "/remove_all_stops", c.RemoveAllStopsAction)
 	c.addRouteWithPrefix( "/manage_notifications", c.ManageNotificationsAction)
+	c.addRouteWithPrefix( "/manage_subscriptions", c.ManageSubscriptionsAction)
+
 	c.addRouteWithPrefix( "/add_scan_notification_subscription", c.AddScanNotificationSubscriptionAction)
 	c.addRouteWithPrefix( "/remove_scan_notification_subscription", c.RemoveScanNotificationSubscriptionAction)
+
+	c.addRouteWithPrefix("/lost_item_report", c.LostItemReportAction)
 
 }
 
@@ -138,7 +145,7 @@ func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.R
 			JurisdictionCount int
 		} {
 			r.FormValue("postal_code"),
-			&models.JurisdictionOptions{},
+			nil,
 			-1,
 		}
 
@@ -150,7 +157,7 @@ func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.R
 		jurisdictions := &models.JurisdictionOptions{}
 
 		pcr := models.PostalCodeReferenceForPostalCode(postal_code)
-		if(pcr != nil){
+		if pcr != nil {
 			s := models.StateForAbbreviation(pcr.StateCode)
 			if(s != nil){
 				jurisdictions = models.AvailableJurisdictionsForState(s.Id, postal_code)
@@ -192,6 +199,8 @@ func (c *AppController) ActivateAction(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
 		return
 	}
+
+	user := models.FindUser(user_id)
 
 
 	if r.Method == "GET" {
@@ -247,19 +256,20 @@ func (c *AppController) ActivateAction(w http.ResponseWriter, r *http.Request) {
 			if registration_type == "Student Identifier" || registration_type == "Access Code + Student Identifier" {
 
 				student_identifiers := r.Form["student_information[][sis_identifier]"]
-				subscription_created, err := models.ActivateStudentIdentifierSubscription(jurisdiction_id, product_id, user_id, student_identifiers)
+				subscription_created, err := models.ActivateStudentIdentifierSubscription(jurisdiction_id, product_id, user, student_identifiers)
 				if !subscription_created || err != nil {
 					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
-					http.Redirect(w, r, r.URL.Host+"/activate/" + string(jurisdiction_id) + "?postal_code=" + postal_code, http.StatusFound)
+					http.Redirect(w, r, r.URL.Host+"/activate/" + strconv.Itoa(jurisdiction_id) + "?postal_code=" + postal_code, http.StatusFound)
 					return
 				}
 
 			} else {
 
-				subscription_created, err := models.ActivateAccessCodeSubscription(jurisdiction_id, product_id, user_id)
+				subscription_created, err := models.ActivateAccessCodeSubscription(jurisdiction_id, product_id, user)
+
 				if !subscription_created || err != nil {
 					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
-					http.Redirect(w, r, r.URL.Host+"/activate/" + string(jurisdiction_id) + "?postal_code=" + postal_code, http.StatusFound)
+					http.Redirect(w, r, r.URL.Host+"/activate/" + strconv.Itoa(jurisdiction_id) + "?postal_code=" + postal_code, http.StatusFound)
 					return
 				}
 
@@ -481,7 +491,14 @@ func (c *AppController) ManageNotificationsAction(w http.ResponseWriter, r *http
 	}
 
 	u := models.FindUser(user_id)
+
 	cj := models.ClientJurisdictionForUser(u, c.ControllerBase.PermissionGroups)
+	if cj == nil {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+
 	sns := models.ScanNotificationSubscriptionsForUser(user_id)
 
 	data := struct {
@@ -496,6 +513,42 @@ func (c *AppController) ManageNotificationsAction(w http.ResponseWriter, r *http
 
 	c.render(w, r, "manage_notifications", data)
 }
+
+
+
+
+
+func (c *AppController) ManageSubscriptionsAction(w http.ResponseWriter, r *http.Request) {
+
+	user_id := currentUserId(c.ControllerBase, r)
+	if(user_id == 0){
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	u := models.FindUser(user_id)
+
+	s := models.SubscriptionsForUser(u)
+	if s == nil {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	data := struct {
+		Subscriptions *models.Subscriptions
+	} {
+		s,
+	}
+
+	c.render(w, r, "manage_subscriptions", data)
+}
+
+
+
+
+
+
+
 
 
 func (c *AppController) AddScanNotificationSubscriptionAction(w http.ResponseWriter, r *http.Request) {
@@ -547,6 +600,97 @@ func (c *AppController) RemoveScanNotificationSubscriptionAction(w http.Response
 
 	http.Redirect(w, r, r.URL.Host+ r.FormValue("out_action"), http.StatusFound)
 }
+
+
+
+
+
+
+
+
+
+
+
+func (c *AppController) LostItemReportAction(w http.ResponseWriter, r *http.Request) {
+
+	user_id := currentUserId(c.ControllerBase, r)
+
+	if user_id == 0 {
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	u := models.FindUser(user_id)
+	cj := models.ClientJurisdictionForUser(u, c.PermissionGroups)
+	if cj == nil {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	jurisdiction_id := 0
+	for i := 0; i < len(cj.Jurisdictions); i++ {
+		if cj.Jurisdictions[i].HasLostItemReports == true {
+			jurisdiction_id = cj.Jurisdictions[i].Id
+			break
+		}
+	}
+	if jurisdiction_id == 0 {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+
+
+	if r.Method == "GET" {
+		data := models.LostItemReport{}
+		data.Email = u.Email
+		data.JurisdictionId = jurisdiction_id
+		c.render(w, r, "lost_item_report", data)
+		return
+
+		} else {
+
+		data := models.LostItemReport{
+			JurisdictionId: jurisdiction_id,
+			FirstName: r.FormValue("first_name"),
+			LastName: r.FormValue("last_name"),
+			Email: u.Email,
+			Summary: r.FormValue("summary"),
+			Phone: r.FormValue("phone"),
+			RouteIdentifier: r.FormValue("route_identifier"),
+			DateLost: r.FormValue("date_lost"),
+			Description: r.FormValue("description"),
+		}
+			success := models.InsertLostItemReport(&data)
+			if success == true {
+				//TODO SEND LOST ITEM REPORT EMAIL
+				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
+				http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+				return
+			} else {
+				c.render(w, r, "lost_item_report", data)
+				return
+			}
+
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

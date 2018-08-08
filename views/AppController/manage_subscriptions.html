@@ -3,6 +3,78 @@
 {{end}}
 {{define "body"}}
 
-TODO: Put stuff here.
+<ul class="list-group" id="subscription-jurisdictions" style="margin-top: 50px;">
 
+    {{ range .ViewData.Subscriptions.Subscriptions}}
+        <a href="/subscription_details/{{ .Id}}" style="cursor: pointer;" class="list-group-item account-li">
+            <table class="list-nav-item-table">
+                <tr>
+                    <td>
+                        <span class="title">{{ .JurisdictionName }}</span>
+                    </td>
+                    <td>
+                        <i class='fa fa-angle-right nav-arrow'></i>
+                    </td>
+                </tr>
+            </table>
+        </a>
+    {{ end }}
+
+</ul>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('body').removeClass('app-body').addClass('app-body-scroll');
+
+
+        // window.send_message = function (action, callback, data) {
+        //     var iframe = document.createElement('iframe');
+        //     var req = encodeURIComponent(action) + "$" + encodeURIComponent(callback) + "$" + encodeURIComponent(data);
+        //     iframe.setAttribute("src", "js://" + req);
+        //     iframe.style.display = "none";
+        //     document.documentElement.appendChild(iframe);
+        //     iframe.parentNode.removeChild(iframe);
+        //     iframe = null;
+        // };
+        //
+        // var is_uiwebview = /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(navigator.userAgent);
+        // if (is_uiwebview) {
+        //     send_message("device_model", "device_model_callback", "");
+        //     send_message("app_version", "app_version_callback", "");
+        //     send_message("os", "os_callback", "");
+        // }
+
+    });
+
+    // function device_model_callback(data) {
+    //     $("#native-device-model").show();
+    //     $("#native-device-model-value").text(data);
+    //     $("#system-header").show();
+    // }
+    //
+    // function app_version_callback(data) {
+    //     $("#native-app-version").show();
+    //     $("#native-app-version-value").text(data);
+    //     $("#system-header").show();
+    // }
+    //
+    // function os_callback(data) {
+    //     $("#native-os").show();
+    //     $("#native-os-value").text(data);
+    //     if (data.indexOf("iPhone") === 0) {
+    //         $("#native-os-icon").addClass("fa-apple");
+    //     }
+    //     else if (data.indexOf("Android") === 0) {
+    //         $("#native-os-icon").addClass("fa-android");
+    //     }
+    //     else {
+    //         $("#native-os-icon").addClass("fa-laptop")
+    //     }
+    //     $("#system-header").show();
+    // }
+
+</script>
 {{end}}

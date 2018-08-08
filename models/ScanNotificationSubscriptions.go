@@ -34,20 +34,19 @@ and a.user_id = $1
 order by a.name;
 `
 	rows, err := database.GetDB().Queryx(query, user_id)
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		if rows != nil {
-			for rows.Next() {
-				s := ScanNotificationSubscription{}
-				err = rows.StructScan(&s)
-				if err != nil {
-					log.Fatal(err)
-				} else {
-					scan_notification_subscriptions.Subscriptions = append(scan_notification_subscriptions.Subscriptions, s)
-				}
-			}
+	if err != nil || rows == nil {
+		log.Println(err.Error())
+		return nil
+	}
+
+	for rows.Next() {
+		s := ScanNotificationSubscription{}
+		err = rows.StructScan(&s)
+		if err != nil {
+			log.Println(err.Error())
+			return nil
 		}
+		scan_notification_subscriptions.Subscriptions = append(scan_notification_subscriptions.Subscriptions, s)
 	}
 
 	return &scan_notification_subscriptions

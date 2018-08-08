@@ -41,98 +41,33 @@ order by a.name
 `
 	rows, err := database.GetDB().Queryx(query, state_id, postal_code)
 	if err != nil {
-		fmt.Print(err)
+		log.Println(err.Error())
+		return &j
 	}
 
-	if rows != nil {
-		for i := 0; rows.Next(); i++ {
-			r := JurisdictionOption{}
-			err := rows.StructScan(&r)
-			if err != nil {
-				fmt.Print(err)
-			}
-			j.Jurisdictions = append(j.Jurisdictions, r)
+	for i := 0; rows.Next(); i++ {
+		r := JurisdictionOption{}
+		err := rows.StructScan(&r)
+		if err != nil {
+			log.Println(err.Error())
+			return &j
 		}
+		j.Jurisdictions = append(j.Jurisdictions, r)
 	}
 
 	return &j
 }
 
+
+
 func JurisdictionCountForUser(u *User, pg *PermissionGroups) int {
-
-	query := ``
 	jurisdiction_count := 0
-
-	if((u.SuperAdmin == true) || HasAnyPermissionGroups([]string{ pg.Admin}, u.PermissionGroups)) {
-		query = `
-select count(*) 
-from jurisdictions 
-where active = true;
-`
-		err := database.GetDB().QueryRow(query).Scan(&jurisdiction_count)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-	} else if (HasAnyPermissionGroups([]string{ pg.License_1, pg.License_2, pg.License_3, pg.License_4}, u.PermissionGroups)){
-		query = `
-select count(*) from jurisdictions a 
-join jurisdictional_restrictions b on a.id = b.jurisdiction_id
-where b.user_id = $1
-`
-
-		err := database.GetDB().QueryRow(query, u.Id).Scan(&jurisdiction_count)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-	} else {
-	query = `
-select count(distinct id) from (
-
-select a.id 
-from jurisdictions a
-join products b on b.jurisdiction_id = a.id
-join subscriptions c on b.id = c.product_id
-join subscription_sub_accounts d on c.id = d.subscription_id
-join users e on d.user_id = e.id
-join time_zones f on f.id = a.time_zone_id
-where c.start_date <= (now() at time zone f.postgresql_name)::date
-and c.end_date >= (now() at time zone f.postgresql_name)::date
-and c.active = 't'
-and b.product_type = 'ss'
-and e.id = $1
-
-union all
-
-select a.id
-from jurisdictions a
-join products b on b.jurisdiction_id = a.id
-join subscriptions c on b.id = c.product_id
-join users d on c.user_id = d.id
-join time_zones e on e.id = a.time_zone_id
-where c.start_date <= (now() at time zone e.postgresql_name)::date
-and c.end_date >= (now() at time zone e.postgresql_name)::date
-and c.active = 't'
-and b.product_type = 'ss'
-and d.id = $1
-
-) z
-`
-		err := database.GetDB().QueryRow(query, u.Id).Scan(&jurisdiction_count)
-		if err != nil {
-			log.Fatal(err)
-		}
+	cj := ClientJurisdictionForUser(u, pg)
+	if cj != nil {
+		jurisdiction_count = len(cj.Jurisdictions)
 	}
-
 	return jurisdiction_count
 }
-
-
-
-
-
-
 
 type ClientJurisdictions struct {
 	Jurisdictions []ClientJurisdiction
@@ -170,14 +105,14 @@ order by name;
 `
 		rows, err := database.GetDB().Queryx(query)
 		if err != nil {
-			log.Fatal(err)
+			return nil
 		} else {
 			if rows != nil {
 				for rows.Next() {
 					j := ClientJurisdiction{}
 					err = rows.StructScan(&j)
 					if err != nil {
-						log.Fatal(err)
+						return nil
 					} else {
 						client_jurisdictions.Jurisdictions = append(client_jurisdictions.Jurisdictions, j)
 					}
@@ -210,7 +145,7 @@ coalesce(phone, '') as phone,
 coalesce(safe_stop_bullying_reports_active, false) as has_incident_reports,
 coalesce(safe_stop_lost_item_reports_active, false) as has_lost_item_reports,
 coalesce(active, false) as active,
-coalesce(a.student_scanning, false) as student_scanning
+coalesce(student_scanning, false) as student_scanning
 from (
 select a.id, 
 a.name, 
@@ -258,14 +193,14 @@ order by z.name
 
 	rows, err := database.GetDB().Queryx(query, u.Id)
 	if err != nil {
-		log.Fatal(err)
+		return nil
 	} else {
 		if rows != nil {
 			for rows.Next() {
 				j := ClientJurisdiction{}
 				err = rows.StructScan(&j)
 				if err != nil {
-
+					return nil
 				} else {
 					client_jurisdictions.Jurisdictions = append(client_jurisdictions.Jurisdictions, j)
 				}
