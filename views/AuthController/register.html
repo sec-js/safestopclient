@@ -175,6 +175,25 @@
 
     });
 
+
+    function check_for_existing_users(){
+        var email = $("#email").val();
+        if(email.length == 0){
+            $("#create-user-fields").hide();
+        }
+        else{
+            $.get('/email_exists_in_safe_stop', { 'user[email]': email }, function(response){
+                if(response.valid){
+                    $("#create-user-fields").show();
+                }
+                else{
+                    $("#create-user-fields").hide();
+                }
+            })
+        }
+    }
+
+
 </script>
 
 
