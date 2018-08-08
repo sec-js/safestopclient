@@ -7,21 +7,64 @@ import (
 	)
 
 
-type JurisdictionOptions struct {
-	Jurisdictions []JurisdictionOption `json:"jurisdictions"`
+type Jurisdictions struct {
+	Jurisdictions []Jurisdiction
 }
 
-type JurisdictionOption struct {
-	*ModelBase
-	Id	int `json:"id" db:"id"`
+
+type Jurisdiction struct {
+	Id int `json:"id" db:"id"`
 	Name string `json:"name" db:"name"`
+	Phone string `json:"phone" db:"phone"`
+	HasLostItemReports bool `json:"has_lost_item_reports" db:"has_lost_item_reports"`
+	HasIncidentReports bool `json:"has_incident_reports" db:"has_incident_reports"`
+	Active bool `json:"active" db:"active"`
+	StudentScanning bool `json:"student_scanning" db:"student_scanning"`
+	RegistrationType string `json:"registration_type" db:"registration_type"`
+	UseScanCodeMapping bool `json:"use_scan_code_mapping" db:"use_scan_code_mapping"`
 	RegisterUrl string `json:"register_url" db:"register_url"`
 	ActivateUrl string `json:"activate_url" db:"activate_url"`
-
+	SubAccountLimit int `json:"sub_account_limit" db:"sub_account_limit"`
 }
 
-func AvailableJurisdictionsForState(state_id int, postal_code string) *JurisdictionOptions {
-	j := JurisdictionOptions{}
+func FindJurisdiction(id int) *Jurisdiction {
+
+	query := `
+select a.id, 
+coalesce(a.name, '') as name,
+coalesce(a.phone, '') as phone ,
+coalesce(a.safe_stop_lost_item_reports_active, false) as has_lost_item_reports,
+coalesce(a.safe_stop_bullying_reports_active, false) as has_incident_reports,
+coalesce(a.active, false) as active,
+coalesce(a.student_scanning, false) as student_scanning,
+coalesce(a.use_scan_code_mapping, false) as use_scan_code_mapping,
+coalesce(c.sub_account_limit, 3) as sub_account_limit
+from jurisdictions a 
+join safe_stop_registration_types b on a.safe_stop_registration_type_id = b.id
+join jurisdiction_safe_stop_infos c on c.jurisdiction_id = a.id
+where a.id = $1
+`
+	row := database.GetDB().QueryRowx(query, id)
+	if row == nil {
+		return nil
+	}
+
+	j := Jurisdiction{}
+	err := row.StructScan(&j)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+	return &j
+}
+
+
+
+
+
+
+func AvailableJurisdictionsForState(state_id int, postal_code string) *Jurisdictions {
+	j := Jurisdictions{}
 
 	query := `
 select a.id, 
@@ -46,7 +89,7 @@ order by a.name
 	}
 
 	for i := 0; rows.Next(); i++ {
-		r := JurisdictionOption{}
+		r := Jurisdiction{}
 		err := rows.StructScan(&r)
 		if err != nil {
 			log.Println(err.Error())
@@ -90,7 +133,7 @@ func ClientJurisdictionForUser(u *User, pg *PermissionGroups) *ClientJurisdictio
 
 	query := ``
 
-	if((u.SuperAdmin == true) || HasAnyPermissionGroups([]string{ pg.Admin}, u.PermissionGroups)) {
+	if((u.SuperAdmin == true) || UserHasAnyPermissionGroups([]string{ pg.Admin}, u.PermissionGroups)) {
 		query = `
 select a.id, 
 a.name, 
@@ -123,7 +166,7 @@ order by name;
 		return &client_jurisdictions
 
 
-	} else if (HasAnyPermissionGroups([]string{ pg.License_1, pg.License_2, pg.License_3, pg.License_4}, u.PermissionGroups)){
+	} else if (UserHasAnyPermissionGroups([]string{ pg.License_1, pg.License_2, pg.License_3, pg.License_4}, u.PermissionGroups)){
 		query = `
 select a.id, 
 a.name, 

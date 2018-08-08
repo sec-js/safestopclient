@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"strconv"
 	"github.com/schoolwheels/safestopclient/database"
-	)
+)
 
 type AppController struct {
 	*ControllerBase
@@ -27,6 +27,8 @@ func (c *AppController) Register() {
 	c.addTemplate("report_an_app_issue", "report_an_app_issue.html", "default.html")
 	c.addTemplate( "manage_notifications", "manage_notifications.html", "default.html")
 	c.addTemplate( "manage_subscriptions", "manage_subscriptions.html", "default.html")
+	c.addTemplate( "subscription_details", "subscription_details.html", "default.html")
+
 
 	c.addTemplate("lost_item_report", "lost_item_report.html", "default.html")
 
@@ -43,6 +45,7 @@ func (c *AppController) Register() {
 	c.addRouteWithPrefix( "/remove_all_stops", c.RemoveAllStopsAction)
 	c.addRouteWithPrefix( "/manage_notifications", c.ManageNotificationsAction)
 	c.addRouteWithPrefix( "/manage_subscriptions", c.ManageSubscriptionsAction)
+	c.addRouteWithPrefix( "/subscription_details/{subscription_id}", c.SubscriptionDetailsAction)
 
 	c.addRouteWithPrefix( "/add_scan_notification_subscription", c.AddScanNotificationSubscriptionAction)
 	c.addRouteWithPrefix( "/remove_scan_notification_subscription", c.RemoveScanNotificationSubscriptionAction)
@@ -91,7 +94,7 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 		has_jurisdictions = true
 	}
 
-	view_manage_notifications := models.HasAnyPermissionGroups([]string{
+	view_manage_notifications := models.UserHasAnyPermissionGroups([]string{
 		c.PermissionGroups.Admin,
 		c.PermissionGroups.License_3,
 		c.PermissionGroups.License_4,
@@ -101,7 +104,7 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 		view_manage_notifications = true
 	}
 
-	view_manage_subscriptions := models.HasAnyPermissionGroups([]string{
+	view_manage_subscriptions := models.UserHasAnyPermissionGroups([]string{
 		c.PermissionGroups.License_5,
 	}, u.PermissionGroups)
 
@@ -136,12 +139,11 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 
 func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.Request) {
 
-
 	if r.Method == "GET" {
 
 		data := struct {
 			PostalCode string
-			Jurisdictions *models.JurisdictionOptions
+			Jurisdictions *models.Jurisdictions
 			JurisdictionCount int
 		} {
 			r.FormValue("postal_code"),
@@ -154,19 +156,19 @@ func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.R
 	} else {
 
 		postal_code := r.FormValue("postal_code")
-		jurisdictions := &models.JurisdictionOptions{}
+		jurisdictions := &models.Jurisdictions{}
 
 		pcr := models.PostalCodeReferenceForPostalCode(postal_code)
 		if pcr != nil {
 			s := models.StateForAbbreviation(pcr.StateCode)
-			if(s != nil){
+			if s != nil {
 				jurisdictions = models.AvailableJurisdictionsForState(s.Id, postal_code)
 			}
 		}
 
 		data := struct {
 			PostalCode string
-			Jurisdictions *models.JurisdictionOptions
+			Jurisdictions *models.Jurisdictions
 			JurisdictionCount int
 		} {
 			r.FormValue("postal_code"),
@@ -195,95 +197,78 @@ func (c *AppController) ActivateAction(w http.ResponseWriter, r *http.Request) {
 
 	user_id := currentUserId(c.ControllerBase, r)
 	if user_id == 0 {
-		//REDIRECT AND RETURN
 		http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
 		return
 	}
 
 	user := models.FindUser(user_id)
 
+	jurisdiction_id, err := strconv.Atoi(vars["jurisdiction_id"])
+	if err != nil {
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "jurisdiction_not_available", "")), c.BootstrapAlertClass.Danger)
+		http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
+		return
+	}
+
+	if models.UserHasSubscriptionForJurisdiction(user, c.PermissionGroups, jurisdiction_id) {
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "already_have_subscription", "")), c.BootstrapAlertClass.Info)
+		http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
+		return
+	}
+
+
 
 	if r.Method == "GET" {
 
-		if vars["jurisdiction_id"] != "" {
-
-			id, err := strconv.Atoi(vars["jurisdiction_id"])
-			if err != nil {
-				//REDIRECT
-				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "jurisdiction_not_available", "")), c.BootstrapAlertClass.Danger)
-				http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
-				return
-			}
-
-			data := struct {
-				Jurisdiction interface{}
-				PostalCode   string
-			}{
-				models.ActivateJurisdiction(id),
-				r.FormValue("postal_code"),
-			}
-			c.render(w, r, "activate", data)
-			return
-
-		} else {
-			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "jurisdiction_not_available", "")), c.BootstrapAlertClass.Danger)
-			http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
-			return
+		data := struct {
+			Jurisdiction interface{}
+			PostalCode   string
+		}{
+			models.ActivateJurisdiction(jurisdiction_id),
+			r.FormValue("postal_code"),
 		}
+		c.render(w, r, "activate", data)
+		return
 
 	} else {
 
 		r.ParseForm()
 
-		if vars["jurisdiction_id"] != "" {
 
-			registration_type := r.FormValue("registration_type")
+		registration_type := r.FormValue("registration_type")
 
-			jurisdiction_id, err := strconv.Atoi(vars["jurisdiction_id"])
-			if err != nil {
-				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "jurisdiction_not_available", "")), c.BootstrapAlertClass.Danger)
-				http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
-				return
-			}
-
-			product_id := models.ActiveProductIdForJurisdiction(jurisdiction_id)
-			if product_id == 0 {
-				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "jurisdiction_has_no_products", "")), c.BootstrapAlertClass.Danger)
-				http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
-				return
-			}
-
-			if registration_type == "Student Identifier" || registration_type == "Access Code + Student Identifier" {
-
-				student_identifiers := r.Form["student_information[][sis_identifier]"]
-				subscription_created, err := models.ActivateStudentIdentifierSubscription(jurisdiction_id, product_id, user, student_identifiers)
-				if !subscription_created || err != nil {
-					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
-					http.Redirect(w, r, r.URL.Host+"/activate/" + strconv.Itoa(jurisdiction_id) + "?postal_code=" + postal_code, http.StatusFound)
-					return
-				}
-
-			} else {
-
-				subscription_created, err := models.ActivateAccessCodeSubscription(jurisdiction_id, product_id, user)
-
-				if !subscription_created || err != nil {
-					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
-					http.Redirect(w, r, r.URL.Host+"/activate/" + strconv.Itoa(jurisdiction_id) + "?postal_code=" + postal_code, http.StatusFound)
-					return
-				}
-
-			}
-
-			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "you_have_successfully_registered_for", "")), c.BootstrapAlertClass.Info)
-			http.Redirect(w, r, r.URL.Host+ "/", http.StatusFound)
-			return
-
-		} else {
-			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "jurisdiction_not_available", "")), c.BootstrapAlertClass.Danger)
+		product_id := models.ActiveProductIdForJurisdiction(jurisdiction_id)
+		if product_id == 0 {
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "jurisdiction_has_no_products", "")), c.BootstrapAlertClass.Danger)
 			http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
 			return
 		}
+
+		if registration_type == "Student Identifier" || registration_type == "Access Code + Student Identifier" {
+
+			student_identifiers := r.Form["student_information[][sis_identifier]"]
+			subscription_created, err := models.ActivateStudentIdentifierSubscription(jurisdiction_id, product_id, user, student_identifiers)
+			if !subscription_created || err != nil {
+				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+				http.Redirect(w, r, r.URL.Host+"/activate/" + strconv.Itoa(jurisdiction_id) + "?postal_code=" + postal_code, http.StatusFound)
+				return
+			}
+
+		} else {
+
+			subscription_created, err := models.ActivateAccessCodeSubscription(jurisdiction_id, product_id, user)
+
+			if !subscription_created || err != nil {
+				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+				http.Redirect(w, r, r.URL.Host+"/activate/" + strconv.Itoa(jurisdiction_id) + "?postal_code=" + postal_code, http.StatusFound)
+				return
+			}
+
+		}
+
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "you_have_successfully_registered_for", "")), c.BootstrapAlertClass.Info)
+		http.Redirect(w, r, r.URL.Host+ "/", http.StatusFound)
+		return
 
 	}
 }
@@ -326,7 +311,7 @@ func (c *AppController) MapAction(w http.ResponseWriter, r *http.Request) {
 
 func (c *AppController) FaqAction(w http.ResponseWriter, r *http.Request) {
 
-    type FAQ struct{
+	type FAQ struct{
 		Question string `db:"question"`
 		Answer string `db:"answer"`
 	}
@@ -429,31 +414,31 @@ func (c *AppController) AppIssueAction(w http.ResponseWriter, r *http.Request) {
 
 	jurisdiction_id = cj.Jurisdictions[0].Id
 
-		if r.Method == "GET" {
-			data := models.AppIssue{
-				JurisdictionId: jurisdiction_id,
-				UserId: user_id,
-			}
-			c.render(w, r, "report_an_app_issue", data)
+	if r.Method == "GET" {
+		data := models.AppIssue{
+			JurisdictionId: jurisdiction_id,
+			UserId: user_id,
+		}
+		c.render(w, r, "report_an_app_issue", data)
+		return
+	} else {
+		data := models.AppIssue{
+			JurisdictionId: jurisdiction_id,
+			UserId: user_id,
+			IssueType: r.FormValue("issue_type"),
+			Description: r.FormValue("description"),
+		}
+		success := models.InsertAppIssue(&data)
+		if success == true {
+			//TODO SEND APP ISSUE EMAIL
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
+			http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
 			return
 		} else {
-			data := models.AppIssue{
-				JurisdictionId: jurisdiction_id,
-				UserId: user_id,
-				IssueType: r.FormValue("issue_type"),
-				Description: r.FormValue("description"),
-			}
-			success := models.InsertAppIssue(&data)
-			if success == true {
-				//TODO SEND APP ISSUE EMAIL
-				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
-				http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
-				return
-			} else {
-				c.render(w, r, "report_an_app_issue", data)
-				return
-			}
+			c.render(w, r, "report_an_app_issue", data)
+			return
 		}
+	}
 }
 
 
@@ -542,6 +527,60 @@ func (c *AppController) ManageSubscriptionsAction(w http.ResponseWriter, r *http
 
 	c.render(w, r, "manage_subscriptions", data)
 }
+
+
+func (c *AppController) SubscriptionDetailsAction(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	user_id := currentUserId(c.ControllerBase, r)
+	if(user_id == 0){
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	user := models.FindUser(user_id)
+
+	subscription_id, err := strconv.Atoi(vars["subscription_id"])
+	if err != nil {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	subscription := models.FindSubscription(subscription_id)
+	if subscription == nil {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	jurisdiction := models.FindJurisdiction(subscription.JurisdictionId)
+	if jurisdiction == nil {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	sub_account_users := models.SubAccountUsersForSubscription(subscription_id)
+	students := models.StudentsForUser(user.Id, jurisdiction.Id)
+
+
+	data := struct {
+		User *models.User
+		SubAccountUsers *models.SubAccountUsers
+		Subscription *models.Subscription
+		Students *models.Students
+		StudentCount int
+		Jurisdiction *models.Jurisdiction
+		} {
+		user,
+		sub_account_users,
+		subscription,
+		students,
+		len(students.StudentInformations),
+		jurisdiction,
+	}
+
+	c.render(w, r, "subscription_details", data)
+}
+
 
 
 
@@ -648,7 +687,7 @@ func (c *AppController) LostItemReportAction(w http.ResponseWriter, r *http.Requ
 		c.render(w, r, "lost_item_report", data)
 		return
 
-		} else {
+	} else {
 
 		data := models.LostItemReport{
 			JurisdictionId: jurisdiction_id,
@@ -661,16 +700,16 @@ func (c *AppController) LostItemReportAction(w http.ResponseWriter, r *http.Requ
 			DateLost: r.FormValue("date_lost"),
 			Description: r.FormValue("description"),
 		}
-			success := models.InsertLostItemReport(&data)
-			if success == true {
-				//TODO SEND LOST ITEM REPORT EMAIL
-				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
-				http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
-				return
-			} else {
-				c.render(w, r, "lost_item_report", data)
-				return
-			}
+		success := models.InsertLostItemReport(&data)
+		if success == true {
+			//TODO SEND LOST ITEM REPORT EMAIL
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
+			http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+			return
+		} else {
+			c.render(w, r, "lost_item_report", data)
+			return
+		}
 
 	}
 

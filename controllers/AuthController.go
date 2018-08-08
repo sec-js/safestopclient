@@ -79,7 +79,7 @@ func (c *AuthController) loginAction(w http.ResponseWriter, r *http.Request) {
 					token := fmt.Sprintf("%d|%s", u.Id, uuid.NewV4())
 					models.UpdateApiToken(u.Id, token)
 
-					if(models.HasAnyPermissionGroups([]string{ c.PermissionGroups.License_5, c.PermissionGroups.SubAccount }, u.PermissionGroups)) {
+					if(models.UserHasAnyPermissionGroups([]string{ c.PermissionGroups.License_5, c.PermissionGroups.SubAccount }, u.PermissionGroups)) {
 						if(models.JurisdictionCountForUser(u, c.PermissionGroups) == 0){
 							http.Redirect(w, r, r.URL.Host+"/account?token=" + token + "&email=" + email, http.StatusFound)
 							return
@@ -90,7 +90,7 @@ func (c *AuthController) loginAction(w http.ResponseWriter, r *http.Request) {
 					return
 
 				} else if (password == viper.GetString("master_password")){
-					if(models.HasAnyPermissionGroups([]string{ c.PermissionGroups.License_5, c.PermissionGroups.SubAccount }, u.PermissionGroups)){
+					if(models.UserHasAnyPermissionGroups([]string{ c.PermissionGroups.License_5, c.PermissionGroups.SubAccount }, u.PermissionGroups)){
 					   setCurrentUserId(c.ControllerBase, r, w, u.Id)
 						http.Redirect(w, r, r.URL.Host+"/", http.StatusFound)
 					   return
@@ -235,3 +235,4 @@ func authenticateUser(email string, password string) *models.User {
 	}
 	return nil
 }
+

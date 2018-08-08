@@ -289,32 +289,6 @@ now()
 	return true, nil
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 func FindUser(id int) *User {
 
 	query := `
@@ -473,7 +447,7 @@ func AuthenticateUser(email string, password string) *User {
 
 
 
-func HasAnyPermissionGroups(permission_groups []string, user_permission_groups string ) bool {
+func UserHasAnyPermissionGroups(permission_groups []string, user_permission_groups string ) bool {
 	has_permission_group := false
 	for i := 0; i < len(permission_groups); i++ {
 		if(strings.Contains(user_permission_groups, permission_groups[i])){
@@ -483,6 +457,41 @@ func HasAnyPermissionGroups(permission_groups []string, user_permission_groups s
 	}
 	return has_permission_group
 }
+
+func UserHasSubscriptionForJurisdiction(user *User, pg *PermissionGroups, jurisdiction_id int) bool {
+
+	if user.SuperAdmin == true {
+		return true
+	} else if UserHasAnyPermissionGroups([]string{pg.License_1, pg.License_2, pg.License_3, pg.License_4, pg.Admin}, user.PermissionGroups) {
+		return true
+	} else {
+
+		ct := 0
+
+		query := `select count(*) 
+  				  from subscriptions a 
+				  join products b on b.id = a.product_id
+				  join jurisdictions c on c.id = b.jurisdiction_id
+				  where c.id = $1 
+			      and a.user_id = $2
+				  and a.start_date <= now()::date and a.end_date >= now()::date`
+
+		row := database.GetDB().QueryRowx(query, jurisdiction_id, user.Id)
+		err := row.Scan(&ct)
+		if err != nil {
+			log.Println(err)
+			return true
+		}
+
+		return (ct > 0)
+	}
+
+
+
+}
+
+
+
 
 
 func HashPassword(password string) (string, error) {
