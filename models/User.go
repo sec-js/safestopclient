@@ -58,6 +58,11 @@ func RegisterUser(email string, password string, first_name string, last_name st
 	person_id := 0
 	user_id := 0
 
+	password, err := HashPassword(password)
+	if err != nil {
+		return 0, err
+	}
+
 	tx, err := database.GetDB().Begin()
 	if err != nil {
 		return 0, err

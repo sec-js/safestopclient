@@ -170,32 +170,23 @@ func (c *AuthController) registerAction(w http.ResponseWriter, r *http.Request) 
 
 		jurisdiction_id := r.FormValue("jurisdiction_id")
 		email := models.ScrubEmailAddress(r.FormValue("user[email]"))
-		password, err := models.HashPassword(r.FormValue("user[password]"))
-
-		if err != nil {
-			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
-			http.Redirect(w, r, r.URL.Host+"/register/" + jurisdiction_id, http.StatusFound)
-			return
-		}
+		password := r.FormValue("user[password]")
 
 		email_exists := models.EmailExists(email)
 
-		if email_exists == false {
-
-			user_id, reg_err := models.RegisterUser(email, password, r.FormValue("person[first_name]"), r.FormValue("person[last_name]"), c.PermissionGroups.License_5)
-			if reg_err != nil {
-				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  reg_err.Error(), "")), c.BootstrapAlertClass.Danger)
-				http.Redirect(w, r, r.URL.Host+"/register/" + jurisdiction_id, http.StatusFound)
-			} else {
-				setCurrentUserId(c.ControllerBase, r, w, user_id)
-			}
-
-		} else {
-			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+		if email_exists == true {
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "email_address_already_in_use", "")), c.BootstrapAlertClass.Danger)
 			http.Redirect(w, r, r.URL.Host+"/register/" + jurisdiction_id, http.StatusFound)
 			return
 		}
 
+		user_id, reg_err := models.RegisterUser(email, password, r.FormValue("person[first_name]"), r.FormValue("person[last_name]"), c.PermissionGroups.License_5)
+		if reg_err != nil {
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  reg_err.Error(), "")), c.BootstrapAlertClass.Danger)
+			http.Redirect(w, r, r.URL.Host+"/register/" + jurisdiction_id, http.StatusFound)
+		}
+
+		setCurrentUserId(c.ControllerBase, r, w, user_id)
 
 		if jurisdiction_id != "" {
 			http.Redirect(w, r, r.URL.Host+"/activate/" + jurisdiction_id, http.StatusFound)
