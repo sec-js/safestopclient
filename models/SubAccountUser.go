@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/schoolwheels/safestopclient/database"
 	"log"
+	"fmt"
 )
 
 type SubAccountUsers struct {
@@ -46,4 +47,56 @@ where b.id = $1
 	}
 
 	return &s
+}
+
+
+
+
+
+func SubAccountUserExists(subscription_id int, user_id int) bool {
+	ct := 0
+	query := `select count(*) from subscription_sub_accounts where user_id = $1 and subscription_id = $2`
+	row := database.GetDB().QueryRowx(query, user_id, subscription_id)
+	if row == nil {
+		return true
+	}
+
+	err := row.Scan(&ct)
+	if err != nil {
+		fmt.Print(err)
+		return true
+	}
+	return (ct > 0)
+}
+
+
+
+func InsertSubAccountUser(subscription_id int, user_id int) bool {
+
+	if subscription_id == 0 || user_id == 0 || SubAccountUserExists(subscription_id, user_id) {
+		return false
+	}
+
+	query := `
+insert into subscription_sub_accounts
+(
+subscription_id,
+user_id,
+created_at,
+updated_at
+) values (
+$1,
+$2,
+now(),
+now()
+)
+`
+	_, err := database.GetDB().Exec(
+		query,
+		subscription_id,
+		user_id)
+	if err != nil {
+		return false
+	}
+	return true
 }

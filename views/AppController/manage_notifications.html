@@ -26,7 +26,7 @@
             <input type="hidden" name="out_action" value="/manage_notifications" >
 
             <div class="form-group">
-                <select name="jurisdiction_id" class="form-control">
+                <select name="scan[][jurisdiction_id]" class="form-control">
                     {{ range .ViewData.Jurisdictions.Jurisdictions }}
                         {{ if and (eq .Active true) (eq .StudentScanning true) }}
                             <option value="{{ .Id }}">{{ .Name }}</option>
@@ -36,10 +36,10 @@
             </div>
 
             <div class="form-group">
-                <input id="name" class="form-control" type="text" name="name" autocomplete="off" placeholder="{{ t .CurrentLocale "student_name" "" }}">
+                <input id="name" class="form-control" type="text" name="scan[][name]" autocomplete="off" placeholder="{{ t .CurrentLocale "student_name" "" }}">
             </div>
             <div class="form-group">
-                <input id="code" class="form-control" type="text" name="code" autocomplete="off" placeholder="{{ t .CurrentLocale "scan_code" "" }}">
+                <input id="code" class="form-control" type="text" name="scan[][code]" autocomplete="off" placeholder="{{ t .CurrentLocale "scan_code" "" }}">
             </div>
             <div class="form-group">
                 <button class="btn btn-block btn-safestop" id="add-student-button">{{ t .CurrentLocale "add_scan_code" "" }}</button>

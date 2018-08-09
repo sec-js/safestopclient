@@ -38,7 +38,8 @@ coalesce(a.safe_stop_bullying_reports_active, false) as has_incident_reports,
 coalesce(a.active, false) as active,
 coalesce(a.student_scanning, false) as student_scanning,
 coalesce(a.use_scan_code_mapping, false) as use_scan_code_mapping,
-coalesce(c.sub_account_limit, 3) as sub_account_limit
+coalesce(c.sub_account_limit, 3) as sub_account_limit,
+coalesce(b.name, 'Access Code') as registration_type
 from jurisdictions a 
 join safe_stop_registration_types b on a.safe_stop_registration_type_id = b.id
 join jurisdiction_safe_stop_infos c on c.jurisdiction_id = a.id
@@ -351,6 +352,21 @@ and a.product_type = 'ss'
 	return product_id
 }
 
+
+func JurisdictionUsesScanCodeMapping(jurisdiction_id int) bool {
+	use_scan_code_mapping := false
+	query := `
+select coalesce(use_scan_code_mapping, false) as use_scan_code_mapping
+from jurisdictions 
+where id = $1
+`
+	err := database.GetDB().QueryRow(query, jurisdiction_id).Scan(&use_scan_code_mapping)
+	if err != nil {
+		log.Println(err)
+	}
+	return use_scan_code_mapping
+
+}
 
 
 

@@ -28,30 +28,30 @@
     </li>
 
     <li class="list-group-item" style="display: none;">
-        <form id="sub-account-form" class="form" method="post" action="/add_sub_account">
-
+        <form id="sub-account-form" class="form" method="post" action="/add_sub_account_user">
+        {{ .CSRFTemplateField }}
             <input type="hidden" value="{{ .ViewData.Subscription.Id }}" name="subscription_id">
             <div class="form-group">
-                <input id="email" class="form-control" type="text" name="user[email]" autocomplete="off" placeholder="{{ t .CurrentLocale "email" "" }}">
+                <input id="email" class="form-control" type="text" name="email" autocomplete="off" placeholder="{{ t .CurrentLocale "email" "" }}">
             </div>
 
             <div id="create-user-fields" style="display:none">
                 <div class="form-group">
-                    <input id="password" class="form-control" type="password" name="user[password]" autocomplete="off" placeholder="{{ t .CurrentLocale "password" ""}}">
+                    <input id="password" class="form-control" type="password" name="password" autocomplete="off" placeholder="{{ t .CurrentLocale "password" ""}}">
                 </div>
                 <div class="form-group">
-                    <input id="confirm-password" class="form-control" type="password" name="user[password_confirmation]" autocomplete="off" placeholder="{{ t .CurrentLocale "confirm_password" ""}}">
+                    <input id="confirm-password" class="form-control" type="password" name="password_confirmation" autocomplete="off" placeholder="{{ t .CurrentLocale "confirm_password" ""}}">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="person[first_name]" autocomplete="off" placeholder="{{ t .CurrentLocale "first_name" ""}}">
+                    <input class="form-control" type="text" name="first_name" autocomplete="off" placeholder="{{ t .CurrentLocale "first_name" ""}}">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="person[last_name]" autocomplete="off" placeholder="{{ t .CurrentLocale "last_name" ""}}">
+                    <input class="form-control" type="text" name="last_name" autocomplete="off" placeholder="{{ t .CurrentLocale "last_name" ""}}">
                 </div>
             </div>
 
             <div class="form-group">
-                <button class="btn btn-block btn-safestop" id="add-student-button">{{ t .CurrentLocale "add_sub_account" "" }}</button>
+                <button class="btn btn-block btn-safestop" type="submit">{{ t .CurrentLocale "add_sub_account" "" }}</button>
             </div>
         </form>
     </li>
@@ -60,6 +60,7 @@
 
         <li class="list-group-item sub-account-li">
             <form action="/remove_sub_account" method="post">
+            {{ $.CSRFTemplateField }}
                 <input type="hidden" value="{{ .Id }}" name="subscription_sub_account_id">
             </form>
 
@@ -101,6 +102,7 @@
 
     <li class="list-group-item" style="display: none;">
         <form id="student-form" class="form" method="post" action="/add_student">
+        {{ .CSRFTemplateField }}
 
             <input type="hidden" value="{{ .ViewData.Subscription.Id}}" name="subscription_id">
 
@@ -108,7 +110,7 @@
                 <input id="sis-identifier" class="form-control" type="text" name="student_information[sis_identifier]" autocomplete="off" placeholder="{{ t .CurrentLocale "student_identifier" "" }}">
             </div>
             <div class="form-group">
-                <button class="btn btn-block btn-safestop" id="add-student-button">{{ t .CurrentLocale "add_student" "" }}</button>
+                <button class="btn btn-block btn-safestop">{{ t .CurrentLocale "add_student" "" }}</button>
             </div>
         </form>
     </li>
@@ -118,8 +120,9 @@
 
     <li class="list-group-item student-li">
         <form action="/remove_student" method="post">
+        {{ $.CSRFTemplateField }}
             <input type="hidden" value="{{ $.ViewData.Subscription.Id }}" name="subscription_id">
-            <input type="hidden" value="{{ .Id }}" name="student_information_id">
+            <input type="hidden" value="{{ .Id }}" name="student_id">
         </form>
         <table class="list-sub-item-table">
             <tr>
@@ -162,83 +165,89 @@
 
     <li class="list-group-item" style="display: none;">
 
+        <form id="scan-form" class="form" method="post" action="/add_scan_notification_subscription">
+        {{ .CSRFTemplateField }}
+
+            <input type="hidden" name="out_action" value="/subscription_details/{{ $.ViewData.Subscription.Id }}" >
+            <input type="hidden" name="scan[][jurisdiction_id]" value="{{ $.ViewData.Jurisdiction.Id}}">
+
 
         {{ if eq .ViewData.Jurisdiction.UseScanCodeMapping true }}
-
-        <form class="form" method="post" action="/add_scan">
-            <input type="hidden" value="1" name="use_scan_code_mapping">
-
-            <input type="hidden" name="jurisdiction_id" value="{{ .ViewDta.Jurisdiction.Id}}">
             <div class="form-group">
-                <input id="name" class="form-control" type="text" name="sis_identifier" autocomplete="off" placeholder="{{ t .CurrentLocale "student_identifier" "" }}">
+                <input id="scan-name" class="form-control" type="hidden" name="scan[][name]" autocomplete="off" placeholder="{{ t .CurrentLocale "name" "" }}">
             </div>
             <div class="form-group">
-                <button class="btn btn-block btn-safestop" id="add-scan-using-scan-code-mapping-button">{{ t .CurrentLocale "add_student" "" }}</button>
+                <input id="scan-code" class="form-control" type="text" name="scan[][code]" autocomplete="off" placeholder="{{ t .CurrentLocale "student_identifier" "" }}">
             </div>
-        </form>
-
-        {{ if gt .ViewData.StudentCount 0}}
-        <div class="text-center" style="margin-top: 20px; margin-bottom: 20px;">OR</div>
-        <form class="form" method="post" action="/add_scan">
-
-            <input type="hidden" value="0" name="use_scan_code_mapping">
-
-            {{range .ViewData.Students.StudentInformations}}
-            <input type="hidden" name="bus_rider_scan_notification_subscription[][jurisdiction_id]" value="{{ $.ViewData.Jurisdiction.Id}}">
-            <input type="hidden" name="bus_rider_scan_notification_subscription[][name]" value="{{ .FullName }}">
-            <input type="hidden" name="bus_rider_scan_notification_subscription[][code]" value="{{ .ScanCode }}">
-            {{ end }}
-
             <div class="form-group">
-                <button class="btn btn-block btn-safestop" id="add-scan-using-scan-code-mapping-button">{{ t .CurrentLocale "add_my_students" "" }}</button>
+                <button class="btn btn-block btn-safestop" id="add-scan-button">{{ t .CurrentLocale "add_student" "" }}</button>
             </div>
-        </form>
-        {{ end }}
-
         {{ else }}
-
-        <form id="scan-form" class="form" method="post" action="/add_scan">
-            <input type="hidden" value="0" name="use_scan_code_mapping">
-            <input type="hidden" name="bus_rider_scan_notification_subscription[][jurisdiction_id]" value="{{ .ViewData.Jurisdiction.Id}}">
             <div class="form-group">
-                <input id="scan-required-name" class="form-control" type="text" name="bus_rider_scan_notification_subscription[][name]" autocomplete="off" placeholder="{{ t .CurrentLocale "student_name" ""}}">
+                <input id="scan-name" class="form-control" type="text" name="scan[][name]" autocomplete="off" placeholder="{{ t .CurrentLocale "student_name" "" }}">
             </div>
             <div class="form-group">
-                <input id="scan-required-code" class="form-control" type="text" name="bus_rider_scan_notification_subscription[][code]" autocomplete="off" placeholder="{{ t .CurrentLocale "scan_code" ""}}">
+                <input id="scan-code" class="form-control" type="text" name="scan[][code]" autocomplete="off" placeholder="{{ t .CurrentLocale "scan_code" "" }}">
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-block btn-safestop">{{ t .CurrentLocale "add_scan_code" ""}}</button>
+                <button class="btn btn-block btn-safestop" id="add-scan-button">{{ t .CurrentLocale "add_scan_code" "" }}</button>
             </div>
-        </form>
-
         {{ end }}
 
+        </form>
+
+{{ if or (eq .ViewData.Jurisdiction.RegistrationType "Student Identifier") (eq .ViewData.Jurisdiction.RegistrationType "Access Code + Student Identifier") }}
+{{ if eq .ViewData.Jurisdiction.UseScanCodeMapping true }}
+{{ if gt .ViewData.StudentCount 0}}
+            <div class="text-center" style="margin-top: 20px; margin-bottom: 20px;">OR</div>
+
+            <form class="form" method="post" action="/add_scan_notification_subscription">
+            {{ $.CSRFTemplateField }}
+
+                <input type="hidden" name="out_action" value="/subscription_details/{{ $.ViewData.Subscription.Id }}" >
+
+                {{range .ViewData.Students.StudentInformations}}
+                    <input type="hidden" name="scan[][jurisdiction_id]" value="{{ $.ViewData.Jurisdiction.Id}}">
+                    <input type="hidden" name="scan[][name]" value="{{ .FullName }}">
+                    <input type="hidden" name="scan[][code]" value="{{ .ScanCode }}">
+                {{ end }}
+
+                <div class="form-group">
+                    <button class="btn btn-block btn-safestop" id="add-scan-using-scan-code-mapping-button">{{ t .CurrentLocale "add_my_students" "" }}</button>
+                </div>
+
+            </form>
+{{ end }}
+{{ end }}
+{{ end }}
 
     </li>
 
 
-    {{/*<% @subscription.user.bus_rider_scan_notification_subscriptions.each do |brsn| %>*/}}
-    {{/*<% if brsn.jurisdiction_id == @subscription.product.jurisdiction_id %>*/}}
-    {{/*<li class="list-group-item scan-li">*/}}
-        {{/*<form action="/remove_scan" method="post">*/}}
-            {{/*<input type="hidden" value="<%= form_authenticity_token %>" name="authenticity_token">*/}}
-            {{/*<input type="hidden" value="<%= @subscription.id %>" name="subscription_id">*/}}
-            {{/*<input type="hidden" value="<%= brsn.id %>" name="bus_rider_scan_notification_subscription_id">*/}}
-        {{/*</form>*/}}
 
-        {{/*<table class="list-sub-item-table">*/}}
-            {{/*<tr>*/}}
-                {{/*<td>*/}}
-                    {{/*<%= brsn.name.titlecase if brsn.name %>*/}}
-                {{/*</td>*/}}
-                {{/*<td>*/}}
-                    {{/*<i class='fa fa-check-square-o remove-student'></i>*/}}
-                {{/*</td>*/}}
-            {{/*</tr>*/}}
-        {{/*</table>*/}}
-    {{/*</li>*/}}
-    {{/*<% end %>*/}}
-    {{/*<% end if @subscription.user.bus_rider_scan_notification_subscriptions %>*/}}
+    {{ range .ViewData.ScanNotificationSubscriptions.Subscriptions }}
+            {{ if eq .JurisdictionId $.ViewData.Jurisdiction.Id}}
+
+        <li class="list-group-item scan-li">
+            <form action="/remove_scan_notification_subscription" method="post">
+            {{ $.CSRFTemplateField }}
+                <input type="hidden" name="out_action" value="/subscription_details/{{ $.ViewData.Subscription.Id }}" >
+                <input type="hidden" value="{{ .Id }}" name="id">
+            </form>
+
+            <table class="list-sub-item-table">
+                <tr>
+                    <td>
+                        {{ .Name }}
+                    </td>
+                    <td>
+                        <i class='fa fa-check-square-o remove-student'></i>
+                    </td>
+                </tr>
+            </table>
+        </li>
+    {{ end }}
+    {{ end }}
 
 
 </ul>
@@ -247,31 +256,32 @@
 
 <script type="text/javascript">
 
+    var fv;
 
     $(document).ready(function () {
 
         $('body').removeClass('app-body').addClass('app-body-scroll');
 
 
-        FormValidation.formValidation(
+        fv = FormValidation.formValidation(
                 document.getElementById("sub-account-form"),
                 {
                     fields: {
-                        'person[first_name]': {
+                        'first_name': {
                             validators: {
                                 notEmpty: {
                                     message: '{{ t .CurrentLocale "required" ""}}'
                                 }
                             }
                         },
-                        'person[last_name]': {
+                        'last_name': {
                             validators: {
                                 notEmpty: {
                                     message: '{{ t .CurrentLocale "required" ""}}'
                                 }
                             }
                         },
-                        'user[email]': {
+                        'email': {
                             validators: {
                                 regexp: {
                                     regexp: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
@@ -280,7 +290,7 @@
                                 notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'},
                             }
                         },
-                        'user[password]': {
+                        'password': {
                             validators: {
                                 notEmpty: {message: '{{ t .CurrentLocale "required" ""}}'},
                                 regexp: {
@@ -317,12 +327,12 @@
                                 remote: {
                                     message: '{{ t .CurrentLocale "invalid_student_identifier" ""}}',
                                     url: '/api/student_exists',
-                                    type: 'post',
+                                    type: 'get',
                                     delay: 100,
                                     data: function (validator, $field, value) {
                                         return {
                                             jurisdiction_id: {{ .ViewData.Jurisdiction.Id }},
-                                            sis_identifier: $("#student-identifier").val()
+                                            sis_identifier: $("#sis-identifier").val()
                                         };
                                     }
                                 }
@@ -342,22 +352,21 @@
                     }
                 })
 
-
     {{ end }}
 
+
+        {{ if eq .ViewData.Jurisdiction.StudentScanning true}}
 
         FormValidation.formValidation(
                 document.getElementById("scan-form"),
                 {
                     fields: {
-                        'bus_rider_scan_notification_subscription[name]': {
-                            selector: '#scan-required-name',
+                        'scan[name]': {
                             validators: {
                                 notEmpty: {message: '{{ t .CurrentLocale "required" ""}}'},
                             }
                         },
-                        'bus_rider_scan_notification_subscription[code]': {
-                            selector: '#scan-required-code',
+                        'scan[code]': {
                             validators: {
                                 notEmpty: {message: '{{ t .CurrentLocale "required" ""}}'},
                             }
@@ -375,6 +384,8 @@
                         }),
                     }
                 })
+
+            {{ end }}
 
 
 
@@ -395,28 +406,26 @@
 
 
 
-        $(document).on("click", ".student-li, .scan-li, .sub-account-li", function(e){
+        $(document).on("click", ".student-li, .scan-li, .sub-account-li", function(e) {
             e.stopPropagation();
             var student_li = $(this);
             var alert_name = $(student_li).find('.list-sub-item-table td:eq(0)').html().trim();
             swal({
-                        title: '{{ t .CurrentLocale "are_you_sure" ""}}',
-                        text: '{{ t .CurrentLocale "ss_client_subscription_details_js_3" "" }}' + alert_name
-                        type: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#A31F2D",
-                        confirmButtonText: "Okay",
-                        cancelButtonText: "Cancel",
-                        closeOnConfirm: true,
-                        closeOnCancel: true
-                    },
-                    function (isConfirm) {
-                        if (isConfirm) {
-                            $(student_li).find('form').submit();
-                        }
-                    })
+                title: '{{ t .CurrentLocale "are_you_sure" ""}}',
+                text: '{{ t .CurrentLocale "ss_client_subscription_details_js_3" "" }}' + alert_name,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#A31F2D",
+                confirmButtonText: "Okay",
+                cancelButtonText: "Cancel",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            }).then((result) => {
+                if (result) {
+                    $(student_li).find('form').submit();
+                }
+            })
         })
-
 
 
 
@@ -443,9 +452,17 @@
             $.get('/api/email_exists', { 'user[email]': email }, function(response){
                 if(response.valid){
                     $("#create-user-fields").show();
+                    fv.enableValidator("first_name", "notEmpty")
+                    fv.enableValidator("last_name", "notEmpty")
+                    fv.enableValidator("password", "notEmpty")
+                    fv.enableValidator("password", "regexp")
                 }
                 else{
                     $("#create-user-fields").hide();
+                    fv.disableValidator("first_name", "notEmpty")
+                    fv.disableValidator("last_name", "notEmpty")
+                    fv.disableValidator("password", "notEmpty")
+                    fv.disableValidator("password", "regexp")
                 }
             })
         }

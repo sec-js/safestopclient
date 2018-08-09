@@ -7,7 +7,7 @@ import (
 	"github.com/schoolwheels/safestopclient/database"
 	"strings"
 	"github.com/pkg/errors"
-)
+	)
 
 type ClientUser struct {
 	*ModelBase
@@ -53,7 +53,7 @@ func UpdateApiToken(user_id int, token string) bool{
 //	}
 //}
 
-func RegisterUser(email string, password string, first_name string, last_name string) (int, error) {
+func RegisterUser(email string, password string, first_name string, last_name string, permission_group_name string) (int, error) {
 
 	person_id := 0
 	user_id := 0
@@ -116,7 +116,7 @@ now()
 	permission_group_query := `
 insert into permission_groups_users (permission_group_id, user_id) values ((select id from permission_groups where name = $1 limit 1),$2)
 `
-	_, err = tx.Exec(permission_group_query, "License 5 – SafeStop User", user_id)
+	_, err = tx.Exec(permission_group_query, permission_group_name, user_id)
 	if err != nil {
 		tx.Rollback()
 		return 0, err
@@ -328,7 +328,6 @@ func EmailExists(email string) bool {
 	email_ct := 0
 	email = ScrubEmailAddress(email)
 
-
 	query := `
 select count(*)
 from users 
@@ -348,10 +347,41 @@ and (security_segment_id = (select id from security_segments where name = 'SafeS
 
 }
 
+func PersonIdForUserId(user_id int) int {
+	person_id := 0
+	query := `select person_id from users where id = $1`
+	row := database.GetDB().QueryRowx(query, user_id)
+	if row == nil {
+		return 0
+	} else {
+		err := row.Scan(&person_id)
+		if err != nil {
+			fmt.Print(err)
+			return 0
+		}
+		return person_id
+	}
+}
 
 
 
 
+func UserIdForEmail(email string) int {
+	email = ScrubEmailAddress(email)
+	user_id := 0
+	query := `select id from users where email = $1 and security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1)`
+	row := database.GetDB().QueryRowx(query, email)
+	if row == nil {
+		return 0
+	}
+
+	err := row.Scan(&user_id)
+	if err != nil {
+		log.Println(err)
+		return 0
+	}
+	return user_id
+}
 
 
 
@@ -485,10 +515,82 @@ func UserHasSubscriptionForJurisdiction(user *User, pg *PermissionGroups, jurisd
 
 		return (ct > 0)
 	}
-
-
-
 }
+
+func AddStudentStopsToUser(user_id int, stop_ids []int) bool {
+	added_stops := false
+
+	for i := 0; i < len(stop_ids); i++ {
+
+		query := `
+insert into bus_route_stops_user (
+user_id, 
+bus_route_stop_id
+) values (
+$1,
+$2
+)`
+		_, err := database.GetDB().Exec(query, user_id, stop_ids)
+		if err != nil {
+			log.Println(err)
+			added_stops = false
+		}
+		added_stops = true
+	}
+
+	return added_stops
+}
+
+
+
+
+func AddPermissionGroupToUser(user_id int, permission_group string) bool {
+
+	ct := 0
+
+	query := `
+select count(*)
+from permission_groups_users  
+where user_id = $1
+and permission_group_id = (select id from permission_groups where name = $2 limit 1)
+`
+	row := database.GetDB().QueryRowx(query, user_id, permission_group)
+	if row == nil {
+		return false
+	}
+
+	err := row.Scan(&ct)
+	if err != nil {
+		return false
+	}
+
+	if ct > 0 {
+		return true
+	}
+
+
+	query = `
+insert into permission_groups_users (
+user_id, 
+permission_group_id
+) values (
+$1,
+(select id from permission_groups where name = $2 limit 1)
+)`
+	_, err = database.GetDB().Exec(query, user_id, permission_group)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	return true
+}
+
+
+
+
+
+
 
 
 

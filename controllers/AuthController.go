@@ -182,7 +182,7 @@ func (c *AuthController) registerAction(w http.ResponseWriter, r *http.Request) 
 
 		if email_exists == false {
 
-			user_id, reg_err := models.RegisterUser(email, password, r.FormValue("person[first_name]"), r.FormValue("person[last_name]"))
+			user_id, reg_err := models.RegisterUser(email, password, r.FormValue("person[first_name]"), r.FormValue("person[last_name]"), c.PermissionGroups.License_5)
 			if reg_err != nil {
 				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  reg_err.Error(), "")), c.BootstrapAlertClass.Danger)
 				http.Redirect(w, r, r.URL.Host+"/register/" + jurisdiction_id, http.StatusFound)

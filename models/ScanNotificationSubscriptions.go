@@ -59,6 +59,15 @@ func InsertScanNotificationSubscriptions(s *ScanNotificationSubscription) bool {
 		return false
 	}
 
+	use_mapping := JurisdictionUsesScanCodeMapping(s.JurisdictionId)
+	if use_mapping {
+		new_code := StudentScanCode(s.Code, s.JurisdictionId)
+		if new_code == "" {
+			return false
+		}
+		s.Code = new_code
+	}
+
 	query := `
 insert into bus_rider_scan_notification_subscriptions
 (

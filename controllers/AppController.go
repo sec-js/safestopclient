@@ -50,6 +50,12 @@ func (c *AppController) Register() {
 	c.addRouteWithPrefix( "/add_scan_notification_subscription", c.AddScanNotificationSubscriptionAction)
 	c.addRouteWithPrefix( "/remove_scan_notification_subscription", c.RemoveScanNotificationSubscriptionAction)
 
+	c.addRouteWithPrefix( "/add_student", c.AddStudentAction)
+	c.addRouteWithPrefix("/remove_student", c.RemoveStudentAction)
+
+	c.addRouteWithPrefix("/add_sub_account_user", c.AddSubAccountUserAction)
+
+
 	c.addRouteWithPrefix("/lost_item_report", c.LostItemReportAction)
 
 }
@@ -560,6 +566,8 @@ func (c *AppController) SubscriptionDetailsAction(w http.ResponseWriter, r *http
 
 	sub_account_users := models.SubAccountUsersForSubscription(subscription_id)
 	students := models.StudentsForUser(user.Id, jurisdiction.Id)
+	scan_notification_subscriptions := models.ScanNotificationSubscriptionsForUser(user_id)
+
 
 
 	data := struct {
@@ -569,6 +577,7 @@ func (c *AppController) SubscriptionDetailsAction(w http.ResponseWriter, r *http
 		Students *models.Students
 		StudentCount int
 		Jurisdiction *models.Jurisdiction
+		ScanNotificationSubscriptions *models.ScanNotificationSubscriptions
 		} {
 		user,
 		sub_account_users,
@@ -576,6 +585,7 @@ func (c *AppController) SubscriptionDetailsAction(w http.ResponseWriter, r *http
 		students,
 		len(students.StudentInformations),
 		jurisdiction,
+		scan_notification_subscriptions,
 	}
 
 	c.render(w, r, "subscription_details", data)
@@ -598,20 +608,32 @@ func (c *AppController) AddScanNotificationSubscriptionAction(w http.ResponseWri
 		return
 	}
 
-	jurisdiction_id := 0
-	if len(r.FormValue("jurisdiction_id")) > 0 {
-		jurisdiction_id, _ = strconv.Atoi(r.FormValue("jurisdiction_id"))
+
+	jurisdiction_infos := r.Form["scan[][jurisdiction_id]"]
+	scan_codes := r.Form["scan[][code]"]
+	scan_names := r.Form["scan[][name]"]
+
+	code_was_added := false
+
+	for i := 0; i < len(jurisdiction_infos); i++ {
+		jurisdiction_id, err := strconv.Atoi(jurisdiction_infos[i])
+		if err != nil {
+			continue
+		}
+
+		s := models.ScanNotificationSubscription{}
+		s.Name = scan_names[i]
+		s.Code = scan_codes[i]
+		s.UserId = user_id
+		s.JurisdictionId = jurisdiction_id
+		sns_added := models.InsertScanNotificationSubscriptions(&s)
+		if sns_added == true {
+			code_was_added = true
+		}
 	}
 
-	s := models.ScanNotificationSubscription{}
-	s.Name = r.FormValue("name")
-	s.Code = r.FormValue("code")
-	s.UserId = user_id
-	s.JurisdictionId = jurisdiction_id
 
-	added_scan_notification_subscription := models.InsertScanNotificationSubscriptions(&s)
-
-	if added_scan_notification_subscription == false {
+	if code_was_added == false {
 		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
 	}
 
@@ -639,6 +661,168 @@ func (c *AppController) RemoveScanNotificationSubscriptionAction(w http.Response
 
 	http.Redirect(w, r, r.URL.Host+ r.FormValue("out_action"), http.StatusFound)
 }
+
+
+
+
+
+func (c *AppController) AddStudentAction(w http.ResponseWriter, r *http.Request) {
+
+	user_id := currentUserId(c.ControllerBase, r)
+	if(user_id == 0){
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	subscription_id, err := strconv.Atoi(r.FormValue("subscription_id"))
+	if err != nil {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	student_identifier := r.FormValue("student_information[sis_identifier]")
+	if len(student_identifier) == 0 {
+		http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
+		return
+	}
+
+	student_added := models.AddStudentToSubscription(subscription_id, student_identifier)
+
+	if student_added == false {
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+	}
+
+	http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+func (c *AppController) RemoveStudentAction(w http.ResponseWriter, r *http.Request) {
+
+	user_id := currentUserId(c.ControllerBase, r)
+	if(user_id == 0){
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	subscription_id, err := strconv.Atoi(r.FormValue("subscription_id"))
+	if err != nil {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	student_id, err := strconv.Atoi(r.FormValue("student_id"))
+	if err != nil {
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+		http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
+	}
+
+	deleted_student := models.RemoveStudentFromSubscription(subscription_id, student_id)
+
+	if deleted_student == false {
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+	}
+
+	http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
+}
+
+
+
+
+
+
+func (c *AppController) AddSubAccountUserAction(w http.ResponseWriter, r *http.Request) {
+
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+	first_name := r.FormValue("first_name")
+	last_name := r.FormValue("last_name")
+
+	if len(email) == 0 {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	user_id := currentUserId(c.ControllerBase, r)
+	if(user_id == 0){
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	subscription_id, err := strconv.Atoi(r.FormValue("subscription_id"))
+	if err != nil {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	subscription := models.FindSubscription(subscription_id)
+	if subscription == nil {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	jurisdiction := models.FindJurisdiction(subscription.JurisdictionId)
+	if jurisdiction == nil {
+		http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
+		return
+	}
+
+	sub_account_users := models.SubAccountUsersForSubscription(subscription_id)
+	if len(sub_account_users.Users) >= jurisdiction.SubAccountLimit {
+		http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
+		return
+	}
+
+	sub_account_user_id := 0
+	if models.EmailExists(email) {
+		suid := models.UserIdForEmail(email)
+		sub_account_user_id = suid
+	} else {
+
+		if len(password) == 0 || len(first_name) == 0 || len(last_name) == 0 {
+			http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
+			return
+		}
+
+		suid, reg_err := models.RegisterUser(email, password, first_name, last_name, c.PermissionGroups.SubAccount)
+		if reg_err != nil {
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  reg_err.Error(), "")), c.BootstrapAlertClass.Danger)
+			http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
+		}
+		sub_account_user_id = suid
+	}
+
+	if sub_account_user_id == 0 {
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+		http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
+	}
+
+	permission_group_added := models.AddPermissionGroupToUser(sub_account_user_id, c.PermissionGroups.SubAccount)
+	if permission_group_added == false {
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+		http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
+	}
+
+
+	sub_account_added := models.AddSubAccountUserToSubscription(subscription, sub_account_user_id)
+	if sub_account_added == false {
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+	}
+
+	http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
+}
+
 
 
 
