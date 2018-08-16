@@ -59,9 +59,12 @@
     {{ range .ViewData.SubAccountUsers.Users}}
 
         <li class="list-group-item sub-account-li">
-            <form action="/remove_sub_account" method="post">
+            <form action="/remove_sub_account_user" method="post">
             {{ $.CSRFTemplateField }}
+                <input type="hidden" value="{{ $.ViewData.Subscription.Id }}" name="subscription_id">
                 <input type="hidden" value="{{ .Id }}" name="subscription_sub_account_id">
+                <input type="hidden" value="{{ .UserId }}" name="subscription_sub_account_user_id">
+                <input type="hidden" value="{{ .PersonId }}" name="subscription_sub_account_person_id">
             </form>
 
             <table class="list-sub-item-table">

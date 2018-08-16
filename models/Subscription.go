@@ -207,3 +207,38 @@ func AddSubAccountUserToSubscription(subscription *Subscription, sub_account_use
 
 	return true
 }
+
+func StudentPersonIdsForSubscription(subscription_id int) []int{
+
+	r := []int{}
+
+	query := `
+select f.person_id
+from subscriptions a
+join users b on a.user_id = b.id
+join people c on c.id = b.person_id
+join personal_relationships d on d.person_id = c.id
+join products e on e.id = a.product_id
+join student_informations f on f.person_id = d.person_related_id and f.jurisdiction_id = e.jurisdiction_id
+where a.id = $1
+`
+
+	rows, err := database.GetDB().Queryx(query, subscription_id)
+	if rows == nil {
+		return r
+	}
+
+	for rows.Next() {
+		sid := 0
+		err = rows.Scan(&sid)
+		if err != nil {
+			log.Println(err.Error())
+			return r
+		}
+		r = append(r, sid)
+	}
+
+	return r
+}
+
+

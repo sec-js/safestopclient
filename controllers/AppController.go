@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"strconv"
 	"github.com/schoolwheels/safestopclient/database"
-)
+	)
 
 type AppController struct {
 	*ControllerBase
@@ -54,6 +54,7 @@ func (c *AppController) Register() {
 	c.addRouteWithPrefix("/remove_student", c.RemoveStudentAction)
 
 	c.addRouteWithPrefix("/add_sub_account_user", c.AddSubAccountUserAction)
+	c.addRouteWithPrefix("/remove_sub_account_user", c.RemoveSubAccountUserAction)
 
 
 	c.addRouteWithPrefix("/lost_item_report", c.LostItemReportAction)
@@ -822,6 +823,60 @@ func (c *AppController) AddSubAccountUserAction(w http.ResponseWriter, r *http.R
 
 	http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
 }
+
+
+
+
+func (c *AppController) RemoveSubAccountUserAction(w http.ResponseWriter, r *http.Request) {
+
+	user_id := currentUserId(c.ControllerBase, r)
+	if(user_id == 0){
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	subscription_id, err := strconv.Atoi(r.FormValue("subscription_id"))
+	if err != nil {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	subscription := models.FindSubscription(subscription_id)
+	if subscription == nil {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	person_id, err := strconv.Atoi(r.FormValue("subscription_sub_account_person_id"))
+	if err != nil {
+		http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
+		return
+	}
+
+	student_person_ids := models.StudentPersonIdsForSubscription(subscription.Id)
+	if len(student_person_ids) > 0 {
+		for i := 0; i < len(student_person_ids); i++ {
+			models.DeletePersonalRelationship(person_id, student_person_ids[i])
+		}
+	}
+
+	sub_account_id, err := strconv.Atoi(r.FormValue("subscription_sub_account_id"))
+	if err != nil {
+		http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
+		return
+	}
+
+	deleted_sub_account_user := models.DeleteSubAccount(sub_account_id)
+
+	if deleted_sub_account_user == false {
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+	}
+
+	http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
+}
+
+
+
 
 
 

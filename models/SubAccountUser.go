@@ -12,6 +12,8 @@ type SubAccountUsers struct {
 
 type SubAccountUser struct {
 	Id int `json:"id" db:"id"`
+	UserId int `json:"user_id" db:"user_id"`
+	PersonId int `json:"person_id" db:"person_id"`
 	FullName string `json:"full_name" db:"full_name"`
 }
 
@@ -23,7 +25,9 @@ func SubAccountUsersForSubscription(subscription_id int) *SubAccountUsers {
 	query := `
 select 
 a.id, 
-d.last_name || ', ' || d.first_name as full_name
+d.last_name || ', ' || d.first_name as full_name,
+c.id as user_id,
+d.id as person_id
 from subscription_sub_accounts a
 join subscriptions b on a.subscription_id = b.id
 join users c on c.id = a.user_id
@@ -99,4 +103,16 @@ now()
 		return false
 	}
 	return true
+}
+
+
+func DeleteSubAccount(sub_account_id int) bool {
+
+	query := `delete from subscription_sub_accounts where id = $1`
+	_, err := database.GetDB().Exec(query, sub_account_id)
+	if err != nil {
+		return false
+	}
+	return true
+
 }
