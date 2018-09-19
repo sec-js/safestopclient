@@ -3,6 +3,124 @@
     --safe-stop-red-hover: #872131;
 }
 
+.arrived {
+    color: #008fa8;
+}
+
+.expected-on-time {
+    color: #06af4b;
+}
+
+.expected-late {
+    color: #EEA925;
+}
+
+.expected-really-late {
+    color: #e94d2f;
+}
+
+
+
+
+
+#overlay {
+    position:absolute;
+    height:100%;
+    width:100%;
+    background:black;
+    opacity:.7;
+    z-index:2;
+    display:none;
+}
+
+.nav-bar-top{
+    background: #ffffff;
+    z-index: 5000;
+    position: fixed;
+    width:100%;
+    top: 0px;
+    border-bottom: 1px solid #ccc;
+    height:50px;
+}
+
+.nav-bar-top table {
+    width:100%;
+    vertical-align: middle;
+    height: 50px;
+    z-index: 5000;
+}
+
+.nav-bar-top  table  tr:first-child  td:first-child {
+    height: 50px;
+    width: 40px;
+    padding-left: 10px !important;
+}
+
+.nav-bar-top  table  tr:first-child  td:first-child + td {
+    height: 50px;
+    vertical-align: middle;
+}
+
+.nav-bar-top  table  tr:first-child  td:first-child + td + td {
+    height: 50px;
+    width:40px;
+    padding-right: 10px !important;
+    text-align: right;
+}
+
+.nav-bar-top .fa-chevron-left {
+    font-size: 20pt;
+    color: #A32837;
+}
+
+.nav-bar-top .fa-check {
+    font-size: 18pt;
+    color: #A32837;
+}
+
+.nav-bar-top .fa-times{
+    font-size: 22pt;
+    color: #A32837;
+}
+
+
+
+.nav-bar-bottom{
+    position: fixed;
+    bottom: 0px;
+    min-height: 56px;
+    width:100%;
+    background:#ECECEC;
+    z-index: 5000;
+}
+
+.nav-bar-bottom table {
+    min-height: 56px;
+    width:100%;
+    border-top:1px solid #ccc;
+}
+
+.nav-bar-bottom table:first-child td:first-child {
+    vertical-align: middle;
+    border-right:1px solid #ccc;
+    height: 56px; width:56px;
+}
+
+.nav-bar-bottom table:first-child td:first-child + td {
+    vertical-align: middle;
+    height: 56px;
+    text-align: center;
+    background: #ffffff;
+}
+
+.nav-bar-bottom table:first-child td:first-child + td + td {
+    vertical-align: middle;
+    border-left:1px solid #ccc;
+    height: 56px; width:56px;
+    text-align: center;
+}
+
+
 .btn-safe-stop{
     color: #ffffff;
     background-color: var(--safe-stop-red);

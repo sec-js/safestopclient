@@ -121,6 +121,7 @@ type ViewModel struct {
 	CurrentUser CurrentUser
 	CurrentUserId int
 	CurrentLocale string
+	CurrentPath string
 	Domain string
 	SupportNumber string
 	CSRFTemplateField template.HTML
@@ -141,6 +142,7 @@ func (c *ControllerBase) renderTemplate(w http.ResponseWriter, r *http.Request, 
 		CurrentLocale: currentLocale(c,r),
 		Domain: viper.GetString("domain"),
 		SupportNumber: viper.GetString("support_number"),
+		CurrentPath: r.URL.Path,
 		ViewData: viewModel,
 		CSRFTemplateField: csrf.TemplateField(r),
 	}

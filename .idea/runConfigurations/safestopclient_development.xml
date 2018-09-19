@@ -8,6 +8,11 @@
       <env name="SSC_DOMAIN" value="ssc.local" />
       <env name="SSC_SUPPORT_NUMBER" value="1-800-843-8936" />
       <env name="SSC_MASTER_PASSWORD" value="tmjxy" />
+      <env name="AWS_ACCESS_KEY_ID" value="AKIAITZKGDVTMCX2VMIA" />
+      <env name="AWS_SECRET_ACCESS_KEY" value="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" />
+      <env name="SSC_SNS_REGION" value="us-west-2" />
+      <env name="SSC_SNS_IOS_ARN" value="arn:aws:sns:us-west-2:501213591967:app/APNS_SANDBOX/SafeStop-iOS-Development" />
+      <env name="SSC_SNS_ANDROID_ARN" value="arn:aws:sns:us-west-2:501213591967:app/GCM/SafeStop-Android" />
     </envs>
     <kind value="FILE" />
     <filePath value="$PROJECT_DIR$/safestopclient.go" />

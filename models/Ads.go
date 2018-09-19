@@ -4,6 +4,80 @@ import (
 	"github.com/schoolwheels/safestopclient/database"
 	)
 
+type Ad struct {
+	Id int `db:"id" json:"id"`
+	Url string `db:"url" json:"url"`
+}
+
+func NextAd(u *User, pg *PermissionGroups) Ad {
+
+	ad := Ad{}
+
+	ads_without_impressions_ct := 0
+	query := `
+select count(*) as ads_without_impressions_ct
+from ads a 
+join ads_jurisdictions b 
+on b.ad_id = a.id
+where b.jurisdiction_id in (` + UsersClientJurisdictionIdSQL(u, pg) + `)
+and a.start_date <= now()::date 
+and a.stop_date >= now()::date
+and a.app_image is not null
+and a.app_image != ''
+and a.id not in (select coalesce(ad_id, -1) from ad_impressions)
+`
+	err := database.GetDB().QueryRow(query).Scan(&ads_without_impressions_ct)
+	if err != nil {
+		return ad
+	}
+
+	if ads_without_impressions_ct > 0 {
+		query = `
+select a.id,
+a.app_image as url
+from ads a 
+join ads_jurisdictions b 
+on b.ad_id = a.id
+where b.jurisdiction_id in (` + UsersClientJurisdictionIdSQL(u, pg) + `)
+and a.start_date <= now()::date 
+and a.stop_date >= now()::date
+and a.app_image is not null
+and a.app_image != ''
+and a.id not in (select coalesce(ad_id, -1) from ad_impressions)
+limit 1
+`
+
+		err := database.GetDB().QueryRowx(query).StructScan(&ad)
+		if err != nil {
+			return ad
+		}
+	} else {
+		query = `
+select a.id,
+a.app_image as url
+from ads a 
+join ads_jurisdictions b on b.ad_id = a.id
+join ad_impressions c on c.ad_id = a.id
+where b.jurisdiction_id in (` + UsersClientJurisdictionIdSQL(u, pg) + `)
+and a.start_date <= now()::date 
+and a.stop_date >= now()::date
+and a.app_image is not null
+and a.app_image != ''
+group by a.id, a.login_image
+order by max(c.id)
+limit 1
+`
+		err := database.GetDB().QueryRowx(query).StructScan(&ad)
+		if err != nil {
+			return ad
+		}
+	}
+	return ad
+}
+
+
+
+
 
 func NextRegistrationAd(jurisdiction_id int) interface{} {
 

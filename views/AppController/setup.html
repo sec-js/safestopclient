@@ -3,6 +3,521 @@
 {{end}}
 {{define "body"}}
 
-TODO: Put stuff here.
+
+
+
+<script id="jurisdiction-template" type="text/html">
+
+    <li class='list-group-item text-center jurisdiction-{|jurisdiction_id|} jurisdiction-li' style='background:#F6F6F6;'>
+        <table style="width:100%;">
+            <tr>
+                <td style="width:100%; font-size: 16pt; font-weight: 500">
+                {|jurisdiction_name|}
+                </td>
+            </tr>
+            <tr>
+                <td style="width:100%; font-size: 10pt; font-weight: 400;" class="stop-count-message">
+                {|stop_count_message|}
+                </td>
+            </tr>
+            <tr>
+                <td style="width:100%; font-size: 10pt; font-weight: 400;" class="search-radius-message">
+                {|search_radius_message|}
+                </td>
+            </tr>
+        </table>
+    </li>
+
+</script>
+
+<script id="route-template" type="text/html">
+    <li class='list-group-item route-li route-{|jurisdiction_id|} bus-route-li' data-rid='{|bus_route_id|}' id='{|bus_route_id|}' style="cursor: pointer;">
+        <table style='width: 100%'>
+            <tr>
+                <td style='width: 90%'>
+                    <table style='width: 100%'>
+                        <tr>
+                            <td style='font-size: 14pt; color:#A12130; font-weight: 500'>{|bus_route_name|}</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 9pt;">Start Time: {|bus_route_start_time |}</td>
+                        </tr>
+                    </table>
+                </td>
+                <td style='width: 10%; vertical-align: middle;' class='text-right'>
+                    <i style='font-size: 30pt; color:#A12130' class='route-angle fa fa-angle-right'></i>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <ul class="stops list-group {|bus_route_id|}-stops" style="margin-top:10px; display:none;">
+
+                    </ul>
+                </td>
+            </tr>
+        </table>
+    </li>
+</script>
+
+<script id="stop-template" type="text/html">
+    <li class="list-group-item stop-li" style="cursor: pointer;">
+        <table style="width:100%;">
+            <tr>
+                <td style='width:84%; font-size: 12pt; color:#919191; font-weight: 500'>
+                {|name|}
+                </td>
+                <td style="width:8%;">
+                </td>
+                <td style="width:8%;" rowspan="2" align="right">
+                    <div class="add-remove-button btn-safestop-web-no-background"
+                         data-sid="{|id|}"
+                         data-name="{|name|}"
+                         data-rid="{|route|}"
+                         data-scheduledtime="{|scheduledtime|}"
+                         data-jurisdiction="{|jurisdiction_id|}">
+                        <i class="fa {|checked_or_unchecked|}" style="color: #50595A;font-size: 25pt; margin-top:3px;{|margin_right|}"></i>
+                    </div>
+
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="font-size: 9pt;">Scheduled Time: {|scheduledtime|}</td>
+            </tr>
+        </table>
+    </li>
+</script>
+
+
+{{ .CSRFTemplateField}}
+<div id="scroll-div" style="overflow-y: scroll;">
+
+    <div class="card">
+
+        <div class="card-header">
+            <form id="search-form" class="form">
+
+
+            {{ if eq .ViewData.ViewNameSearch true }}
+
+                <div class="form-group">
+                    <label>{{ t .CurrentLocale "ss_client_setup_1" "" }}</label>
+                    <input id="search-text" type="text" class="form-control" placeholder="Search Route Names">
+                </div>
+
+            {{ end }}
+
+                <div class="form-group">
+                    <label>{{ t .CurrentLocale "ss_client_setup_2" "" }}</label>
+                    <input id="search-address-1" type="text" class="form-control" placeholder="{{ t .CurrentLocale "street_address" "" }}" >
+                </div>
+
+                <div class="form-group">
+                    <input id="search-postal-code" type="text" class="form-control" placeholder="{{ t .CurrentLocale "zip_code" "" }}" >
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-safestop btn-block" id="search">{{ t .CurrentLocale "search" "" }}</button>
+                </div>
+            </form>
+        </div>
+
+
+    </div>
+
+    <div class="unable-to-find-routes text-center" style="display: none; color:#A12130; font-size: 16pt; font-weight: bold;">
+        <div class="card">
+            <div class="card-header">
+            {{ t .CurrentLocale "ss_client_setup_4" "" }}
+            </div>
+        </div>
+    </div>
+
+    <ul class="list-group" id="routes" style="padding-bottom: 50px;">
+        <li id="loading-li" style="padding-top: 20px;">
+            <div id="loading-more" style="color:#6E7071; display:none; font-size: 16pt;" class="text-center">
+                <i id="loading-more" style="font-size: 25px;" class="fa fa-spinner fa-spin"></i>
+                Loading More...
+            </div>
+        </li>
+    </ul>
+    <div id="waypoint-div" align="center" style="height: 5px; margin-bottom: 20px;"></div>
+
+    <div id="loading_spinner" style="display:none;">
+        {{/*<img src="<%= image_path "spinner.png" %>">*/}}
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+    var waypoint;
+    var next_page = 1;
+    var pages = 50;
+    var initialized = false;
+    var current_jurisdiction = undefined;
+
+    var stopTemplate = $("#stop-template").html();
+    Mustache.parse(stopTemplate);
+
+    var routeTemplate = $("#route-template").html();
+    Mustache.parse(routeTemplate);
+
+    var jurisdictionTemplate = $("#jurisdiction-template").html();
+    Mustache.parse(jurisdictionTemplate);
+
+
+    $(document).ready(function () {
+
+        $("#scroll-div").height(window.innerHeight - 106 + 'px');
+
+        var window_height = window.innerWidth;
+
+        waypoint = $('#waypoint-div').waypoint({
+            handler: function (direction) {
+                if (direction == 'down') {
+                    if (initialized) {
+                        if (pages >= next_page) {
+                            $("#loading-more").show()
+                            get_bus_routes();
+                        }
+                    }
+                }
+            },
+            offset: '100%',
+            context: document.getElementById('scroll-div'),
+        });
+
+
+        $("#search").click(function (e) {
+            e.preventDefault();
+            reset_search();
+
+            $('#search').prop('disabled', true);
+
+            var address_1 = $("#search-address-1").val();
+            var postal_code = $("#search-postal-code").val();
+
+
+
+
+        {{/*{{ t .CurrentLocale "error" "" }}*/}}
+
+
+            {{ if eq .ViewData.IsRegularUser true}}
+
+                if (postal_code.length > 0 && address_1.length > 0) {
+                    get_bus_routes();
+                }
+                else {
+                    swal({
+                        title: '{{ t .CurrentLocale "error" "" }}',
+                        text: '{{ t .CurrentLocale "ss_client_setup_js_2" "" }}',
+                        type: "error",
+                        confirmButtonColor: "#A31F2D"
+                    })
+                    $('#search').prop('disabled', false);
+                }
+
+            {{ else }}
+
+                if (postal_code.length == 0 && address_1.length == 0) {
+                    get_bus_routes();
+                }
+                else if (address_1.length > 0 && postal_code.length == 0 || address_1.length == 0 && postal_code.length > 0) {
+
+                    swal({
+                        title: '{{ t .CurrentLocale "error" "" }}',
+                        text: '{{ t .CurrentLocale "ss_client_setup_js_2" "" }}',
+                        type: "error",
+                        confirmButtonColor: "#A31F2D"
+                    })
+                    $('#search').prop('disabled', false);
+                }
+                else {
+                    get_bus_routes();
+                }
+
+            {{ end }}
+
+
+
+        })
+
+
+        $(document).on("click", ".stop-li", function (e) {
+            e.stopPropagation();
+            $(this).find('.add-remove-button').trigger('click');
+        });
+
+        $(document).on("click", ".add-remove-button", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            var add_remove_button = this
+            if ($(this).find("i").hasClass("fa-check-square-o")) {
+                remove_stop(add_remove_button);
+            }
+            else {
+
+                if($(".jurisdiction-" + $(this).data('jurisdiction')).data('limit') == $(".jurisdiction-" + $(this).data('jurisdiction')).data('ct') &&
+                        $(".jurisdiction-" + $(this).data('jurisdiction')).data('limit')){
+
+
+
+                {{ if eq .Domain "safestopapp.com" }}
+
+                    swal({
+                        title: '{{ t .CurrentLocale "ss_client_setup_js_3" "" }}',
+                        text: '{{ t .CurrentLocale "ss_client_setup_js_4" "" }}' + $(".jurisdiction-" + $(this).data('jurisdiction')).data('limit') + '{{ t .CurrentLocale "ss_client_setup_js_5" "" }}',
+                        type: "error",
+                        confirmButtonColor: "#A31F2D"})
+
+                {{ else }}
+
+                    swal({
+                        title: '{{ t .CurrentLocale "ss_client_setup_js_3" "" }}',
+                        text: '{{ t .CurrentLocale "ss_client_setup_js_4" "" }}' + $(".jurisdiction-" + $(this).data('jurisdiction')).data('limit') + '{{ t .CurrentLocale "ss_client_setup_js_5_ca" "" }}',
+                        type: "error",
+                        confirmButtonColor: "#A31F2D"})
+
+                {{ end }}
+
+
+
+
+
+                }
+                else{
+                    add_stop(add_remove_button);
+                }
+            }
+        });
+
+        $(window).keydown(function(event){
+            if(event.keyCode == 13) {
+                event.preventDefault();
+                return false;
+            }
+        });
+
+        $(document).on("click", ".route-li", function (e) {
+            e.stopPropagation();
+
+            var route_li = this
+
+            if ($(route_li).find('.route-angle').hasClass('fa-angle-right')) {
+                $(route_li).find('.route-angle').removeClass('fa-angle-right')
+                $(route_li).find('.route-angle').addClass('fa-angle-down')
+                $(route_li).find('.stops').show();
+            }
+            else {
+                $(route_li).find('.route-angle').removeClass('fa-angle-down')
+                $(route_li).find('.route-angle').addClass('fa-angle-right')
+                $(route_li).find('.stops').hide();
+            }
+
+            if (!$(route_li).data('stops-populated') == true) {
+                get_bus_route_stops(this);
+            }
+        });
+
+
+    });
+
+    function get_bus_routes() {
+
+        $(".unable-to-find-routes").hide();
+
+
+        $.get('/api/available_bus_routes', {
+            page: next_page,
+            search: $("#search-text").val(),
+            address_1: $("#search-address-1").val(),
+            postal_code: $("#search-postal-code").val()
+        }, function (response) {
+
+            $('#search').prop('disabled', false);
+
+            if (response.bus_routes.length == 0) {
+                if (!response.accurate_geocoding) {
+                    swal({ title: '{{ t .CurrentLocale "error" "" }}',
+                        text: '{{ t .CurrentLocale "ss_client_setup_js_6" "" }}',
+                        type: "error",
+                        confirmButtonColor: "#A31F2D"})
+                }
+                $(".unable-to-find-routes").show();
+            }
+
+            initialized = true;
+            pages = response.pages;
+
+            $(response.bus_routes).each(function (index, r) {
+
+                if(current_jurisdiction != r.jurisdiction_name) {
+                    current_jurisdiction = r.jurisdiction_name
+
+                    var rendered = Mustache.render(jurisdictionTemplate, {
+                        jurisdiction_id: r.jurisdiction_id,
+                        jurisdiction_name: r.jurisdiction_name
+                    });
+                    $(rendered).insertBefore("#loading-li");
+                }
+
+                var rendered = Mustache.render(routeTemplate, {
+                    bus_route_id: r.bus_route_id,
+                    bus_route_name: r.bus_route_name,
+                    bus_route_start_time: r.bus_route_start_time,
+                    jurisdiction_id: r.jurisdiction_id
+                });
+
+                $(rendered).insertBefore("#loading-li");
+
+                $(".jurisdiction-" + r.jurisdiction_id).find('.search-radius-message').empty()
+                if (r.search_radius) {
+                    $(".jurisdiction-" + r.jurisdiction_id).find('.search-radius-message').append('{{ t .CurrentLocale "ss_client_setup_js_7" "" }}' + r.search_radius + '{{ t .CurrentLocale "ss_client_setup_js_8" "" }}')
+                }
+
+            });
+
+            waypoint.resize();
+
+            $("#loading-more").hide();
+
+
+
+            if(response.jurisdiction_stop_counts) {
+                if (response.jurisdiction_stop_counts.stop_counts) {
+                    if (response.jurisdiction_stop_counts.limits_apply_to_user) {
+                        $(response.jurisdiction_stop_counts.stop_counts).each(function (index, r) {
+                            if (r.limit_applied == 't') {
+                                $(".jurisdiction-" + r.jurisdiction_id).find('.stop-count-message').empty()
+                                $(".jurisdiction-" + r.jurisdiction_id).find('.stop-count-message').append('{{ t .CurrentLocale "ss_client_setup_js_9" "" }}' + r.ct + '{{ t .CurrentLocale "ss_client_setup_js_10" "" }}' + r.limit + '{{ t .CurrentLocale "ss_client_setup_js_11" "" }}')
+                            }
+                        })
+                    }
+                }
+            }
+
+            next_page += 1;
+
+
+        });
+    }
+
+    function add_stop(add_remove_button) {
+
+        $.post('/api/add_user_stop', {
+            "gorilla.csrf.Token": $("input[name='gorilla.csrf.Token']").val(),
+            bus_route_stop_id: $(add_remove_button).data('sid')
+        }, function (response) {
+            $(add_remove_button).find("i").removeClass("fa-square-o")
+            $(add_remove_button).find("i").addClass("fa-check-square-o")
+            $(add_remove_button).find("i").css("margin-right", "0px")
+            adjust_stop_counts(response, add_remove_button);
+        });
+    }
+
+    function remove_stop(add_remove_button) {
+        $.post('/api/remove_user_stop', {
+            "gorilla.csrf.Token": $("input[name='gorilla.csrf.Token']").val(),
+            bus_route_stop_id: $(add_remove_button).data('sid')
+        }, function (response) {
+            $(add_remove_button).find("i").removeClass("fa-check-square-o")
+            $(add_remove_button).find("i").addClass("fa-square-o")
+            $(add_remove_button).find("i").css("margin-right", "5px")
+            adjust_stop_counts(response, add_remove_button);
+        });
+    }
+
+    function adjust_stop_counts(jurisdiction_stop_counts, add_remove_button){
+        if(jurisdiction_stop_counts.limits_apply_to_user) {
+            if (jurisdiction_stop_counts.stop_counts) {
+                var limit, ct, limit_applied;
+                $(jurisdiction_stop_counts.stop_counts).each(function (index, r) {
+                    if (r.jurisdiction_id == $(add_remove_button).data('jurisdiction')) {
+                        limit_applied = r.limit_applied;
+                        limit = r.limit;
+                        ct = r.ct;
+                        return false;
+                    }
+                })
+
+                if (limit_applied == undefined) {
+                    $(".jurisdiction-" + $(add_remove_button).data('jurisdiction')).find('.stop-count-message').empty();
+                }
+                else if (limit_applied == 't') {
+                    $(".jurisdiction-" + $(add_remove_button).data('jurisdiction')).find('.stop-count-message').empty()
+                    $(".jurisdiction-" + $(add_remove_button).data('jurisdiction')).data('ct', ct);
+                    $(".jurisdiction-" + $(add_remove_button).data('jurisdiction')).data('limit', limit);
+                    $(".jurisdiction-" + $(add_remove_button).data('jurisdiction')).find('.stop-count-message').append('You have ' + ct + ' out of ' + limit + ' stops selected')
+
+                    if (ct >= limit) {
+                        $(".route-" + $(add_remove_button).data('jurisdiction')).find('.fa-square-o').css('color', '#A12130');
+                    }
+                }
+            }
+        }
+    }
+
+    function get_bus_route_stops(bus_route_li) {
+
+        $.get('/api/available_bus_route_stops', {bus_route_id: $(bus_route_li).data('rid')},
+                function (response) {
+
+                    $(response.bus_route_stops).each(function (index, stop) {
+
+                        found = stop.selected == 't' ? true : false
+
+                        var rendered = Mustache.render(stopTemplate, {
+                            name: stop.name,
+                            id: stop.id,
+                            route: stop.bus_route_id,
+                            jurisdiction_id: stop.jurisdiction_id,
+                            scheduledtime: stop.scheduled_time,
+                            checked_or_unchecked: stop.selected ? "fa-check-square-o" : "fa-square-o",
+                            margin_right: stop.selected ? "margin-right:0px;" : 'margin-right:4px;'
+                        });
+                        $(bus_route_li).find('.stops').append(rendered);
+                        $(bus_route_li).data('stops-populated', true)
+                    });
+
+                    $(response.user_stop_limitations).each(function (index, r) {
+                            $(".jurisdiction-" + r.jurisdiction_id).find('.stop-count-message').empty()
+                            $(".jurisdiction-" + r.jurisdiction_id).data('ct', r.ct);
+                            $(".jurisdiction-" + r.jurisdiction_id).data('limit', r.limit);
+                            $(".jurisdiction-" + r.jurisdiction_id).find('.stop-count-message').append('You have ' + r.ct + ' out of ' + r.limit + ' stops selected')
+                            if (r.limit == r.ct) {
+                                $(".route-" + r.jurisdiction_id).find('.fa-square-o').css('color', 'gray');
+                            }
+                    })
+                });
+    }
+
+    function reset_search() {
+        next_page = 1;
+        pages = 1;
+        initialized = false;
+        current_jurisdiction = undefined;
+        $(".bus-route-li").remove();
+        $(".jurisdiction-li").remove();
+    }
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 {{end}}

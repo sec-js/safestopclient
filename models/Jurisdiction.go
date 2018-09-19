@@ -128,6 +128,17 @@ type ClientJurisdiction struct {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
 func ClientJurisdictionForUser(u *User, pg *PermissionGroups) *ClientJurisdictions {
 
 	client_jurisdictions := ClientJurisdictions{}

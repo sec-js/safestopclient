@@ -2,7 +2,411 @@
 
 {{end}}
 {{define "body"}}
+{{ .CSRFTemplateField}}
 
-Map
+
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDiObDov0rg4zTixsC4E1bFaxjMf3gSwRQ"></script>
+
+<style>
+    .gm-style-mtc {
+        display: none;
+    }
+</style>
+
+
+<script id="run-data-template" type="text/html">
+    <div class="{|#run_data_collapsed|} collapse  {|/run_data_collapsed|}" align="center" style="padding-top: 20px; padding-bottom: 20px;" id="run-data">
+        <span style="display: inline-block;" align="left">
+
+            <div>
+                <span class="map-data-header">{{ t .CurrentLocale "route_u" "" }} - </span>
+                <span class="map-data">{|rn|}</span>
+                {|#a|}
+                    <i class="fa fa-clock-o" style="color: #FCD20A; font-size: 14pt;" aria-hidden="true"></i>
+                {|/a|}
+            </div>
+
+            <div>
+                <span class="map-data-header">{{ t .CurrentLocale "stop_u" "" }} - </span>
+                <span class="map-data">{|sn|}</span>
+            </div>
+
+            <div>
+                <span class="map-data-header">{{ t .CurrentLocale "scheduled" "" }} - </span>
+                <span class="map-data">{|sst|}</span>
+            </div>
+
+            <div>
+                <span class="map-data-header">{|tt|} - </span>
+                <span class="map-data expected-time {|tc|}"> {|t|}</span>
+            </div>
+
+            <div>
+                {|^sh|}
+                    <div style="margin-top: 20px;" data-stop_id="{|sid|}" class="btn btn-sm btn-safestop btn-block" id="remove-stop">{{ t .CurrentLocale "remove" "" }}</div>
+                {|/sh|}
+            </div>
+        </span>
+    </div>
+</script>
+
+<div class="container-fluid safestop-web-container">
+    <div id="loading_spinner" style="display:none;">
+    {{/*<img src="<%= image_path "spinner.png" %>">*/}}
+    </div>
+</div>
+
+
+        <div id="testing">
+
+        </div>
+
+<div id="map">
+
+</div>
+
+<div style="position: absolute; left: 10px; top: 50%;">
+    <i id="previous-stop" class="fa fa-chevron-left map-arrow" style="display: none;"></i>
+</div>
+<div style="position: absolute; right: 10px; top: 50%;">
+    <i id="next-stop" class="fa fa-chevron-right map-arrow" style="display: none;"></i>
+</div>
+
+<script type="text/javascript">
+
+    var map_data;
+    var stop_markers = [];
+    var bus_markers = [];
+
+    var selected_stop = {{ .ViewData.SelectedStopId }} > 0 ? {{.ViewData.SelectedStopId }} : -1;
+    var selected_route = {{ .ViewData.SelectedRouteId }};
+
+    var map;
+    var run_data_template = $("#run-data-template").html();
+    var run_data_collapsed = true;
+    var stop_to_remove;
+
+
+    $(document).ready(function () {
+
+        start_progress_bar();
+
+        initialize_map();
+
+
+        $(document).on('click', '.fa-clock-o', function(e){
+            e.stopPropagation();
+            $('.message-bubble').trigger('click');
+        })
+
+        $("#bottom-bar-center-td").on('click', function(e){
+            run_data_collapsed = !run_data_collapsed;
+        })
+
+        $("#map").css('height', $(window).height() - $(".nav-bar-bottom").height() - $(".nav-bar-top").height() + 'px')
+
+        $(window).resize(function () {
+            $("#map").css('height', $(window).height() - $(".nav-bar-bottom").height() - $(".nav-bar-top").height() + 'px')
+        });
+
+        $(document).on('click', '#next-stop', function(e){
+            e.preventDefault();
+            if(selected_stop == -1){
+                selected_stop = parseInt(map_data[0].sid);
+            }
+            else if(selected_stop == parseInt(map_data[map_data.length - 1].sid)){
+                selected_stop = parseInt(map_data[0].sid);
+            }
+            else{
+                var selected_stop_index = -1;
+                for(var x = 0; x < map_data.length; x++){
+                    if(selected_stop == parseInt(map_data[x].sid)){
+                        selected_stop_index = x;
+                        x = map_data.length;
+                    }
+                }
+                selected_stop = parseInt(map_data[selected_stop_index + 1].sid);
+            }
+            refresh_map();
+            refresh_map_view_info();
+        })
+
+        $(document).on('click', '#previous-stop', function(e){
+            e.preventDefault();
+            if(selected_stop == -1){
+                selected_stop = parseInt(map_data[map_data.length - 1].sid);
+            }
+            else if(selected_stop == parseInt(map_data[0].sid)){
+                selected_stop = parseInt(map_data[map_data.length - 1].sid)
+            }
+            else{
+                var selected_stop_index = -1;
+                for(var x = 0; x < map_data.length; x++){
+                    if(selected_stop == parseInt(map_data[x].sid)){
+                        selected_stop_index = x;
+                        x = map_data.length;
+                    }
+                }
+                selected_stop = parseInt(map_data[selected_stop_index - 1].sid);
+            }
+            refresh_map();
+            refresh_map_view_info();
+        })
+
+
+        $(document).on('click', "#remove-stop", function (e) {
+            e.preventDefault();
+            stop_to_remove = $(this).data('stop_id');
+
+            swal({
+                title: '{{ t .CurrentLocale "are_you_sure" "" }}',
+                text: '{{ t .CurrentLocale "ss_client_live_view_js_3" "" }}',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#A31F2D',
+                cancelButtonColor: '#ccc',
+                confirmButtonText: '{{ t .CurrentLocale "ss_client_live_view_js_4" "" }}'
+            }).then((result) => {
+
+                if (result == true) {
+                    $.post('/api/remove_user_stop', {
+                        "gorilla.csrf.Token": $("input[name='gorilla.csrf.Token']").val(),
+                        bus_route_stop_id: stop_to_remove
+                    }, function (response) {
+                        window.open('/', '_self');
+                    });
+                }
+            })
+
+        })
+
+
+        refresh_stops();
+    });
+
+
+
+
+
+
+    function refresh_stops() {
+        $.get('/api/map', {
+            "gorilla.csrf.Token": $("input[name='gorilla.csrf.Token']").val(),
+            bus_route_id: selected_route,
+            format: 'json'
+        }, function (response) {
+
+            if (response.length > 0) {
+                map_data = response;
+                if(map_data.length > 1){
+                    $(".map-arrow").show();
+                } else{
+                    selected_stop = map_data[0].rid;
+                    $(".map-arrow").hide();
+                }
+
+                refresh_map();
+                refresh_map_view_info();
+            }
+        });
+    }
+
+    function refresh_map() {
+        clear_markers();
+
+        for (var x = 0; x < map_data.length; x++) {
+            if (selected_stop != -1) {
+                if (map_data[x].sid == selected_stop.toString()) {
+
+                    var m = new google.maps.Marker({
+                        position: {
+                            lat: parseFloat(map_data[x].slat),
+                            lng: parseFloat(map_data[x].slng)
+                        },
+                        icon: "/images/map-marker-red.png",
+                        map: map
+                    });
+
+                    stop_markers.push(m);
+                }
+            }
+            else {
+                var m = new google.maps.Marker({
+                    position: {
+                        lat: parseFloat(map_data[x].slat),
+                        lng: parseFloat(map_data[x].slng)
+                    },
+                    icon: "/images/map-marker-red.png",
+                    map: map
+                });
+
+                stop_markers.push(m);
+            }
+        }
+
+        var i = selected_stop_index();
+        if (map_data[i].sb == true || map_data[i].a == true) {
+            if (map_data[i].blat != 0 && map_data[i].blng != 0){
+                bus_markers.push(new google.maps.Marker({
+                    position: {
+                        lat: parseFloat(map_data[i].blat),
+                        lng: parseFloat(map_data[i].blng)
+                    },
+                    icon: {
+                        url: "/images/bus-marker-red.png",
+                        scaledSize: new google.maps.Size(37, 33),
+                    },
+                    map: map
+                }));
+            }
+        }
+
+
+        var bounds = new google.maps.LatLngBounds();
+
+        if(selected_stop == -1){
+            for (var i = 0; i < stop_markers.length; i++) {
+                bounds.extend(stop_markers[i].getPosition());
+            }
+        }
+        else{
+            for (var i = 0; i < stop_markers.length; i++) {
+                bounds.extend(stop_markers[i].getPosition());
+            }
+        }
+
+        for (var i = 0; i < bus_markers.length; i++) {
+            bounds.extend(bus_markers[i].getPosition());
+        }
+
+        map.fitBounds(bounds);
+    }
+
+    function initialize_map() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            scrollwheel: false,
+            disableDefaultUI: true,
+            zoom: 4
+        });
+    }
+
+    function clear_markers() {
+        for (var i = 0; i < stop_markers.length; i++) {
+            stop_markers[i].setMap(null);
+        }
+
+        for (var i = 0; i < bus_markers.length; i++) {
+            bus_markers[i].setMap(null);
+        }
+        stop_markers.length = 0;
+        bus_markers.length = 0;
+
+    }
+
+    function selected_stop_index(){
+        var i = -1;
+        for(var x = 0; x < map_data.length; x++){
+            if(map_data[x].sid == selected_stop.toString()){
+                i = x;
+                break;
+            }
+        }
+        return i;
+    }
+
+
+    function refresh_map_view_info(){
+        var i = selected_stop_index();
+        $("#map-view-info").empty();
+
+        $("#map-view-data").append(Mustache.render(run_data_template, {
+            rn: map_data[i].rn,
+            hp: map_data[i].hp,
+            sn: map_data[i].sn,
+            sst: map_data[i].sst,
+            t: map_data[i].t,
+            tc: map_data[i].tc,
+            tt: map_data[i].tt,
+            ao: map_data[i].ao,
+            sh: map_data[i].sh,
+            a: map_data[i].a,
+            sid: map_data[i].sid,
+            run_data_collapsed: run_data_collapsed
+        }))
+
+        if(map_data[i].sh == false){
+            if(map_data[i].hp || map_data[i].a){
+                $("#summary-time").hide();
+            }
+            else{
+
+                $("#summary-time").text(map_data[i].t)
+                $("#summary-time").addClass(map_data[i].tc)
+                $("#summary-time-title").text(map_data[i].tt);
+                $("#summary-as-of").text(map_data[i].ao);
+            }
+        }
+
+        if(run_data_collapsed){
+            $("#run-data").removeClass('in');
+        }
+        else{
+            $("#run-data").addClass('in');
+        }
+
+    }
+
+
+    function refresh_scan_notifications() {
+        $.get('/api/scan_notifications', {
+            "gorilla.csrf.Token": $("input[name='gorilla.csrf.Token']").val()
+        }, function (response) {
+            if (response.length > 0) {
+                for (var x = 0; x < response.length; x++) {
+                    var id = response[x].id
+                    swal({
+                                title: '{{ t .CurrentLocale "student_scan" "" }}',
+                                text: response[x].name + ' {{ t .CurrentLocale "was_scanned_at" "" }} ' + response[x].date_occurred,
+                                type: "success",
+                                confirmButtonColor: "#A31F2D"
+                            },
+                            function () {
+                                $.post('/dismiss_scan_notification', {
+                                    "gorilla.csrf.Token": $("input[name='gorilla.csrf.Token']").val(),
+                                    scan_notification_id: id
+                                }, function (response) {
+
+                                });
+                            })
+                }
+            }
+        });
+    }
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 {{end}}

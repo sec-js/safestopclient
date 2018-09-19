@@ -1,7 +1,11 @@
-{{define "head"}}
 
+{{define "head"}}
+<title></title>
 {{end}}
 {{define "body"}}
+
+{{ .CSRFTemplateField}}
+
 
 <style>
     .icon-stack {
@@ -36,63 +40,119 @@
 
 
 <script id="ms-template" type="text/html">
-{{`{{={| |}=}}`}}
+
 {|#jurisdictions|}
-
-<li class="list-group-item text-center ms-jurisdiction">{|jurisdiction_name|}</li>
-
+<li class="list-group-item text-center ms-jurisdiction">{|jn|}</li>
 {|#routes|}
-
 {|#stops|}
 
+{|^ra|}
 <div class="list-group-item stop-li" style="border-radius:0px; border:1px solid #DDDDDD;">
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 90%;">
+                <table style="width:100%;">
+                    <tr>
+                        <td colspan="2" class="ms-route" style="color:#9D9D9D;">
+                            {|rn|}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="ms-stop" style="color:#9D9D9D;">
+                            {|sn|}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 100%; font-style: italic">
+                            This stop has been marked inactive by your transportation staff. Reactivate by using the Report An App Issue feature in the Settings menu.
+                        </td>
+                        <td></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+{|/ra|}
 
-<table style="width: 100%;">
-<tr>
-<td style="width: 90%;">
-<table style="width:100%;">
-<tr>
-<td colspan="2" class="ms-route" style="font-style: {|inactive_font|}; color: {|inactive_color|};">{|route_name|}
 
-{|#audible|}
-    <i class="fa fa-clock-o" style="font-style: {|inactive_font|}; color: #FCD20A;" aria-hidden="true"></i>
-{|/audible|}
+{|^ba|}
+<div class="list-group-item stop-li" style="border-radius:0px; border:1px solid #DDDDDD;">
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 90%;">
+                <table style="width:100%;">
+                    <tr>
+                        <td colspan="2" class="ms-route" style="color:#9D9D9D;">
+                            {|rn|}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="ms-stop" style="color:#9D9D9D;">
+                            {|sn|}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 100%; font-style: italic">
+                            This route currently does not have a bus assigned to it. Use the Report An App Issue feature to resolve this matter with your transportation staff.
+                        </td>
+                        <td></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+{|/ba|}
 
-</td>
-</tr>
-<tr>
-        <td colspan="2" class="ms-stop" style="font-style: {|inactive_font|}; color: {|inactive_color|};">
-{|stop_name|}
-</td>
-</tr>
-<tr>
 
-{|^loop_mode_flag|}
-<td style="width: {|width|}; vertical-align: top;">
-
-        <div class="se-title" style="font-style: {|inactive_font|}; color: {|inactive_color|};">{|scheduled_title|}</div>
-<div class="ms-time">{|scheduled_time|}</div>
-</td>
-{|/loop_mode_flag|}
-
-            {|^audible|}
-              {|^hide_predictions|}
-<td style="width: 40%;" class="text-left">
-<div class="se-title">{|time_title|}</div>
-        <div class="ms-time" style="color: {|time_color|};">{|time|}</div>
-<div class="as_of">{|as_of|}</div>
-</td>
-{|/hide_predictions|}
-            {|/audible|}
-
-</tr>
-</table>
-</td>
-        <td style="vertical-align: middle; display: {|hide_pin|};" class="text-right">
-    <!--<i class="fa fa-chevron-right nav-arrow"></i>-->
-
-        <a href="/map_view?bus_route_id={|route_id|}&bus_route_stop_id={|stop_id|}" class="icon-stack">
-    <i class="ss ss-live-map-map icon-stack-3x" style="color: #575B5E;
+{|^e|}
+<div class="list-group-item stop-li {|sc|}" style="border-radius:0px; border:1px solid #DDDDDD;">
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 90%;">
+                <table style="width:100%;">
+                    <tr>
+                        <td colspan="2" class="ms-route">
+                            {|rn|}
+                            {|#a|}
+                                <i class="fa fa-clock-o" style="color: #FCD20A;"></i>
+                            {|/a|}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="ms-stop">
+                            {|sn|}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%;">
+                            {|^sh|}
+                                <div class="scheduled_time">
+                                    <div class="se-title">{{ t .CurrentLocale "scheduled" "" }}</div>
+                                    <div class="ms-time">{|sst|}</div>
+                                </div>
+                            {|/sh|}
+                        </td>
+                        <td style="width: 40%;" class="text-left">
+                            {|^sh|}
+                                {|^a|}
+                                    {|^hp|}
+                                        <div class="expected_time">
+                                            <div class="se-title">{|tt|}</div>
+                                            <div class="ms-time {|tc|}">{|t|}</div>
+                                            <div class="as_of">{|ao|}</div>
+                                        </div>
+                                    {|/hp|}
+                                {|/a|}
+                            {|/sh|}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td style="vertical-align: middle;" class="text-right">
+                <a href="/map?bus_route_id={|rid|}&bus_route_stop_id={|sid|}" class="icon-stack">
+                    <i class="ss ss-live-map-map icon-stack-3x" style="color: #575B5E;
                                                              font-size: 40px;
                                                              padding-top: 10px;
                                                              border: 3px solid #575B5E;
@@ -102,20 +162,18 @@
                                                              -webkit-border-radius:35px;
                                                              -moz-border-radius:35px;">
 
-    </i>
-    <i class="ss ss-live-map-pin icon-stack-1x" style="color: #A12130; font-size: 30pt; top: 18px"></i>
-</a>
-
-
-</td>
-</tr>
-</table>
-
+                    </i>
+                    <i class="ss ss-live-map-pin icon-stack-1x" style="color: #A12130; font-size: 30pt; top: 18px"></i>
+                </a>
+            </td>
+        </tr>
+    </table>
 </div>
+{|/e|}
 
 {|/stops|}
-  {|/routes|}
-  {|/jurisdictions|}
+{|/routes|}
+{|/jurisdictions|}
 
 </script>
 
@@ -125,127 +183,84 @@
 
 </ul>
 
-
-
 <div id="loading_spinner" style="display:none;" align="center">
-    <img src="/images/spinner.png">
+
+
 </div>
+
+
 
 <script type="text/javascript">
 
-    var token = "{{ .ViewData.Token }}";
-    var email = "{{ .ViewData.Email }}";
-
-
-// var refreshTimeout;
-// var refreshAdTimeout;
-// var ms_template = $("#ms-template").html();
-// Mustache.parse(ms_template);
-
+var ms_template = $("#ms-template").html();
 
 $(document).ready(function () {
+    start_progress_bar();
 
+    $(".message-bubble").click(function (e) {
+        set_viewed_alerts();
+    });
 
-    if (token != "") {
-        window.localStorage.setItem("token", token);
-    }
+    $( window ).scroll(function() {
+        $("#overlay").css("top",$(window).scrollTop());
+    });
 
-    if (email != "") {
-        window.localStorage.setItem("email", email);
-    }
-
+    $("#my-stops").height((window.innerHeight - 106) + 'px');
 
 })
 
-{{/*{{ if true }} <!-- !@register.nil? and @register -->*/}}
+function refresh_stops() {
 
-    {{/*if(isNativeiOSApp()) {*/}}
-        {{/*sendMessageToNative({*/}}
-            {{/*command: 'register_for_notifications',*/}}
-            {{/*callback: 'did_register_for_notifications_with_user_callback',*/}}
-            {{/*data: ''*/}}
-        {{/*});*/}}
-    {{/*}*/}}
-    {{/*else if (isNativeAndroidApp()) {*/}}
-        {{/*gcm_token = Android.getGCMToken();*/}}
-        {{/*gcm_user_callback(gcm_token);*/}}
-    {{/*}*/}}
+    $('#loading_spinner').show();
 
-{{/*{{ end }}*/}}
+    $.get('/api/my_stops', {
+        "gorilla.csrf.Token": $("input[name='gorilla.csrf.Token']").val(),
+        format: 'json'
+    }, function (response) {
 
-{{/*$("#my-stops").height((window.innerHeight - 106) + 'px');*/}}
+        console.log(JSON.stringify(response));
 
-    {{/*//refresh_stops();*/}}
-    {{/*//refresh_scans();*/}}
-    {{/*//refresh_ad();*/}}
-
-{{/*$(document).on('click', '.fa-clock-o', function(e){*/}}
-    {{/*e.stopPropagation();*/}}
-    {{/*$('.message-bubble').trigger('click');*/}}
-{{/*})*/}}
-
-{{/*});*/}}
-
-
-{{/*function refresh_stops() {*/}}
-
-    {{/*//START PROGRESS BAR*/}}
-    {{/*progressValue = 100;*/}}
-    {{/*if (!inProgress) {*/}}
-        {{/*progress();*/}}
-        {{/*inProgress = !inProgress;*/}}
-    {{/*}*/}}
-
-    {{/*$('#loading_spinner').show();*/}}
-    {{/*refreshTimeout = setTimeout(refresh_stops, 30000);*/}}
-
-{{/*$.get('/my_stops', {*/}}
-    {{/*authenticity_token: '<%= form_authenticity_token %>',*/}}
-    {{/*format: 'json'*/}}
-{{/*}, function (response) {*/}}
-    {{/*console.log("Res", response)*/}}
-
-    {{/*$("#my-stops").empty();*/}}
-    {{/*$('#loading_spinner').hide();*/}}
-
-{{/*if (response.length > 0) {*/}}
-    {{/*$('#my-stops').append(Mustache.render(ms_template, {jurisdictions: response}));*/}}
-{{/*}*/}}
-{{/*else {*/}}
-
-{{/*}*/}}
-
-{{/*// <% if current_app_user and [Sti::LICENSE_5, Sti::SUB_ACCOUNT_USER].include?(current_app_user.client_permission_group) %>*/}}
-{{/*//         <% current_app_user.client_jurisdictions.each do |j| %>*/}}
-{{/*//         <% if j.jurisdiction_safe_stop_info.status == 'testing' %>*/}}
-{{/*//*/}}
-{{/*//         $('#my-stops').append('<li class="list-group-item text-center ms-jurisdiction"><%= j.name %></li>');*/}}
-{{/*//     $('#my-stops').append('<li class="list-group-item text-center"><%= t('ss_client_my_stops_js_1', locale: current_locale) %></li>');*/}}
-{{/*//*/}}
-{{/*// <% end %>*/}}
-{{/*// <% end %>*/}}
-{{/*// <% end %>*/}}
+        $("#my-stops").empty();
+        $('#loading_spinner').hide();
+        if (response.length > 0) {
+            $('#my-stops').append(Mustache.render(ms_template, {jurisdictions: response}));
+        }
+    });
+}
 
 
 
 
-{{/*});*/}}
-{{/*}*/}}
+function refresh_scan_notifications() {
+    $.get('/api/scan_notifications', {
+        "gorilla.csrf.Token": $("input[name='gorilla.csrf.Token']").val()
+    }, function (response) {
+        if (response.length > 0) {
+            for (var x = 0; x < response.length; x++) {
+                var id = response[x].id
+                swal({
+                        title: '{{ t .CurrentLocale "student_scan" "" }}',
+                        text: response[x].name + ' {{ t .CurrentLocale "was_scanned_at" "" }} ' + response[x].date_occurred,
+                        type: "success",
+                        confirmButtonColor: "#A31F2D"
+                    },
+                    function () {
+                        $.post('/dismiss_scan_notification', {
+                            "gorilla.csrf.Token": $("input[name='gorilla.csrf.Token']").val(),
+                            scan_notification_id: id
+                        }, function (response) {
 
-{{/*function refreshAd() {*/}}
-    {{/*refreshAdTimeout = setTimeout(refreshAd, 30000);*/}}
-{{/*$.post('/next_ad', {*/}}
-    {{/*authenticity_token: '<%= form_authenticity_token %>'*/}}
-{{/*}, function (response) {*/}}
-{{/*//        alert(response.ad.app_image);*/}}
-    {{/*if(response.ad) {*/}}
-        {{/*$("#ad-image").attr("src", response.ad.app_image);*/}}
-        {{/*$("#ad-link").attr("href", '/adclick/'+response.ad.id);*/}}
-        {{/*$("#my-stops").css("margin-bottom", "156px");*/}}
-    {{/*}*/}}
-{{/*});*/}}
-{{/*}*/}}
+                        });
+                    })
+            }
+        }
+    });
+}
+
+
+
 
 
 </script>
-{{end}}
+
+{{ end }}

@@ -14,12 +14,11 @@
 </head>
 <body>
 
-{{range .FlashMessages.FlashMessages}}
 
+{{range .FlashMessages.FlashMessages}}
 <div class="alert alert-{{.BootstrapClass}}" role="alert">
 {{.Message}}
 </div>
-
 {{end}}
 
 

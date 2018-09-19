@@ -17,20 +17,22 @@ type AppController struct {
 func (c *AppController) Register() {
 
 	//templates
-	c.addTemplate("index", "index.html", "app.html")
+	c.addTemplate("index", "index.html", "index.html")
 	c.addTemplate("check_availability", "check_availability.html", "default.html")
-	c.addTemplate("account", "account.html", "app.html")
-	c.addTemplate( "language", "language.html", "app.html")
+	c.addTemplate("account", "account.html", "account.html")
+	c.addTemplate( "language", "language.html", "language.html")
 	c.addTemplate( "activate", "activate.html", "default.html")
-	c.addTemplate("faq", "faq.html", "default.html")
+	c.addTemplate("faq", "faq.html", "faq.html")
 	c.addTemplate("failed_registration_attempt", "failed_registration_attempt.html", "default.html")
 	c.addTemplate("report_an_app_issue", "report_an_app_issue.html", "default.html")
-	c.addTemplate( "manage_notifications", "manage_notifications.html", "default.html")
-	c.addTemplate( "manage_subscriptions", "manage_subscriptions.html", "default.html")
-	c.addTemplate( "subscription_details", "subscription_details.html", "default.html")
-
-
+	c.addTemplate( "manage_notifications", "manage_notifications.html", "manage_notifications.html")
+	c.addTemplate( "manage_subscriptions", "manage_subscriptions.html", "manage_subscriptions.html")
+	c.addTemplate( "subscription_details", "subscription_details.html", "subscription_details.html")
 	c.addTemplate("lost_item_report", "lost_item_report.html", "default.html")
+	c.addTemplate( "setup", "setup.html", "setup.html")
+	c.addTemplate( "map", "map.html", "map.html")
+
+
 
 	//actions
 	c.addRouteWithPrefix("/", c.IndexAction)
@@ -46,18 +48,15 @@ func (c *AppController) Register() {
 	c.addRouteWithPrefix( "/manage_notifications", c.ManageNotificationsAction)
 	c.addRouteWithPrefix( "/manage_subscriptions", c.ManageSubscriptionsAction)
 	c.addRouteWithPrefix( "/subscription_details/{subscription_id}", c.SubscriptionDetailsAction)
-
 	c.addRouteWithPrefix( "/add_scan_notification_subscription", c.AddScanNotificationSubscriptionAction)
 	c.addRouteWithPrefix( "/remove_scan_notification_subscription", c.RemoveScanNotificationSubscriptionAction)
-
 	c.addRouteWithPrefix( "/add_student", c.AddStudentAction)
 	c.addRouteWithPrefix("/remove_student", c.RemoveStudentAction)
-
 	c.addRouteWithPrefix("/add_sub_account_user", c.AddSubAccountUserAction)
 	c.addRouteWithPrefix("/remove_sub_account_user", c.RemoveSubAccountUserAction)
-
-
 	c.addRouteWithPrefix("/lost_item_report", c.LostItemReportAction)
+	c.addRouteWithPrefix("/setup", c.SetupAction)
+	c.addRouteWithPrefix("/map", c.MapAction)
 
 }
 
@@ -67,12 +66,21 @@ type dashData struct {
 
 func (c *AppController) IndexAction(w http.ResponseWriter, r *http.Request) {
 
+	uid := currentUserId(c.ControllerBase, r)
+	if(uid == 0){
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	u := models.FindUser(uid)
+
+
 	data := struct {
 		Token string
 		Email string
 	} {
 		r.FormValue("token"),
-		r.FormValue("email"),
+		u.Email,
 	}
 
 
@@ -130,6 +138,7 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 		ViewManageNotifications bool
 		ViewManageSubscriptions bool
 		ViewReportLostItem bool
+		Email string
 	}{
 		len(cj.Jurisdictions),
 		has_jurisdictions,
@@ -137,6 +146,7 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 		view_manage_notifications,
 		view_manage_subscriptions,
 		view_lost_item_reports,
+		u.Email,
 	}
 
 	c.render(w, r, "account", data)
@@ -301,22 +311,55 @@ func (c *AppController) LanguageAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	u := models.FindUser(uid)
 
-	c.render(w, r, "language", nil)
+	data := struct {
+		Email string
+	} {
+		u.Email,
+	}
+
+	c.render(w, r, "language", data)
 }
 
 
 func (c *AppController) MapAction(w http.ResponseWriter, r *http.Request) {
-	session, _ :=  c.SessionStore.Get(r, "auth")
-	email := session.Values["current_user_email"]
-	if email != nil {
-		http.Redirect(w, r, r.URL.Host+"/dashboard", http.StatusFound)
+
+	uid := currentUserId(c.ControllerBase, r)
+	if(uid == 0){
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
 	}
 
-	c.render(w, r, "map", nil)
+	u := models.FindUser(uid)
+
+
+	data := struct {
+		Email string
+		SelectedStopId string
+		SelectedRouteId string
+	} {
+		u.Email,
+		r.FormValue("bus_route_stop_id"),
+		r.FormValue("bus_route_id"),
+	}
+
+
+
+	c.render(w, r, "map", data)
 }
 
 func (c *AppController) FaqAction(w http.ResponseWriter, r *http.Request) {
+
+	uid := currentUserId(c.ControllerBase, r)
+	if(uid == 0){
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	u := models.FindUser(uid)
+
+
 
 	type FAQ struct{
 		Question string `db:"question"`
@@ -325,6 +368,7 @@ func (c *AppController) FaqAction(w http.ResponseWriter, r *http.Request) {
 
 	data := struct{
 		Faq []FAQ
+		Email string
 	} {
 
 	}
@@ -340,6 +384,8 @@ func (c *AppController) FaqAction(w http.ResponseWriter, r *http.Request) {
 			data.Faq = append(data.Faq, d)
 		}
 	}
+
+	data.Email = u.Email
 
 	c.render(w, r, "faq", data)
 }
@@ -497,10 +543,12 @@ func (c *AppController) ManageNotificationsAction(w http.ResponseWriter, r *http
 		Jurisdictions *models.ClientJurisdictions
 		NotificationSubscriptions *models.ScanNotificationSubscriptions
 		HasNotificationSubscriptions bool
+		Email string
 	} {
 		cj,
 		sns,
 		(len(sns.Subscriptions) > 0),
+		u.Email,
 	}
 
 	c.render(w, r, "manage_notifications", data)
@@ -528,8 +576,10 @@ func (c *AppController) ManageSubscriptionsAction(w http.ResponseWriter, r *http
 
 	data := struct {
 		Subscriptions *models.Subscriptions
+		Email string
 	} {
 		s,
+		u.Email,
 	}
 
 	c.render(w, r, "manage_subscriptions", data)
@@ -579,6 +629,7 @@ func (c *AppController) SubscriptionDetailsAction(w http.ResponseWriter, r *http
 		StudentCount int
 		Jurisdiction *models.Jurisdiction
 		ScanNotificationSubscriptions *models.ScanNotificationSubscriptions
+		Email string
 		} {
 		user,
 		sub_account_users,
@@ -587,6 +638,7 @@ func (c *AppController) SubscriptionDetailsAction(w http.ResponseWriter, r *http
 		len(students.StudentInformations),
 		jurisdiction,
 		scan_notification_subscriptions,
+		user.Email,
 	}
 
 	c.render(w, r, "subscription_details", data)
@@ -953,6 +1005,61 @@ func (c *AppController) LostItemReportAction(w http.ResponseWriter, r *http.Requ
 	}
 
 }
+
+
+
+
+func (c *AppController) SetupAction(w http.ResponseWriter, r *http.Request) {
+
+	user_id := currentUserId(c.ControllerBase, r)
+
+	if user_id == 0 {
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	u := models.FindUser(user_id)
+
+	view_name_search := (models.UserHasAnyPermissionGroups([]string{
+		c.PermissionGroups.Admin,
+		c.PermissionGroups.License_1,
+		c.PermissionGroups.License_2,
+		c.PermissionGroups.License_3,
+		c.PermissionGroups.License_4,
+	}, u.PermissionGroups) == true || u.SuperAdmin == true)
+
+
+	is_regular_user := (models.UserHasAnyPermissionGroups([]string{
+		c.PermissionGroups.Admin,
+		c.PermissionGroups.License_1,
+		c.PermissionGroups.License_2,
+		c.PermissionGroups.License_3,
+		c.PermissionGroups.License_4,
+	}, u.PermissionGroups) == false && u.SuperAdmin == false)
+
+
+
+
+
+	data := struct {
+		ViewNameSearch bool
+		IsRegularUser bool
+		Email string
+	} {
+		view_name_search,
+		is_regular_user,
+		u.Email,
+	}
+
+
+
+
+
+	c.render(w, r, "setup", data)
+}
+
+
+
 
 
 

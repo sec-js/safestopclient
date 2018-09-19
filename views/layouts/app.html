@@ -9,42 +9,50 @@
 </head>
 <body id="body" class="app-body">
 
-<div id="overlay"
-     style="
-     position:absolute;
-         height:100%;
-         width:100%;
-         background:black;
-         opacity:.7;
-         z-index:2;
-         display:none;
-     ">
-</div>
+{{/*<div id="overlay"*/}}
+     {{/*style="*/}}
+     {{/*position:absolute;*/}}
+         {{/*height:100%;*/}}
+         {{/*width:100%;*/}}
+         {{/*background:black;*/}}
+         {{/*opacity:.7;*/}}
+         {{/*z-index:2;*/}}
+         {{/*display:none;*/}}
+     {{/*"></div>*/}}
 
-<div id="top-bar" style="background: #ffffff;
-    z-index: 5000;
-    position: fixed;
-    width:100%;
-    top: 0px;
-    border-bottom: 1px solid #ccc;
-    height:50px;">
+{{/*<div id="top-bar" style="background: #ffffff;*/}}
+    {{/*z-index: 5000;*/}}
+    {{/*position: fixed;*/}}
+    {{/*width:100%;*/}}
+    {{/*top: 0px;*/}}
+    {{/*border-bottom: 1px solid #ccc;*/}}
+    {{/*height:50px;">*/}}
 
-{{/*<table style="width:100%; height: 50px; z-index: 5000;">*/}}
+    {{/*<table style="width:100%; height: 50px; z-index: 5000;">*/}}
         {{/*<tr>*/}}
             {{/*<td style="width: 40px; height:50px; padding-top: 4px;">*/}}
+
+
+                {{/*{{ if eq .CurrentPath "/setup" or eq .CurrentPath "/account" }}*/}}
 
                 {{/*<% if request.fullpath == "/setup" ||*/}}
                 {{/*request.fullpath == '/account' ||*/}}
                 {{/*request.fullpath.starts_with?('/map_view') %>*/}}
                 {{/*<a style="margin-left:10px;" href="/web"><i style="font-size: 25pt; color: #A32837;" class="fa fa-times back" aria-hidden="true"></i></a>*/}}
-                {{/*<% elsif*/}}
+
+
+                {{/*{{if eq .CurrentPath "/manage_notifications" or eq .CurrentPath "/manage_subscriptions" or eq .CurrentPath "/language" or eq .CurrentPath "/faq" }}*/}}
+
+                    {{/*<% elsif*/}}
                 {{/*request.fullpath == '/manage_notifications' ||*/}}
                 {{/*request.fullpath == '/manage_subscriptions' ||*/}}
                 {{/*request.fullpath == '/language' ||*/}}
                 {{/*request.fullpath == '/faq'*/}}
-
                 {{/*%>*/}}
+
                 {{/*<a style="margin-left:10px;" href="/account"><i style="font-size: 16pt; color: #A32837;" class="fa fa-chevron-left back" aria-hidden="true"></i></a>*/}}
+
+
 
                 {{/*<% elsif*/}}
                 {{/*request.fullpath.starts_with?('/my_routes/')*/}}
@@ -54,8 +62,10 @@
 
                 {{/*<% elsif request.fullpath.start_with?('/subscription_details') %>*/}}
                 {{/*<a style="margin-left:10px;" href="/manage_subscriptions"><i style="font-size: 16pt; color: #A32837;" class="fa fa-chevron-left back" aria-hidden="true"></i></a>*/}}
-
                 {{/*<% end %>*/}}
+
+
+
             {{/*</td>*/}}
 
             {{/*<td align="center">*/}}
@@ -109,8 +119,7 @@
         {{/*</tr>*/}}
         {{/*<% end %>*/}}
     {{/*</table>*/}}
-
-</div>
+{{/*</div>*/}}
 
 
 {{/*<% flash.each do |type, message| %>*/}}
