@@ -32,8 +32,8 @@ func (c *APIController) Register() {
 	c.addRouteWithPrefix("/map", c.MapAction)
 	c.addRouteWithPrefix("/scan_notifications", c.ScanNotificationsAction)
 	c.addRouteWithPrefix("/dismiss_scan_notification", c.DismissScanNotificationAction)
-
 	c.addRouteWithPrefix("/next_ad", c.NextAdAction)
+	c.addRouteWithPrefix("/register_for_push_notifications", c.RegisterForPushNotificationsAction)
 
 
 
@@ -638,7 +638,7 @@ func (c *APIController) NextAdAction(w http.ResponseWriter, r *http.Request) {
 }
 
 
-func (c *APIController) GCMAction(w http.ResponseWriter, r *http.Request) {
+func (c *APIController) RegisterForPushNotificationsAction(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	resp := struct {
@@ -658,7 +658,7 @@ func (c *APIController) GCMAction(w http.ResponseWriter, r *http.Request) {
 
 	if device_token != "" {
 
-		if models.InsertDevice(device_platform, device_token) == false {
+		if models.InsertDevice(device_platform, device_token, uid) == false {
 			c.renderJSON(resp, w)
 			return
 		}
@@ -677,15 +677,6 @@ func (c *APIController) GCMAction(w http.ResponseWriter, r *http.Request) {
 
 	c.renderJSON(resp, w)
 }
-
-
-func (c *APIController) GCMUserAction(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	c.renderJSON(models.Geocode("1680 Eider Down Dr.", "29483"), w)
-}
-
-
-
 
 
 

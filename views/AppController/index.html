@@ -195,6 +195,17 @@
 var ms_template = $("#ms-template").html();
 
 $(document).ready(function () {
+
+    if(isNativeiOSApp()) {
+        sendMessageToNative({command:'register_for_notifications', callback: 'did_register_for_notifications_callback', data:''});
+    }
+
+    if(isNativeAndroidApp())
+    {
+        gcm_callback(gcm_token);
+    }
+
+
     start_progress_bar();
 
     $(".message-bubble").click(function (e) {

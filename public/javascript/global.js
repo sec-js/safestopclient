@@ -2,6 +2,36 @@
 
 Mustache.tags = ["{|", "|}"];
 
+var is_uiwebview = /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(navigator.userAgent);
+
+var red = '#e94d2f';
+var green = '#06af4b';
+var blue = '#008fa8';
+var yellow = '#EEA925';
+
+var progressValue = 0,
+    inProgress,
+    progressTimeout;
+
+
+function progress() {
+    progressValue -= 1;
+    $(".progress-bar").css("width", progressValue + "%");
+    progressTimeout = setTimeout(progress, 300)
+}
+
+function isBadIE() {
+    if (navigator.appVersion.indexOf("MSIE 9") == -1 &&
+        navigator.appVersion.indexOf("MSIE 8") == -1 &&
+        navigator.appVersion.indexOf("MSIE 7") == -1 &&
+        navigator.appVersion.indexOf("MSIE 6") == -1) {
+        return false
+    }
+    return true;
+}
+
+
+
 var all_alerts = [];
 var progress_value;
 var in_progress = false;
@@ -126,4 +156,53 @@ function refresh_ad() {
 
         }
     });
+}
+
+function isNativeiOSApp() {
+    return /SafeStop-iOS\/[0-9\.]+$/.test(navigator.userAgent);
+}
+
+function isNativeAndroidApp() {
+    return /SafeStop-Android/.test(navigator.userAgent);
+}
+
+function sendMessageToNative(json) {
+    try {
+        webkit.messageHandlers.callbackHandler.postMessage(json);
+    } catch(err) {
+        console.log('The native context does not exist yet');
+    }
+}
+
+function did_register_for_notifications_callback(data)
+{
+    d = data.split("::");
+    notification_token = d[0];
+    device_platform = d[1];
+    if(notification_token.length > 0)
+    {
+        $.post('/api/register_for_push_notifications', {
+            device_token: notification_token,
+            device_platform: device_platform,
+            "gorilla.csrf.Token": $("input[name='gorilla.csrf.Token']").val(),
+        }, function(response){
+
+        }, "json");
+    }
+}
+
+function gcm_callback()
+{
+    var gcm_token = Android.getGCMToken();
+    if (gcm_token && gcm_token.length > 0) {
+        if (ntk && ntk.length > 0 && tk && tk.length > 0){
+            $.post('/api/register_for_push_notifications', {
+                device_token: gcm_token,
+                device_platform: "Android",
+                "gorilla.csrf.Token": $("input[name='gorilla.csrf.Token']").val(),
+            }, function(response){
+                window.localStorage.removeItem("gcm_token");
+            }, "json");
+        }
+    }
 }
