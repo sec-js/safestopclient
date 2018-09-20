@@ -1,11 +1,18 @@
 package models
 
-import "github.com/schoolwheels/safestopclient/database"
+import (
+	"fmt"
+	"github.com/schoolwheels/safestopclient/database"
+)
 
-func InsertDevice(device_platform string, device_token string) bool {
+func InsertDevice(device_platform string, device_token string, user_id int) bool {
 
 	if device_platform == "" || device_token == "" {
 		return false
+	}
+
+	if DeviceExists(device_platform, device_token) == true {
+		return true
 	}
 
 	query := `
@@ -13,21 +20,40 @@ insert into devices
 (
 device_platform,
 notification_token,
+user_id,
 created_at,
 updated_at
 ) values (
 $1,
 $2,
+$3,
 now(),
 now()
 )
 `
-	_, err := database.GetDB().Exec(query, device_platform, device_token)
+	_, err := database.GetDB().Exec(query, device_platform, device_token, user_id)
 	if err != nil {
 		return false
 	}
 	return true
 }
+
+func DeviceExists(device_platform string, device_token string) bool {
+	ct := 0
+	query := `select count(*) from devices where device_platform_id = (select id from device_platforms where name = $1 limit 1) and notification_token = $2`
+	row := database.GetDB().QueryRowx(query, device_platform, device_token)
+	if row == nil {
+		return true
+	}
+
+	err := row.Scan(&ct)
+	if err != nil {
+		fmt.Print(err)
+		return true
+	}
+	return (ct > 0)
+}
+
 
 
 func UpdateDeviceARN(device_platform string, device_token string, arn string) bool {

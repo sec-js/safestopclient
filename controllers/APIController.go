@@ -1,16 +1,9 @@
 package controllers
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sns"
-	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/schoolwheels/safestopclient/models"
 	"github.com/spf13/viper"
-	"log"
 	"net/http"
-	"os"
 	"strconv"
 )
 
@@ -309,44 +302,10 @@ func (c *APIController) RemoveUserStopAction(w http.ResponseWriter, r *http.Requ
 func (c *APIController) TestAction(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	aws_config := aws.Config{
-		Credentials: credentials.NewEnvCredentials(),
-		Region: aws.String(os.Getenv("AWS_REGION")),
-	}
+	endpoint := models.CreateSNSEndpointWithLambda("iOS", "b")
 
 
-	resp := ""
-	sess, err := session.NewSession(&aws_config)
-	if err != nil {
-		resp = err.Error();
-		log.Println(err)
-
-	}
-
-	if sess != nil {
-		sns_client := sns.New(sess, &aws_config)
-		if sns_client != nil {
-
-
-			end_point, err := sns_client.CreatePlatformEndpoint(&sns.CreatePlatformEndpointInput{
-				PlatformApplicationArn: aws.String(viper.GetString("SNS_ANDROID_ARN")),
-				Token: aws.String(""),
-			})
-
-			if err != nil {
-				resp = err.Error()
-				log.Println(err)
-			}
-
-			if end_point != nil {
-				resp = aws.StringValue(end_point.EndpointArn)
-			}
-
-		}
-	}
-
-
-	c.renderJSON(resp, w)
+	c.renderJSON(endpoint, w)
 }
 
 
@@ -688,6 +647,12 @@ func (c *APIController) GCMAction(w http.ResponseWriter, r *http.Request) {
 		false,
 	}
 
+	uid := currentUserId(c.ControllerBase, r)
+	if(uid <= 0){
+		c.renderJSON(resp, w)
+		return
+	}
+
 	device_platform := "Android"
 	device_token := r.FormValue("device_token")
 
@@ -698,62 +663,16 @@ func (c *APIController) GCMAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-
 		end_point_arn := ""
-
-		aws_config := aws.Config{
-			Credentials: credentials.NewEnvCredentials(),
-			Region:      aws.String(viper.GetString("SNS_REGION")),
-		}
-
-		sess, err := session.NewSession(&aws_config)
-		if err != nil {
-			c.renderJSON(resp, w)
-			return
-		}
-
-		if sess == nil {
-			c.renderJSON(resp, w)
-			return
-		}
-
 		if viper.GetString("domain") == "safestopapp.ca" {
-
-			lambda_client := lambda.New(sess)
-			if lambda_client == nil {
-				c.renderJSON(resp, w)
-				return
-			}
-
-
-
+			end_point_arn = models.CreateSNSEndpointWithLambda(device_platform, device_token)
 		} else if (viper.GetString("domain") == "safestopapp.com") {
-
-			sns_client := sns.New(sess, &aws_config)
-			if sns_client == nil {
-				c.renderJSON(resp, w)
-				return
-			}
-
-			end_point, err := sns_client.CreatePlatformEndpoint(&sns.CreatePlatformEndpointInput{
-				PlatformApplicationArn: aws.String(viper.GetString("SNS_ANDROID_ARN")),
-				Token: aws.String(device_token),
-			})
-
-			if err != nil {
-				c.renderJSON(resp, w)
-				return
-			}
-
-			end_point_arn = aws.StringValue(end_point.EndpointArn)
-
-		} else {
-
+			end_point_arn = models.CreateSNSEndpoint(device_platform, device_token)
 		}
 
-
-		resp.Success = models.UpdateDeviceARN(device_platform, device_token, aws.StringValue(end_point.EndpointArn))
-
+		if len(end_point_arn) > 0 {
+			resp.Success = models.UpdateDeviceARN(device_platform, device_token, end_point_arn)
+		}
 	}
 
 	c.renderJSON(resp, w)
