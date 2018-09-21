@@ -5,6 +5,7 @@ import (
 	"log"
 	"fmt"
 	"github.com/schoolwheels/safestopclient/database"
+	"math/rand"
 	"strings"
 	"github.com/pkg/errors"
 	)
@@ -374,7 +375,7 @@ func PersonIdForUserId(user_id int) int {
 func UserIdForEmail(email string) int {
 	email = ScrubEmailAddress(email)
 	user_id := 0
-	query := `select id from users where email = $1 and security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1)`
+	query := `select id from users where lower(email) = lower($1) and security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1)`
 	row := database.GetDB().QueryRowx(query, email)
 	if row == nil {
 		return 0
@@ -388,7 +389,22 @@ func UserIdForEmail(email string) int {
 	return user_id
 }
 
+func UserIdForPasswordResetCode(code string) int {
 
+	user_id := 0
+	query := `select id from users where password_reset_code = $1 and security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1)`
+	row := database.GetDB().QueryRowx(query, code)
+	if row == nil {
+		return 0
+	}
+
+	err := row.Scan(&user_id)
+	if err != nil {
+		log.Println(err)
+		return 0
+	}
+	return user_id
+}
 
 
 
@@ -1096,6 +1112,59 @@ order by date_occurred
 	}
 	return r
 }
+
+
+func GenerateUserPasswordResetCode(user_id int) string {
+	code := RandStringBytes(25)
+	query := "update users set password_reset_code = $1 where id = $2;"
+	_, err := database.GetDB().Exec(query, code, user_id)
+	if err != nil {
+		return code
+	}
+	return code
+}
+
+func ClearUserPasswordResetCode(user_id int) bool {
+	query := "update users set password_reset_code = null where id = $1;"
+	_, err := database.GetDB().Exec(query, user_id)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+
+
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+func RandStringBytes(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
+}
+
+
+func UpdateUserPassword(user_id int, password string) bool{
+	hashed_password, err := HashPassword(password)
+	if err != nil {
+		return false
+	}
+
+	query := "update users set password_digest = $1 where id = $2;"
+
+	_, err = database.GetDB().Exec(query, hashed_password, user_id)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+
+
+
+
+
 
 
 

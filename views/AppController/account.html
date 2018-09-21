@@ -9,7 +9,7 @@
         <table class="list-item-table">
             <tr>
                 <td>
-                    <span class="icon"><i class="fa fa-globe"></i></span>
+                    <span class="icon"><i style="color:#555;" class="fa fa-globe"></i></span>
                 </td>
                 <td>
                 {{ t .CurrentLocale "ss_client_account_language" "" }}
@@ -22,13 +22,11 @@
         <table class="list-item-table">
             <tr>
                 <td>
-
-                    {{ if eq .ViewData.JurisdictionCount  0 }}
-                        <span class="icon"><i class="fa fa-power-off"></i></span>
-                    {{ else }}
-                    <span class="icon"><i class="fa fa-graduation-cap"></i></span>
-                    {{ end }}
-
+                {{ if eq .ViewData.JurisdictionCount  0 }}
+                    <span class="icon"><i style="color:#555;" class="fa fa-power-off"></i></span>
+                {{ else }}
+                <span class="icon"><i style="color:#555;" class="fa fa-graduation-cap"></i></span>
+                {{ end }}
                 </td>
                 <td>
                 {{ if eq .ViewData.JurisdictionCount 0 }}
@@ -50,7 +48,7 @@
             <table class="list-item-table">
                 <tr>
                     <td>
-                        <i class="ss ss-delete" style="width:35px;"></i>
+                        <i style="color:#555;" class="ss ss-delete" style="width:35px;"></i>
                     </td>
                     <td>
                     {{ t .CurrentLocale "remove_all_stops" "" }}
@@ -68,7 +66,7 @@
             <table class="list-item-table">
                 <tr>
                     <td>
-                        <i class="ss ss-settings"></i>
+                        <i style="color:#555;" class="ss ss-settings"></i>
                     </td>
                     <td>
                     {{ t .CurrentLocale "manage_notifications" "" }}
@@ -84,7 +82,7 @@
         <table class="list-item-table">
             <tr>
                 <td>
-                    <i class="ss ss-settings"></i>
+                    <i style="color:#555;" class="ss ss-settings"></i>
                 </td>
                 <td>
                 {{ t .CurrentLocale "manage_account" "" }}
@@ -120,7 +118,7 @@
         <table class="list-item-table">
             <tr>
                 <td>
-                    <i class="fa fa-question"></i>
+                    <i style="color:#555;" class="fa fa-question"></i>
                 </td>
                 <td>
                     FAQ
@@ -134,7 +132,7 @@
         <table class="list-item-table">
             <tr>
                 <td>
-                    <i class="ss ss-sign-out"></i>
+                    <i style="color:#555;" class="ss ss-sign-out"></i>
                 <td>
                     {{ t .CurrentLocale "sign_out" "" }}
                 </td>
@@ -151,7 +149,7 @@
         <table class="list-item-table">
             <tr>
                 <td>
-                    <i class="ss ss-email-1"></i>
+                    <i style="color:#555;" class="ss ss-email-1"></i>
                 </td>
                 <td>
                     <a href='mailto:support@{{ .Domain }}'>support@{{ .Domain }}</a>
@@ -165,7 +163,7 @@
         <table class="list-item-table">
             <tr>
                 <td>
-                    <i class="ss ss-call"></i>
+                    <i style="color:#555;" class="ss ss-call"></i>
                 </td>
                 <td>
                     <a href='tel://{{ .SupportNumber }}'>{{ .SupportNumber }}</a>
@@ -179,7 +177,7 @@
         <table class="list-item-table">
             <tr>
                 <td>
-                    <i class="ss ss-facebook"></i>
+                    <i style="color:#555;" class="ss ss-facebook"></i>
                 <td>
                     {{ t .CurrentLocale "facebook" "" }}
                 </td>
@@ -191,7 +189,7 @@
         <table class="list-item-table">
             <tr>
                 <td>
-                    <i class="ss ss-twitter"></i>
+                    <i style="color:#555;" class="ss ss-twitter"></i>
                 <td>
                     {{ t .CurrentLocale "twitter" "" }}
                 </td>
@@ -207,7 +205,7 @@
         <table class="list-item-table">
             <tr>
                 <td>
-                    <i class="fa fa-mobile"></i>
+                    <i style="color:#555;" class="fa fa-mobile"></i>
                 <td id="native-device-model-value">
 
                 </td>
@@ -219,7 +217,7 @@
         <table class="list-group-item-table">
             <tr>
                 <td class="icon-font">
-                    <i id="native-os-icon" class="fa"></i>
+                    <i style="color:#555;" id="native-os-icon" class="fa"></i>
                 <td id="native-os-value" class="text">
 
                 </td>
@@ -239,7 +237,7 @@
             <table class="list-item-table">
                 <tr>
                     <td>
-                        <i class="ss ss-call"></i>
+                        <i style="color:#555;" class="ss ss-call"></i>
                     </td>
                     <td>
                         <a href='{{ .Phone }}'>{{ .Phone }}</a>
@@ -266,7 +264,7 @@
         <table class="list-item-table">
             <tr>
                 <td class="icon-font">
-                    <i class="ss ss-lost-item"></i>
+                    <i style="color:#555;" class="ss ss-lost-item"></i>
                 <td class="text">
                 {{ t .CurrentLocale "report_an_app_issue" "" }}
                 </td>
@@ -279,7 +277,7 @@
             <table class="list-item-table">
                 <tr>
                     <td class="icon-font">
-                        <i class="ss ss-lost-item"></i>
+                        <i style="color:#555;" class="ss ss-lost-item"></i>
                     <td class="text">
                         {{ t .CurrentLocale "report_lost_item" "" }}
                     </td>
@@ -302,6 +300,18 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
+
+        if(isNativeiOSApp()) {
+            sendMessageToNative({command:'register_for_notifications', callback: 'did_register_for_notifications_callback', data:''});
+        }
+
+        if(isNativeAndroidApp())
+        {
+            gcm_callback(gcm_token);
+        }
+
+
+
 
         $('body').removeClass('app-body').css("overflow-y", "scroll");
 

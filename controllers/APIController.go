@@ -21,6 +21,7 @@ func (c *APIController) Register() {
 	c.addRouteWithPrefix("/school_code_exists", c.SchoolCodeExistsAction)
 	c.addRouteWithPrefix("/email_exists", c.EmailExistsAction)
 	c.addRouteWithPrefix("/test", c.TestAction)
+	c.addRouteWithPrefix("/test_email", c.TestEmailAction)
 	c.addRouteWithPrefix("/test_google", c.TestGoogleAction)
 	c.addRouteWithPrefix("/available_bus_routes", c.AvailableBusRoutesAction)
 	c.addRouteWithPrefix("/available_bus_route_stops", c.AvailableBusRouteStopsAction)
@@ -302,10 +303,10 @@ func (c *APIController) RemoveUserStopAction(w http.ResponseWriter, r *http.Requ
 func (c *APIController) TestAction(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	endpoint := models.CreateSNSEndpointWithLambda("iOS", "b")
+	//endpoint := models.CreateSNSEndpointWithLambda("iOS", "b")
 
 
-	c.renderJSON(endpoint, w)
+	c.renderJSON("", w)
 }
 
 
@@ -683,4 +684,20 @@ func (c *APIController) RegisterForPushNotificationsAction(w http.ResponseWriter
 func (c *APIController) TestGoogleAction(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	c.renderJSON(models.Geocode("1680 Eider Down Dr.", "29483"), w)
+}
+
+
+func (c *APIController) TestEmailAction(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	//m := models.NewMailRequest([]string{"acook@ridesta.com", "acook@safestopapp.com"}, "TEST EMAIL", "")
+	//err := m.ParseMailTemplate("test", nil)
+	//
+	//if err == nil {
+	//	ok, _ := m.SendEmail()
+	//	fmt.Println(ok)
+	//}
+
+	c.renderJSON("SENT", w)
+
 }

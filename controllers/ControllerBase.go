@@ -1,16 +1,18 @@
 package controllers
 
 import (
-	"runtime"
-	"net/http"
-	"html/template"
+	"bytes"
+	"encoding/json"
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/schoolwheels/safestopclient/i18n"
-	"github.com/gorilla/csrf"
-	"encoding/json"
 	"github.com/schoolwheels/safestopclient/models"
 	"github.com/spf13/viper"
+	"html/template"
+	"log"
+	"net/http"
+	"runtime"
 )
 
 
@@ -50,6 +52,38 @@ func (c *ControllerBase) addTemplateNoNav(name string){
 func (c *ControllerBase) addTemplateApp(name string){
 	c.addTemplate(name, name + ".html", "app.html")
 }
+
+func (c *ControllerBase) ParseMailTemplate(mr *models.MailRequest, name string, r *http.Request, viewModel interface{}) error {
+
+	var currentUser CurrentUser
+	session, _ :=  c.SessionStore.Get(r, "auth")
+	if session.Values["current_user_email"] != nil {
+		currentUser = CurrentUser {Email: session.Values["current_user_email"].(string)}
+	}
+
+	var data = ViewModel {
+		CurrentUser:  currentUser,
+		CurrentUserId: currentUserId(c,r),
+		CurrentLocale: currentLocale(c,r),
+		Domain: viper.GetString("domain"),
+		SupportNumber: viper.GetString("support_number"),
+		ViewData: viewModel,
+	}
+
+	funcMap := template.FuncMap{"t": T}
+
+	t := template.Must(template.New(name + ".html").Funcs(funcMap).ParseFiles("views/mail/" + name + ".html"))
+
+	buf := new(bytes.Buffer)
+	if err := t.Execute(buf, data); err != nil {
+		log.Println(err)
+		return err
+	}
+	mr.Body = buf.String()
+	return nil
+}
+
+
 
 func (c *ControllerBase) addTemplate(name string, file string, layout string){
 	if c.Templates == nil {
@@ -128,6 +162,8 @@ type ViewModel struct {
 	ViewData interface{}
 }
 
+
+
 func (c *ControllerBase) renderTemplate(w http.ResponseWriter, r *http.Request, name string, template_name string, viewModel interface{}) {
 
 	var currentUser CurrentUser
@@ -161,6 +197,9 @@ func (c *ControllerBase) renderTemplate(w http.ResponseWriter, r *http.Request, 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
+
+
 
 func currentLocale(c *ControllerBase, r *http.Request) string {
 	session, _ :=  c.SessionStore.Get(r, "auth")

@@ -1,12 +1,13 @@
 package controllers
 
 import (
-	"net/http"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/schoolwheels/safestopclient/models"
-		"github.com/spf13/viper"
-		"github.com/twinj/uuid"
-			"github.com/gorilla/mux"
+	"github.com/spf13/viper"
+	"github.com/twinj/uuid"
+	"net/http"
+	"strconv"
 )
 
 type AuthController struct {
@@ -23,13 +24,17 @@ func (c *AuthController) Register() {
 	c.addTemplate("login", "login.html", "default.html")
 	c.addTemplate("register", "register.html", "default.html")
 	c.addTemplate("forgot_password", "forgot_password.html", "default.html")
-	c.addTemplate("forgot_password_result", "forgot_password_result.html", "default.html")
+	c.addTemplate("reset_password", "reset_password.html", "default.html")
+
 
 	//actions
 	c.addRouteWithPrefix("/login", c.loginAction)
 	c.addRouteWithPrefix("/logout", c.logoutAction)
 	c.addRouteWithPrefix("/register/{jurisdiction_id}", c.registerAction)
-	c.addRouteWithPrefix("/forgot_password", c.forgotPasswordAction)
+	c.addRouteWithPrefix("/forgot_password", c.ForgotPasswordAction)
+
+	c.addRouteWithPrefix("/reset_password", c.ResetPasswordAction)
+	c.addRouteWithPrefix("/reset_password/{code}", c.ResetPasswordAction)
 
 }
 
@@ -136,16 +141,6 @@ func (c *AuthController) logoutAction(w http.ResponseWriter, r *http.Request) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
 func (c *AuthController) registerAction(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("method:", r.Method) //get request method
 	if r.Method == "GET" {
@@ -199,25 +194,114 @@ func (c *AuthController) registerAction(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func (c *AuthController) forgotPasswordAction(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("method:", r.Method) //get request method
+func (c *AuthController) ForgotPasswordAction(w http.ResponseWriter, r *http.Request) {
+
 	if r.Method == "GET" {
+
 		c.render(w, r, "forgot_password", nil)
-	} else {
+
+	} else if (r.Method == "POST") {
+
 		r.ParseForm()
 
-		user := models.FindUserByEmail(string(r.Form["username"][0]))
-		if user != nil {
-
-
-
+		user_id := models.UserIdForEmail(r.FormValue("email"))
+		if user_id == 0 {
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "ss_pw_reset_email_flash_2", "")), c.BootstrapAlertClass.Danger)
 			http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
 			return
 		}
-		http.Redirect(w, r, r.URL.Host+"/forgot_password", http.StatusFound)
+
+		code := models.GenerateUserPasswordResetCode(user_id)
+		if code != "" {
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "ss_pw_reset_email_flash_1", "")), c.BootstrapAlertClass.Info)
+
+
+			link := ""
+			if viper.GetString("env") == "development" {
+				link = "http://ssc.local:8080/reset_password/" + code
+			} else {
+				link = "https://" + viper.GetString("domain") + "/reset_password/" + code
+			}
+
+			//EMAIL LINK
+			data := struct {
+				Link string
+			} {
+				link,
+			}
+
+
+			m := models.NewMailRequest([]string{r.FormValue("email")}, string(T(currentLocale(c.ControllerBase, r),"ss_pw_reset_email_subject", "")), "")
+			err := c.ParseMailTemplate(m,"password_reset", r, data)
+
+			if err == nil {
+				ok, _ := m.SendEmail()
+				fmt.Println(ok)
+			}
+
+
+		}
+
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+
 
 	}
 }
+
+
+
+func (c *AuthController) ResetPasswordAction(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method == "GET" {
+		vars := mux.Vars(r)
+
+		user_id := models.UserIdForPasswordResetCode(vars["code"])
+		if user_id == 0 {
+			http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+			return
+		}
+
+		data := struct {
+			UserId int
+		} {
+			user_id,
+		}
+
+		c.render(w, r, "reset_password", data)
+
+	} else if (r.Method == "POST") {
+		r.ParseForm()
+
+
+		user_id, err := strconv.Atoi(r.FormValue("user_id"))
+		if err != nil {
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+			http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+			return
+		}
+
+		if models.UpdateUserPassword(user_id, r.FormValue("password")) == false {
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+			http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+			return
+		}
+
+
+
+		models.ClearUserPasswordResetCode(user_id)
+		setFlash(c.ControllerBase, r, w, "Your password has been updated", c.BootstrapAlertClass.Info)
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+
+	}
+}
+
+
+
+
+
+
+
+
 
 func authenticateUser(email string, password string) *models.User {
 	user := models.AuthenticateUser(email, password)
