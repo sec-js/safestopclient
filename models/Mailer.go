@@ -18,11 +18,10 @@ type MailRequest struct {
 	Body    string
 }
 
-func NewMailRequest(to []string, subject, body string) *MailRequest {
+func NewMailRequest(to []string, subject string) *MailRequest {
 	return &MailRequest{
 		To:      to,
 		Subject: subject,
-		Body:    body,
 	}
 }
 
@@ -59,35 +58,6 @@ func (r *MailRequest) SendEmail() (bool, error) {
 	if err := smtp.SendMail(host_address, auth, from, r.To, msg.Bytes()); err != nil {
 		log.Println(err)
 		return false, err
-
 	}
 	return true, nil
 }
-
-
-
-
-//func (r *MailRequest) ParseMailTemplate(templateFileName string, data interface{}) error {
-//
-//	funcMap := template.FuncMap{"t": T}
-//
-//	t, err := template.ParseFiles("views/mail/" + templateFileName + ".html")
-//	if err != nil {
-//		log.Println(err)
-//		return err
-//	}
-//
-//	t.Funcs(funcMap)
-//
-//	buf := new(bytes.Buffer)
-//	if err = t.Execute(buf, data); err != nil {
-//		log.Println(err)
-//		return err
-//	}
-//	r.body = buf.String()
-//	return nil
-//}
-
-//func T(locale string, key string, value string, args ...interface{}) template.HTML {
-//	return i18n.GetI18n().Default(value).T(locale, key, args...)
-//}

@@ -213,8 +213,6 @@ func (c *AuthController) ForgotPasswordAction(w http.ResponseWriter, r *http.Req
 
 		code := models.GenerateUserPasswordResetCode(user_id)
 		if code != "" {
-			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "ss_pw_reset_email_flash_1", "")), c.BootstrapAlertClass.Info)
-
 
 			link := ""
 			if viper.GetString("env") == "development" {
@@ -230,13 +228,15 @@ func (c *AuthController) ForgotPasswordAction(w http.ResponseWriter, r *http.Req
 				link,
 			}
 
-
-			m := models.NewMailRequest([]string{r.FormValue("email")}, string(T(currentLocale(c.ControllerBase, r),"ss_pw_reset_email_subject", "")), "")
-			err := c.ParseMailTemplate(m,"password_reset", r, data)
-
-			if err == nil {
-				ok, _ := m.SendEmail()
-				fmt.Println(ok)
+			if c.SendEmail(r,
+				[]string{r.FormValue("email")},
+				string(T(currentLocale(c.ControllerBase, r),"ss_pw_reset_email_subject", "")),
+				"password_reset",
+				data,
+			) == true {
+				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "ss_pw_reset_email_flash_1", "")), c.BootstrapAlertClass.Info)
+			} else {
+				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
 			}
 
 

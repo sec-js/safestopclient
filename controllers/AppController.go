@@ -1,14 +1,14 @@
 package controllers
 
 import (
-	"net/http"
-	"github.com/schoolwheels/safestopclient/models"
-	"strings"
-	"reflect"
 	"github.com/gorilla/mux"
-	"strconv"
 	"github.com/schoolwheels/safestopclient/database"
-	)
+	"github.com/schoolwheels/safestopclient/models"
+	"net/http"
+	"reflect"
+	"strconv"
+	"strings"
+)
 
 type AppController struct {
 	*ControllerBase
@@ -958,9 +958,11 @@ func (c *AppController) LostItemReportAction(w http.ResponseWriter, r *http.Requ
 	}
 
 	jurisdiction_id := 0
+	jurisdiction_name := ""
 	for i := 0; i < len(cj.Jurisdictions); i++ {
 		if cj.Jurisdictions[i].HasLostItemReports == true {
 			jurisdiction_id = cj.Jurisdictions[i].Id
+			jurisdiction_name = cj.Jurisdictions[i].Name
 			break
 		}
 	}
@@ -982,6 +984,7 @@ func (c *AppController) LostItemReportAction(w http.ResponseWriter, r *http.Requ
 
 		data := models.LostItemReport{
 			JurisdictionId: jurisdiction_id,
+			JurisdictionName: jurisdiction_name,
 			FirstName: r.FormValue("first_name"),
 			LastName: r.FormValue("last_name"),
 			Email: u.Email,
@@ -994,6 +997,37 @@ func (c *AppController) LostItemReportAction(w http.ResponseWriter, r *http.Requ
 		success := models.InsertLostItemReport(&data)
 		if success == true {
 			//TODO SEND LOST ITEM REPORT EMAIL
+
+
+			c.SendEmail(r,[]string{
+				"acook@ridesta.com"},
+			"SafeStop Lost Item Report Received",
+			"lost_item_report",
+			data,
+			)
+
+			c.SendEmail(r,[]string{
+				"acook@ridesta.com"},
+				"SafeStop Lost Item Report Received",
+				"lost_item_report_autoreply",
+				data,
+			)
+
+			//m := models.NewMailRequest([]string{"acook@ridesta.com"},"SafeStop Lost Item Report Received", "")
+			//err := c.ParseMailTemplate(m,"lost_item_report", r, data)
+			//if err == nil {
+			//	ok, _ := m.SendEmail()
+			//	fmt.Println(ok)
+			//}
+			//
+			//arm := models.NewMailRequest([]string{u.Email},"SafeStop Lost Item Report Received", "")
+			//err = c.ParseMailTemplate(arm,"lost_item_report_autoreply", r, data)
+			//if err == nil {
+			//	ok, _ := arm.SendEmail()
+			//	fmt.Println(ok)
+			//}
+
+
 			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
 			http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
 			return

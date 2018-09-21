@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h3>Below is the information that you submitted for your records.</h3>
+<table>
+    <tr>
+        <td>Date Lost:</td>
+        <td>{{.ViewData.DateLost}}</td>
+    </tr>
+    <tr>
+        <td>Route:</td>
+        <td>{{.ViewData.RouteIdentifier}}</td>
+    </tr>
+
+    <tr>
+        <td>Jurisdiction:</td>
+        <td>{{.ViewData.JurisdictionName}}</td>
+    </tr>
+    <tr>
+        <td>Name:</td>
+        <td>{{.ViewData.FirstName}} {{.ViewData.LastName}}</td>
+    </tr>
+    <tr>
+        <td>Phone Number:</td>
+        <td>{{ .ViewData.Phone }}</td>
+    </tr>
+    <tr>
+        <td>Email:</td>
+        <td>{{ .ViewData.Email }}</td>
+    </tr>
+    <tr>
+        <td>Description:</td>
+        <td>{{ .ViewData.Description }}</td>
+    </tr>
+</table>
+
+</body>
+</html>

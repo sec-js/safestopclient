@@ -12,6 +12,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"runtime"
 )
 
@@ -53,7 +54,16 @@ func (c *ControllerBase) addTemplateApp(name string){
 	c.addTemplate(name, name + ".html", "app.html")
 }
 
-func (c *ControllerBase) ParseMailTemplate(mr *models.MailRequest, name string, r *http.Request, viewModel interface{}) error {
+
+
+func (c *ControllerBase) SendEmail(r *http.Request, to []string, subject string,  template_name string, viewModel interface{}) bool {
+
+
+	file_path := "views/mail/" + template_name + ".html"
+	if _, err := os.Stat(file_path); os.IsNotExist(err) {
+		log.Println(err)
+		return false
+	}
 
 	var currentUser CurrentUser
 	session, _ :=  c.SessionStore.Get(r, "auth")
@@ -70,18 +80,26 @@ func (c *ControllerBase) ParseMailTemplate(mr *models.MailRequest, name string, 
 		ViewData: viewModel,
 	}
 
-	funcMap := template.FuncMap{"t": T}
+	m := models.NewMailRequest(to, subject)
 
-	t := template.Must(template.New(name + ".html").Funcs(funcMap).ParseFiles("views/mail/" + name + ".html"))
+	funcMap := template.FuncMap{"t": T}
+	t := template.Must(template.New(template_name + ".html").Funcs(funcMap).ParseFiles("views/mail/" + template_name + ".html"))
+
+	if t == nil {
+		return false
+	}
 
 	buf := new(bytes.Buffer)
 	if err := t.Execute(buf, data); err != nil {
 		log.Println(err)
-		return err
+		return false
 	}
-	mr.Body = buf.String()
-	return nil
+	m.Body = buf.String()
+
+	ok, _ := m.SendEmail()
+	return ok
 }
+
 
 
 

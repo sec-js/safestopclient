@@ -6,6 +6,7 @@ type LostItemReport struct {
 	Id int
 	Email string
 	JurisdictionId int
+	JurisdictionName string
 	Description string
 	DateLost string
 	RouteIdentifier string
