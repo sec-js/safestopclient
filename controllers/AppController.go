@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type AppController struct {
@@ -466,6 +467,7 @@ func (c *AppController) AppIssueAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jurisdiction_id = cj.Jurisdictions[0].Id
+	jurisdiction_name := cj.Jurisdictions[0].Name
 
 	if r.Method == "GET" {
 		data := models.AppIssue{
@@ -477,13 +479,20 @@ func (c *AppController) AppIssueAction(w http.ResponseWriter, r *http.Request) {
 	} else {
 		data := models.AppIssue{
 			JurisdictionId: jurisdiction_id,
+			JurisdictionName: jurisdiction_name,
 			UserId: user_id,
+			Email: u.Email,
+			Date: time.Now().Format("01-02-2006"),
 			IssueType: r.FormValue("issue_type"),
 			Description: r.FormValue("description"),
 		}
 		success := models.InsertAppIssue(&data)
 		if success == true {
 			//TODO SEND APP ISSUE EMAIL
+			c.SendEmail(r, []string{"acook@ridesta.com"}, "SafeStop - App Issue Report", "app_issue", data)
+
+
+
 			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
 			http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
 			return

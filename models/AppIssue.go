@@ -4,9 +4,12 @@ import "github.com/schoolwheels/safestopclient/database"
 
 type AppIssue struct {
 	UserId int
+	Email string
 	JurisdictionId int
+	JurisdictionName string
 	IssueType string
 	Description string
+	Date string
 }
 
 func InsertAppIssue(ai *AppIssue) bool {
@@ -14,7 +17,7 @@ func InsertAppIssue(ai *AppIssue) bool {
 insert into safe_stop_app_issues
 (
 jurisdiction_id,
-user_id
+user_id,
 issue_type,
 description,
 created_at,
