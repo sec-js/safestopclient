@@ -121,7 +121,7 @@ func main() {
 		//csrf.Protect([]byte("32-byte-long-auth-key"))(r)
 	} else {
 		// redirect every http request to https
-		go http.ListenAndServe(":5000", http.HandlerFunc(redirect), )
+		go http.ListenAndServe(":80", http.HandlerFunc(redirect), )
 		//log.Fatal(http.ListenAndServeTLS(":8443", "certs/safestopapp.com.pem", "certs/safestopapp.com-key.pem", middleware.RequestLogger(r)))
 	}
 }
