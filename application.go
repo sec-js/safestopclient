@@ -122,11 +122,7 @@ func main() {
 	} else {
 		// redirect every http request to https
 
-
-		log.Fatal(http.ListenAndServe(":5000", csrf.Protect([]byte("32-byte-long-auth-key"), csrf.Secure(false))(r)))
-
-
-		//go http.ListenAndServe(":5000", http.HandlerFunc(redirect), )
+		go http.ListenAndServe(":5000", http.HandlerFunc(redirect), )
 		//log.Fatal(http.ListenAndServe(":443", csrf.Protect([]byte("32-byte-long-auth-key"), csrf.Secure(true))(r)))
 
 		//log.Fatal(http.ListenAndServeTLS(":8443", "certs/safestopapp.com.pem", "certs/safestopapp.com-key.pem", middleware.RequestLogger(r)))
