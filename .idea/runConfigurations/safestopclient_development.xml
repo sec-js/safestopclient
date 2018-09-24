@@ -16,6 +16,11 @@
       <env name="SSC_SES_ADDRESS" value="email-smtp.us-west-2.amazonaws.com:587" />
       <env name="SSC_SES_USERNAME" value="" />
       <env name="SSC_SES_PASSWORD" value="" />
+      <env name="SSC_DB_HOST" value="localhost" />
+      <env name="SSC_DB_PORT" value="5432" />
+      <env name="SSC_DB_USERNAME" value="safestopapp" />
+      <env name="SSC_DB_PASSWORD" value="safestopapp" />
+      <env name="SSC_DB_NAME" value="hermes_dev" />
     </envs>
     <kind value="FILE" />
     <filePath value="$PROJECT_DIR$/safestopclient.go" />
