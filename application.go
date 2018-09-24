@@ -1,22 +1,21 @@
 package main
 
 import (
-	"html/template"
-	"net/http"
-	"log"
+	"encoding/gob"
 	"fmt"
-	"os"
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
-	"github.com/spf13/viper"
-	_ "github.com/lib/pq"
 	"github.com/gorilla/sessions"
-	"github.com/schoolwheels/safestopclient/controllers"
+	_ "github.com/lib/pq"
 	"github.com/qor/i18n"
 	"github.com/qor/i18n/backends/yaml"
-	"path/filepath"
-	"github.com/gorilla/csrf"
-	"encoding/gob"
+	"github.com/schoolwheels/safestopclient/controllers"
 	"github.com/schoolwheels/safestopclient/models"
+	"github.com/spf13/viper"
+	"html/template"
+	"log"
+	"net/http"
+	"path/filepath"
 )
 
 
@@ -55,7 +54,7 @@ func main() {
 	fmt.Println("french: ",french)
 
 	fmt.Println("~~~~~ SafeStop Client ~~~~~")
-	fmt.Println("SSC_ENV:", os.Getenv("SSC_ENV"))
+	fmt.Println("SSC_ENV:", viper.GetString("env"))
 
 
 	viper.SetEnvPrefix("SSC")
@@ -123,6 +122,7 @@ func main() {
 		// redirect every http request to https
 
 		go http.ListenAndServe(":5000", http.HandlerFunc(redirect), )
+
 		//log.Fatal(http.ListenAndServe(":443", csrf.Protect([]byte("32-byte-long-auth-key"), csrf.Secure(true))(r)))
 
 		//log.Fatal(http.ListenAndServeTLS(":8443", "certs/safestopapp.com.pem", "certs/safestopapp.com-key.pem", middleware.RequestLogger(r)))
