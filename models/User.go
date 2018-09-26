@@ -1,14 +1,14 @@
 package models
 
 import (
+	"fmt"
+	"github.com/pkg/errors"
+	"github.com/schoolwheels/safestopclient/database"
 	"golang.org/x/crypto/bcrypt"
 	"log"
-	"fmt"
-	"github.com/schoolwheels/safestopclient/database"
 	"math/rand"
 	"strings"
-	"github.com/pkg/errors"
-	)
+)
 
 type ClientUser struct {
 	*ModelBase
@@ -695,12 +695,88 @@ $1,
 }
 
 
-func UsersClientJurisdictionIdSQL(u *User, pg *PermissionGroups) string {
+
+
+
+//func UsersClientJurisdictionIdSQL(u *User, pg *PermissionGroups) string {
+//
+//	if((u.SuperAdmin == true) || UserHasAnyPermissionGroups([]string{ pg.Admin}, u.PermissionGroups)) {
+//
+//		return `
+//select array_to_string(array_agg(a.id),',') as ids
+//from jurisdictions a
+//join jurisdiction_safe_stop_infos b on b.jurisdiction_id = a.id
+//where active = true
+//and (b.status = 'internal testing' or b.status = 'testing' or b.status = 'live')
+//`
+//
+//	} else if (UserHasAnyPermissionGroups([]string{ pg.License_1, pg.License_2, pg.License_3, pg.License_4}, u.PermissionGroups)){
+//
+//		return fmt.Sprintf(`
+//select array_to_string(array_agg(a.id),',') as ids
+//from jurisdictions a
+//join jurisdictional_restrictions b on a.id = b.jurisdiction_id
+//join jurisdiction_safe_stop_infos c on c.jurisdiction_id = a.id
+//where active = true
+//and (c.status = 'testing' or c.status = 'live')
+//and b.user_id = %d`, u.Id)
+//
+//	} else {
+//
+//		return fmt.Sprintf(`
+//select array_to_string(array_agg(distinct z.jurisdiction_id),',') as ids from (
+//
+//select b.jurisdiction_id
+//from subscriptions a
+//join products b on b.id = a.product_id
+//join jurisdictions d on d.id = b.jurisdiction_id
+//join time_zones e on e.id = d.time_zone_id
+//join jurisdiction_safe_stop_infos f on f.jurisdiction_id = d.id
+//where 1 = 1
+//and a.active = true
+//and b.active = true
+//and b.product_type = 'ss'
+//and (now() at time zone e.postgresql_name)::date between a.start_date and a.end_date
+//and a.user_id = %d
+//and f.status = 'live'
+//
+//union all
+//
+//select b.jurisdiction_id
+//from subscriptions a
+//join products b on b.id = a.product_id
+//join jurisdictions d on d.id = b.jurisdiction_id
+//join time_zones e on e.id = d.time_zone_id
+//join subscription_sub_accounts f on f.subscription_id = a.id
+//join jurisdiction_safe_stop_infos g on g.jurisdiction_id = d.id
+//where 1 = 1
+//and a.active = true
+//and b.active = true
+//and b.product_type = 'ss'
+//and (now() at time zone e.postgresql_name)::date between a.start_date and a.end_date
+//and f.user_id = %d
+//and g.status = 'live'
+//) z`, u.Id, u.Id)
+//
+//	}
+//}
+
+
+
+
+
+
+
+
+
+func UsersClientJurisdictionIds(u *User, pg *PermissionGroups) string {
+
+	sql := ""
 
 	if((u.SuperAdmin == true) || UserHasAnyPermissionGroups([]string{ pg.Admin}, u.PermissionGroups)) {
 
-		return `
-select a.id 
+		sql = `
+select array_to_string(array_agg(a.id),',') as ids
 from jurisdictions a
 join jurisdiction_safe_stop_infos b on b.jurisdiction_id = a.id
 where active = true
@@ -709,8 +785,8 @@ and (b.status = 'internal testing' or b.status = 'testing' or b.status = 'live')
 
 	} else if (UserHasAnyPermissionGroups([]string{ pg.License_1, pg.License_2, pg.License_3, pg.License_4}, u.PermissionGroups)){
 
-		return fmt.Sprintf(`
-select a.id 
+		sql = fmt.Sprintf(`
+select array_to_string(array_agg(a.id),',') as ids
 from jurisdictions a 
 join jurisdictional_restrictions b on a.id = b.jurisdiction_id 
 join jurisdiction_safe_stop_infos c on c.jurisdiction_id = a.id
@@ -720,8 +796,8 @@ and b.user_id = %d`, u.Id)
 
 	} else {
 
-		return fmt.Sprintf(`
-select distinct z.jurisdiction_id from (
+		sql = fmt.Sprintf(`
+select array_to_string(array_agg(distinct  z.id),',') as ids from (
 
 select b.jurisdiction_id 
 from subscriptions a
@@ -756,6 +832,19 @@ and g.status = 'live'
 ) z`, u.Id, u.Id)
 
 	}
+
+	ids := "-1"
+	row := database.GetDB().QueryRowx(sql)
+	if row == nil {
+		return ids
+	} else {
+		err := row.Scan(&ids)
+		if err != nil {
+			return ids
+		}
+	}
+
+	return ids
 }
 
 func UsersClientJurisdictionCount(u *User, pg *PermissionGroups) int {
@@ -920,6 +1009,8 @@ type MapViewStop struct {
 
 func UsersMyStops(u *User, pg *PermissionGroups) []MyStopsDbResult {
 
+	jurisdiction_ids := UsersClientJurisdictionIds(u, pg)
+
 	dbr := []MyStopsDbResult{}
 
 sql := fmt.Sprintf(`
@@ -1050,7 +1141,7 @@ and a.deleted = 'f'
 and a.active = 't'
 order by c.name, b.display_name, a.scheduled_time_offset
 
-`, UsersClientJurisdictionIdSQL(u, pg), u.Id)
+`, jurisdiction_ids, u.Id)
 
 	rows, err := database.GetDB().Queryx(sql)
 	if err != nil {

@@ -196,13 +196,12 @@
             bus_route_id: selected_route,
             format: 'json'
         }, function (response) {
-
             if (response.length > 0) {
                 map_data = response;
                 if(map_data.length > 1){
                     $(".map-arrow").show();
                 } else{
-                    selected_stop = map_data[0].rid;
+                    selected_stop = map_data[0].sid;
                     $(".map-arrow").hide();
                 }
 
@@ -246,22 +245,25 @@
         }
 
         var i = selected_stop_index();
-        if (map_data[i].sb == true || map_data[i].a == true) {
-            if (map_data[i].blat != 0 && map_data[i].blng != 0){
-                bus_markers.push(new google.maps.Marker({
-                    position: {
-                        lat: parseFloat(map_data[i].blat),
-                        lng: parseFloat(map_data[i].blng)
-                    },
-                    icon: {
-                        url: "/images/bus-marker-red.png",
-                        scaledSize: new google.maps.Size(37, 33),
-                    },
-                    map: map
-                }));
+
+
+        if(i > 0) {
+            if (map_data[i].sb == true || map_data[i].a == true) {
+                if (map_data[i].blat != 0 && map_data[i].blng != 0){
+                    bus_markers.push(new google.maps.Marker({
+                        position: {
+                            lat: parseFloat(map_data[i].blat),
+                            lng: parseFloat(map_data[i].blng)
+                        },
+                        icon: {
+                            url: "/images/bus-marker-red.png",
+                            scaledSize: new google.maps.Size(37, 33),
+                        },
+                        map: map
+                    }));
+                }
             }
         }
-
 
         var bounds = new google.maps.LatLngBounds();
 
@@ -307,7 +309,7 @@
     function selected_stop_index(){
         var i = -1;
         for(var x = 0; x < map_data.length; x++){
-            if(map_data[x].sid == selected_stop.toString()){
+            if(map_data[x].sid.toString() == selected_stop.toString()){
                 i = x;
                 break;
             }

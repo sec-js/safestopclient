@@ -7,9 +7,12 @@ import (
 type Ad struct {
 	Id int `db:"id" json:"id"`
 	Url string `db:"url" json:"url"`
+	TargetUrl string `db:"target_url" json:"target_url"`
 }
 
 func NextAd(u *User, pg *PermissionGroups) Ad {
+
+	jurisdiction_ids := UsersClientJurisdictionIds(u, pg)
 
 	ad := Ad{}
 
@@ -19,7 +22,7 @@ select count(*) as ads_without_impressions_ct
 from ads a 
 join ads_jurisdictions b 
 on b.ad_id = a.id
-where b.jurisdiction_id in (` + UsersClientJurisdictionIdSQL(u, pg) + `)
+where b.jurisdiction_id in (` + jurisdiction_ids + `)
 and a.start_date <= now()::date 
 and a.stop_date >= now()::date
 and a.app_image is not null
@@ -34,11 +37,12 @@ and a.id not in (select coalesce(ad_id, -1) from ad_impressions)
 	if ads_without_impressions_ct > 0 {
 		query = `
 select a.id,
-a.app_image as url
+a.app_image as url,
+a.target_url as target_url
 from ads a 
 join ads_jurisdictions b 
 on b.ad_id = a.id
-where b.jurisdiction_id in (` + UsersClientJurisdictionIdSQL(u, pg) + `)
+where b.jurisdiction_id in (` + jurisdiction_ids + `)
 and a.start_date <= now()::date 
 and a.stop_date >= now()::date
 and a.app_image is not null
@@ -54,11 +58,12 @@ limit 1
 	} else {
 		query = `
 select a.id,
-a.app_image as url
+a.app_image as url,
+a.target_url as target_url
 from ads a 
 join ads_jurisdictions b on b.ad_id = a.id
 join ad_impressions c on c.ad_id = a.id
-where b.jurisdiction_id in (` + UsersClientJurisdictionIdSQL(u, pg) + `)
+where b.jurisdiction_id in (` + jurisdiction_ids + `)
 and a.start_date <= now()::date 
 and a.stop_date >= now()::date
 and a.app_image is not null

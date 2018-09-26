@@ -389,6 +389,7 @@ func (c *APIController) MyStopsAction(w http.ResponseWriter, r *http.Request) {
 
 	ms := []models.MyStopsJurisdiction{}
 	dbr := models.UsersMyStops(u, c.PermissionGroups)
+	predictions_always_on := u.SuperAdmin == true || models.UserHasAnyPermissionGroups([]string{c.PermissionGroups.Admin}, u.PermissionGroups)
 
 	if len(dbr) > 0 {
 		current_jurisdiction := models.MyStopsJurisdiction{}
@@ -405,6 +406,7 @@ func (c *APIController) MyStopsAction(w http.ResponseWriter, r *http.Request) {
 					current_jurisdiction.Routes = append(current_jurisdiction.Routes, current_route)
 					ms = append(ms, current_jurisdiction)
 					current_route = models.MyStopsRoute{}
+					current_stop = models.MyStopsStop{}
 					current_jurisdiction = models.MyStopsJurisdiction{ Name: dbr[x].JurisdictionName }
 				}
 			}
@@ -412,6 +414,7 @@ func (c *APIController) MyStopsAction(w http.ResponseWriter, r *http.Request) {
 
 			if current_route.Id != dbr[x].BusRouteId {
 				if current_route.Id > 0 {
+					current_route.Stops = append(current_route.Stops, current_stop)
 					current_jurisdiction.Routes = append(current_jurisdiction.Routes, current_route)
 				}
 				current_route = models.MyStopsRoute{
@@ -437,7 +440,7 @@ func (c *APIController) MyStopsAction(w http.ResponseWriter, r *http.Request) {
 					current_route.Shuttle = dbr[x].LoopMode != "off"
 				}
 
-				if u.SuperAdmin == true || models.UserHasAnyPermissionGroups([]string{c.PermissionGroups.Admin}, u.PermissionGroups) {
+				if predictions_always_on == true {
 					current_route.HidePredictions = false;
 				}
 			}
@@ -461,34 +464,50 @@ func (c *APIController) MyStopsAction(w http.ResponseWriter, r *http.Request) {
 						current_stop.TimeClass = "arrived"
 						current_stop.TimeTitle = string(T(currentLocale(c.ControllerBase, r),  "arrived", ""))
 					} else if len(dbr[x].SkippedAt) > 0 {
-						current_stop.TimeTitle = "No Stop Recorded"
-						current_stop.AsOf = "No Stop Recorded"
+						current_stop.TimeClass = "not-available"
+						current_stop.TimeTitle = string(T(currentLocale(c.ControllerBase, r), "expected", ""))
+						current_stop.Time = string(T(currentLocale(c.ControllerBase, r), "not_available", ""))
+						current_stop.AsOf = ""
 					} else {
-
 						current_stop.TimeTitle = string(T(currentLocale(c.ControllerBase, r),  "expected", ""))
+
+
 						if dbr[x].PredictedTimeOffset != -1 {
 							if dbr[x].HidePredictions == false {
 								pto := dbr[x].PredictedTimeOffset
 								sto := dbr[x].ScheduledTimeOffset
 								if dbr[x].PredictedTimeOffset > dbr[x].ScheduledTimeOffset {
 									dif := (pto - sto) / 60
-									if dif >= 0 && dif <= 5 {
+									if dif <= 5 {
 										current_stop.TimeClass = "expected-on-time"
 									} else if dif >= 6 && dif <= 15 {
 										current_stop.TimeClass = "expected-late"
 									} else if dif > 15 {
 										current_stop.TimeClass = "expected-really-late"
 									}
+								} else {
+									current_stop.TimeClass = "expected-on-time"
 								}
 							}
 							current_stop.Time = dbr[x].PredictedTimeString
-							current_stop.AsOf = ""
+
+							if len(current_stop.AsOf) > 0 {
+								current_stop.AsOf = "As of" + current_stop.AsOf + " " + string(T(currentLocale(c.ControllerBase, r), "ss_client_my_stops_js_4", ""))
+							}
+
 						} else {
 							current_stop.Time = dbr[x].ScheduledTime
 							current_stop.TimeClass = "expected-on-time"
-							current_stop.AsOf = ""
+							current_stop.AsOf = string(T(currentLocale(c.ControllerBase, r), "ss_client_my_stops_js_6", ""))
 						}
 					}
+				}
+
+				if predictions_always_on == false && dbr[x].HidePredictions == true {
+					current_stop.TimeClass = "not-available"
+					current_stop.TimeTitle = string(T(currentLocale(c.ControllerBase, r), "expected", ""))
+					current_stop.Time = string(T(currentLocale(c.ControllerBase, r), "not_available", ""))
+					current_stop.AsOf = ""
 				}
 			}
 		}
@@ -497,7 +516,6 @@ func (c *APIController) MyStopsAction(w http.ResponseWriter, r *http.Request) {
 		current_jurisdiction.Routes = append(current_jurisdiction.Routes, current_route)
 		ms = append(ms, current_jurisdiction)
 	}
-
 
 	c.renderJSON(ms, w)
 }
@@ -520,6 +538,8 @@ func (c *APIController) MapAction(w http.ResponseWriter, r *http.Request) {
 	u := models.FindUser(uid)
 
 	dbr := models.UsersMyStops(u, c.PermissionGroups)
+	predictions_always_on := u.SuperAdmin == true || models.UserHasAnyPermissionGroups([]string{c.PermissionGroups.Admin}, u.PermissionGroups)
+
 
 	if len(dbr) > 0 {
 
@@ -536,9 +556,10 @@ func (c *APIController) MapAction(w http.ResponseWriter, r *http.Request) {
 				s.BusLatitude = dbr[x].BusLatitude
 				s.BusLongitude = dbr[x].BusLongitude
 				s.Audible = dbr[x].Audible
+				s.ShowBus = dbr[x].ShowBus
 
 
-				if u.SuperAdmin == true || models.UserHasAnyPermissionGroups([]string{c.PermissionGroups.Admin}, u.PermissionGroups) {
+				if predictions_always_on == true {
 					s.HidePredictions = false
 					s.ShowBus = true
 				}
@@ -550,8 +571,10 @@ func (c *APIController) MapAction(w http.ResponseWriter, r *http.Request) {
 					s.TimeClass = "arrived"
 					s.TimeTitle = string(T(currentLocale(c.ControllerBase, r), "arrived", ""))
 				} else if len(dbr[x].SkippedAt) > 0 {
-					s.TimeTitle = "No Stop Recorded"
-					s.AsOf = "No Stop Recorded"
+					s.TimeClass = "not-available"
+					s.TimeTitle = string(T(currentLocale(c.ControllerBase, r), "expected", ""))
+					s.Time = string(T(currentLocale(c.ControllerBase, r), "not_available", ""))
+					s.AsOf = ""
 				} else {
 
 					s.TimeTitle = string(T(currentLocale(c.ControllerBase, r), "expected", ""))
@@ -568,6 +591,8 @@ func (c *APIController) MapAction(w http.ResponseWriter, r *http.Request) {
 								} else if dif > 15 {
 									s.TimeClass = "expected-really-late"
 								}
+							} else {
+								s.TimeClass = "expected-on-time"
 							}
 						}
 						s.Time = dbr[x].PredictedTimeString
@@ -578,6 +603,15 @@ func (c *APIController) MapAction(w http.ResponseWriter, r *http.Request) {
 						s.AsOf = ""
 					}
 				}
+
+				if predictions_always_on == false && dbr[x].HidePredictions == true {
+					s.TimeClass = "not-available"
+					s.TimeTitle = string(T(currentLocale(c.ControllerBase, r), "expected", ""))
+					s.Time = string(T(currentLocale(c.ControllerBase, r), "not_available", ""))
+					s.AsOf = ""
+				}
+
+
 				stops = append(stops, s)
 			}
 		}
@@ -690,14 +724,10 @@ func (c *APIController) TestGoogleAction(w http.ResponseWriter, r *http.Request)
 func (c *APIController) TestEmailAction(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	//m := models.NewMailRequest([]string{"acook@ridesta.com", "acook@safestopapp.com"}, "TEST EMAIL", "")
-	//err := m.ParseMailTemplate("test", nil)
-	//
-	//if err == nil {
-	//	ok, _ := m.SendEmail()
-	//	fmt.Println(ok)
-	//}
 
-	c.renderJSON("SENT", w)
+
+
+
+	c.renderJSON(c.SendEmail(r, []string{"acook@ridesta.com"}, "TEST","test", nil ), w)
 
 }

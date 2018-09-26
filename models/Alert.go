@@ -205,7 +205,7 @@ and a.start_date::date <= now()::date
 and a.end_date::date >= now()::date
 and d.id in (select bus_route_stop_id from bus_route_stop_users where user_id = %d)
 
-`, UsersClientJurisdictionIdSQL(u, pg), u.Id, u.Id, u.Id)
+`, UsersClientJurisdictionIds(u, pg), u.Id, u.Id, u.Id)
 	}
 
 	rows, err := database.GetDB().Queryx(sql)

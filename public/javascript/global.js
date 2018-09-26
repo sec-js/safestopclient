@@ -14,11 +14,11 @@ var progressValue = 0,
     progressTimeout;
 
 
-function progress() {
-    progressValue -= 1;
-    $(".progress-bar").css("width", progressValue + "%");
-    progressTimeout = setTimeout(progress, 300)
-}
+// function progress() {
+//     progressValue -= 1;
+//     $(".progress-bar").css("width", progressValue + "%");
+//     progressTimeout = setTimeout(progress, 300)
+// }
 
 function isBadIE() {
     if (navigator.appVersion.indexOf("MSIE 9") == -1 &&
@@ -40,10 +40,10 @@ function start_progress_bar(){
     //START PROGRESS BAR
     progress_value = 100;
     if (!in_progress) {
-        refresh_messages();
-        refresh_stops();
-        refresh_scan_notifications();
         refresh_ad();
+        refresh_stops();
+        refresh_messages();
+        refresh_scan_notifications();
         progress();
         in_progress = !in_progress;
     }
@@ -51,14 +51,17 @@ function start_progress_bar(){
 
 function progress() {
     progress_value -= 1;
+
     $(".progress-bar").css("width", progress_value + "%");
 
     if(progress_value == 0){
-        refresh_messages();
-        refresh_stops();
-        refresh_scan_notifications();
         refresh_ad();
+        refresh_stops();
+        refresh_messages();
+        refresh_scan_notifications();
         progress_value = 100;
+        $(".progress-bar").addClass("notransition").css("width", "100%").removeClass("notransition");
+
     }
     progress_timeout = setTimeout(progress, 300)
 }
@@ -140,7 +143,7 @@ function refresh_ad() {
             $("#ad").show();
 
             $("#ad-image").attr("src", response.url);
-            $("#ad-link").attr("href", '/adclick/' + response.id);
+            $("#ad-link").attr("href", response.target_url);
 
             setTimeout(function(){
 

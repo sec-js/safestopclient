@@ -13,9 +13,9 @@
       <env name="AWS_SECRET_ACCESS_KEY" value="x35U1cR9V6ND4ZwWHr4P05ekn8oe5XLD/d4QMZT3" />
       <env name="SSC_MASTER_PASSWORD" value="tmjxy" />
       <env name="SSC_SNS_ANDROID_ARN" value="arn:aws:sns:us-west-2:501213591967:app/GCM/SafeStop-Android" />
-      <env name="SSC_SES_ADDRESS" value="email-smtp.us-west-2.amazonaws.com:587" />
-      <env name="SSC_SES_USERNAME" value="" />
-      <env name="SSC_SES_PASSWORD" value="" />
+      <env name="SSC_EMAIL_SERVER" value="127.0.0.1:25" />
+      <env name="SSC_EMAIL_USERNAME" value="" />
+      <env name="SSC_EMAIL_PASSWORD" value="" />
       <env name="SSC_DB_HOST" value="localhost" />
       <env name="SSC_DB_PORT" value="5432" />
       <env name="SSC_DB_USERNAME" value="safestopapp" />

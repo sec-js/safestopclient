@@ -25,6 +25,8 @@ func BusRoutesForAdminAndSchoolAdminUser(page int, search string, address_1 stri
 	offset := (page - 1) * limit
 	parameters := []string{}
 
+	jurisdiction_ids := UsersClientJurisdictionIds(u, pg)
+
 	r := struct {
 		AccurateGeocoding bool `json:"accurate_geocoding"`
 		BusRoutes []BusRouteSearchResult `json:"bus_routes"`
@@ -78,7 +80,7 @@ where a.active = true
 and a.bus_id is not null
 and e.active = true
 and e.deleted = false
-and b.id in (` + UsersClientJurisdictionIdSQL(u, pg) + `)
+and b.id in (` + jurisdiction_ids + `)
 ` + geo_condition + search_condition
 
 
@@ -121,7 +123,7 @@ where a.active = true
 and a.bus_id is not null
 and e.active = true
 and e.deleted = false
-and b.id in (` + UsersClientJurisdictionIdSQL(u, pg) + `)
+and b.id in (` + jurisdiction_ids + `)
 ` + geo_condition + search_condition + `
 group by a.id, a.display_name, a.start_time, b.id, b.name, b.search_radius
 order by jurisdiction_name, bus_route_name
@@ -159,6 +161,8 @@ func BusRoutesForRegularUsers(page int, address_1 string, postal_code string, u 
 	limit := 20
 	offset := (page - 1) * limit
 
+	jurisdiction_ids := UsersClientJurisdictionIds(u, pg)
+
 	r := struct {
 		AccurateGeocoding bool `json:"accurate_geocoding"`
 		BusRoutes []BusRouteSearchResult `json:"bus_routes"`
@@ -192,7 +196,7 @@ where a.active = true
 and a.bus_id is not null
 and e.active = true
 and e.deleted = false
-and b.id in (` + UsersClientJurisdictionIdSQL(u, pg) + `)
+and b.id in (` + jurisdiction_ids + `)
 and d.status = 'live'
 and (ST_Distance(
                    ST_Transform(ST_GeomFromText('POINT(' || $1 || ')',4326),900913),
@@ -235,7 +239,7 @@ where a.active = true
 and a.bus_id is not null
 and e.active = true
 and e.deleted = false
-and b.id in (` + UsersClientJurisdictionIdSQL(u, pg) + `)
+and b.id in (` + jurisdiction_ids + `)
 and d.status = 'live'
 and (ST_Distance(
                    ST_Transform(ST_GeomFromText('POINT(' || $1 || ')',4326),900913),

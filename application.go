@@ -54,7 +54,7 @@ func main() {
 	fmt.Println("french: ",french)
 
 	fmt.Println("~~~~~ SafeStop Client ~~~~~")
-	fmt.Println("SSC_ENV:", viper.GetString("env"))
+	//fmt.Println("SSC_ENV:", viper.GetString("env"))
 
 
 	viper.SetEnvPrefix("SSC")
@@ -63,8 +63,10 @@ func main() {
 	viper.AddConfigPath("./config") // look for config in the working directory
 	err := viper.ReadInConfig()     // Find and read the config file
 	if err != nil { // Handle errors reading the config file
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		log.Fatal(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
+
+	fmt.Println("SSC_ENV:", viper.GetString("env"))
 
 
 	fmt.Println(viper.GetString("db_host"))
@@ -110,7 +112,6 @@ func main() {
 	APIController.Register()
 
 	http.Handle("/", r)
-	log.Println("Listening...")
 	if viper.GetString("env") == "development" {
 		//log.Fatal(http.ListenAndServe(":5000", middleware.RequestLogger(r)))
 
@@ -121,7 +122,18 @@ func main() {
 	} else {
 		// redirect every http request to https
 
-		go http.ListenAndServe(":5000", http.HandlerFunc(redirect), )
+
+
+		//go func() {
+			if err := http.ListenAndServe(":5000", csrf.Protect([]byte("32-byte-long-auth-key"), csrf.Secure(true))(r) ); err != nil {
+				log.Fatalf("ListenAndServe error: %v", err)
+			}
+		//}()
+
+
+
+		//go http.ListenAndServe(":5000", middleware.RequestLogger(http.HandlerFunc(redirect)), )
+
 
 		//log.Fatal(http.ListenAndServe(":443", csrf.Protect([]byte("32-byte-long-auth-key"), csrf.Secure(true))(r)))
 
@@ -130,20 +142,22 @@ func main() {
 }
 
 
-func redirect(w http.ResponseWriter, req *http.Request) {
-	// remove/add not default ports from req.Host
-	target := "https://" + req.Host + req.URL.Path
-	if len(req.URL.RawQuery) > 0 {
-		target += "?" + req.URL.RawQuery
-	}
-	log.Printf("redirect to: %s", target)
-	http.Redirect(w, req, target,
-		// see @andreiavrammsd comment: often 307 > 301
-		http.StatusTemporaryRedirect)
-}
+//func redirect(w http.ResponseWriter, req *http.Request) {
+//	target := req.TLS.
+//	if req.URL.Scheme == "http" {
+//		// remove/add not default ports from req.Host
+//		target = "https://" + req.Host + req.URL.Path
+//		if len(req.URL.RawQuery) > 0 {
+//			target += "?" + req.URL.RawQuery
+//		}
+//		log.Printf("redirect to: %s", target)
+//	}
+//	http.Redirect(w, req, target, http.StatusTemporaryRedirect)
+//}
 
 func checkErr(err error) {
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
+		//panic(err)
 	}
 }
