@@ -446,7 +446,7 @@ func (c *APIController) MyStopsAction(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if current_stop.Id != dbr[x].StopId {
-				if current_stop.Id > 0 {
+				if current_stop.Id > 0 && current_route.Id == current_stop.BusRouteId {
 					current_route.Stops = append(current_route.Stops, current_stop)
 				}
 
@@ -456,6 +456,7 @@ func (c *APIController) MyStopsAction(w http.ResponseWriter, r *http.Request) {
 					ScheduledTime: dbr[x].ScheduledTime,
 					Latitude: dbr[x].StopLatitude,
 					Longitude: dbr[x].StopLongitude,
+					BusRouteId: dbr[x].BusRouteId,
 				}
 
 				if current_route.Errors == false {

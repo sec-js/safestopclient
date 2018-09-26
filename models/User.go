@@ -975,6 +975,7 @@ type MyStopsRoute struct {
 
 type MyStopsStop struct {
 	Id int `json:"sid"`
+	BusRouteId int `json:"rid"`
 	Name string `json:"sn"`
 	ScheduledTime string `json:"sst"`
 	AsOf string `json:"ao"`
