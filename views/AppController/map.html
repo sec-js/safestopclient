@@ -246,8 +246,7 @@
 
         var i = selected_stop_index();
 
-
-        if(i > 0) {
+        if(i > -1) {
             if (map_data[i].sb == true || map_data[i].a == true) {
                 if (map_data[i].blat != 0 && map_data[i].blng != 0){
                     bus_markers.push(new google.maps.Marker({
@@ -309,6 +308,9 @@
     function selected_stop_index(){
         var i = -1;
         for(var x = 0; x < map_data.length; x++){
+
+            console.log(map_data[x])
+
             if(map_data[x].sid.toString() == selected_stop.toString()){
                 i = x;
                 break;

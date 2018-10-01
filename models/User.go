@@ -1013,8 +1013,6 @@ func UsersMyStops(u *User, pg *PermissionGroups) []MyStopsDbResult {
 
 	jurisdiction_ids := UsersClientJurisdictionIds(u, pg)
 
-	log.Println("USER: %d, STOPS: %")
-
 	dbr := []MyStopsDbResult{}
 
 sql := fmt.Sprintf(`
@@ -1125,14 +1123,17 @@ then (select predicted_time_string from bus_route_stop_activity_logs where bus_r
 else ''
 end as predicted_time_string,
 
-coalesce(d.latitude, -1) as bus_latitude,
 
-coalesce(d.longitude, -1) as bus_longitude
+coalesce((select latitude from bus_movement_reports where bus_id = b.bus_id order by id desc limit 1), -1) as bus_latitude,
+coalesce((select longitude from bus_movement_reports where bus_id = b.bus_id order by id desc limit 1), -1) as bus_longitude
+
+--coalesce(d.latitude, -1) as bus_latitude,
+--coalesce(d.longitude, -1) as bus_longitude
 
 from bus_route_stops a
 join bus_routes b on a.bus_route_id = b.id
 join jurisdictions c on b.jurisdiction_id = c.id
-left join buses d on b.bus_id = d.id
+join buses d on b.bus_id = d.id
 join time_zones e on e.id = c.time_zone_id
 left join safe_stop_audibles f on f.jurisdiction_id = c.id
               and (f.created_at at time zone 'utc' at time zone e.postgresql_name)::date = (now() at time zone e.postgresql_name)::date
