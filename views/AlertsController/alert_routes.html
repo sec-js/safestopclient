@@ -1,0 +1,133 @@
+{{define "head"}}
+<title></title>
+{{end}}
+{{define "body"}}
+
+
+<style>
+
+    .alerts-dashboard-header{
+        background: #F0F0F0;
+        padding: 15px;
+        border: 1px solid #ccc;
+    }
+
+    .alerts-dashboard-header .header{
+        color: #AE0F32;
+        font-size: 20pt;
+    }
+
+    .alerts-dashboard-header .sub-header {
+        font-size: 12pt;
+        font-weight: 300;
+    }
+
+    .alerts-target-li {
+        cursor: pointer;
+    }
+
+    .alerts-target {
+        font-size: 16pt;
+        font-weight: 500;
+    }
+
+    .alerts-target-description {
+        font-size: 12pt;
+        font-weight: 300;
+    }
+
+
+    .alert-target-link {
+        color: #AE0F32;
+        font-weight: 600;
+    }
+
+    .fa-chevron-right {
+        color: #AE0F32;
+        font-size: 20pt;
+    }
+
+</style>
+
+
+<div class="alerts-dashboard-header">
+    <div class="header">
+    {{ t .CurrentLocale "dashboard" "" }}
+    </div>
+
+    <div class="sub-header">
+    {{ t .CurrentLocale "select_audience" "" }}
+    </div>
+</div>
+
+
+
+<ul class="list-group">
+    <li class="list-group-item alerts-target-li">
+        <table style="width: 100%;">
+            <tr>
+                <td style="width: 100%;">
+                    <div class="alerts-target">
+                    {{ t .CurrentLocale "by_jurisdiction" "" }}
+                    </div>
+                    <div class="alerts-target-description">
+                    {{ t .CurrentLocale "by_jurisdiction_description" "" }}
+                    </div>
+                </td>
+                <td style="vertical-align: middle;">
+                    <i class="fa fa-chevron-right"></i>
+                </td>
+            </tr>
+        </table>
+    </li>
+
+    <li class="list-group-item alerts-target-li">
+        <table style="width: 100%;">
+            <tr>
+                <td style="width: 100%;">
+                    <div class="alerts-target">
+                    {{ t .CurrentLocale "by_route_or_stop" "" }}
+                    </div>
+                    <div class="alerts-target-description">
+                    {{ t .CurrentLocale "by_route_or_stop_description" "" }}
+                    </div>
+                </td>
+                <td style="vertical-align: middle;">
+                    <i class="fa fa-chevron-right"></i>
+                </td>
+            </tr>
+        </table>
+    </li>
+
+    <li class="list-group-item alerts-target-li">
+        <table style="width: 100%;">
+            <tr>
+                <td style="width: 100%;">
+                    <div class="alerts-target">
+                    {{ t .CurrentLocale "by_bus" "" }}
+                    </div>
+                    <div class="alerts-target-description">
+                    {{ t .CurrentLocale "by_bus_description" "" }}
+                    </div>
+                </td>
+                <td style="vertical-align: middle;">
+                    <i class="fa fa-chevron-right"></i>
+                </td>
+            </tr>
+        </table>
+    </li>
+
+</ul>
+
+
+
+
+
+<script type="text/javascript">
+
+
+</script>
+
+
+
+{{end}}

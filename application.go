@@ -111,6 +111,9 @@ func main() {
 	APIController := controllers.APIController{&controllers.ControllerBase{Name: "APIController", Templates: make(map[string]*template.Template), Router: r, SessionStore: sessionStore, PermissionGroups: &PermissionGroups}}
 	APIController.Register()
 
+	AlertsController := controllers.AlertsController{&controllers.ControllerBase{Name: "AlertsController", Templates: make(map[string]*template.Template), Router: r, SessionStore: sessionStore, BootstrapAlertClass: &BootstrapAlertClass, PermissionGroups: &PermissionGroups,}}
+	AlertsController.Register()
+
 	http.Handle("/", r)
 	if viper.GetString("env") == "development" {
 		//log.Fatal(http.ListenAndServe(":5000", middleware.RequestLogger(r)))

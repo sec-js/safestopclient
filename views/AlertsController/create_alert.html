@@ -1,0 +1,248 @@
+{{define "head"}}
+<title></title>
+{{end}}
+{{define "body"}}
+
+
+        <style>
+
+            .alert-target-message {
+                padding-top: 10px;
+                color: #A12130;
+                font-style: italic;
+                font-size: 14pt;
+            }
+
+            .alert-target {
+                font-size: 12pt;
+                font-weight: bold;
+            }
+
+        </style>
+
+
+<div class="container-fluid">
+
+
+{{ if ne .ViewData.JurisdictionIds "" }}
+    <div class="alert-target-message">{{ t .CurrentLocale "your_alert_will_be_sent_to_jurisdictions" "" }}</div>
+    <ul>
+    {{ range .ViewData.JurisdictionNames}}
+        <li class="alert-target">
+        {{ . }}
+        </li>
+    {{ end }}
+    </ul>
+{{ end }}
+
+
+    <div class="row">
+        <div class="col">
+            <form id="create-alert-form" class="form" role="form" method="post" action="/create_alert">
+
+            {{ .CSRFTemplateField}}
+                <input name="bus_ids" type="hidden" value="{{.ViewData.BusIds}}">
+                <input name="route_ids" type="hidden" value="{{.ViewData.RouteIds}}">
+                <input name="stop_ids" type="hidden" value="{{.ViewData.StopIds}}">
+                <input name="jurisdiction_ids" type="hidden" value="{{.ViewData.JurisdictionIds}}">
+
+                <div class="form-group">
+                    <label for="start-date">Start</label>
+                    <div class="input-group">
+                        <input readonly id="start-date" type="text" class="form-control" name="start_date"/>
+                        <div class="input-group-append">
+                            <button id="start-date-button" style="background: #ffffff; cursor: pointer;" class="input-group-text" id="basic-addon2"><i class="fa fa-calendar"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="end-date">End</label>
+                    <div class="input-group">
+                        <input readonly id="end-date" type="text" class="form-control" name="end_date"/>
+                        <div class="input-group-append">
+                            <button id="end-date-button" style="background: #ffffff; cursor: pointer;" class="input-group-text" id="basic-addon2"><i class="fa fa-calendar"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="priority">Type</label>
+                    <select id=priority class="form-control" name="priority">
+                        <option value='' disabled selected style='display:none;'>Select Type</option>
+                        <option value='alert'>Alert</option>
+                        <option value="info">Info</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="text">Body</label>
+                    <textarea style="height:80px;" class="form-control" id="text" name="text"></textarea>
+                </div>
+
+
+            {{ if eq .Domain "safestopapp.com"}}
+
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="push_notification">Push Notification
+                        </label>
+                    </div>
+                </div>
+
+            {{ end }}
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+
+    var fv;
+
+    $(document).ready(function(){
+
+
+        $('#start-date').datepicker({
+            format: "mm/dd/yyyy",
+            autoclose: true,
+            orientation: "bottom left",
+            startDate: new Date(),
+        }).on("changeDate", function(e) {
+            fv.revalidateField('start_date');
+
+            if($("#end-date").val() != "") {
+                fv.revalidateField('end_date');
+            }
+        });
+
+        $("#start-date-button").click(function(e){
+            e.preventDefault();
+            $('#start-date').datepicker("show");
+        })
+
+        $('#end-date').datepicker({
+            format: "mm/dd/yyyy",
+            autoclose: true,
+            orientation: "bottom left",
+            startDate: new Date(),
+        }).on("changeDate", function(e) {
+            fv.revalidateField('end_date');
+            if($("#start-date").val() != "") {
+                fv.revalidateField('start_date');
+            }
+        });
+
+        $("#end-date-button").click(function(e){
+            e.preventDefault();
+            $('#end-date').datepicker("show");
+        })
+
+       fv = FormValidation.formValidation(
+                document.getElementById("create-alert-form"),
+                {
+                    fields: {
+                        'start_date': {
+                            validators: {
+                                notEmpty: {
+                                    message: '{{ t .CurrentLocale "required" "" }}'
+                                },
+                                callback: {
+                                    callback: check_start_date,
+                                    message:"End date must be greater or equal to the start date"
+                                }
+                            }
+                        },
+                        'end_date': {
+                            validators: {
+                                notEmpty: {
+                                    message: '{{ t .CurrentLocale "required" "" }}'
+                                },
+                                callback: {
+                                    callback: check_end_date,
+                                    message:"End date must be greater or equal to the start date"
+                                }
+                            }
+                        },
+                        'priority': {validators: {notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'}}},
+                        'text': {validators: {notEmpty: {message: '{{ t .CurrentLocale "required" "" }}'}}},
+
+                    },
+                    plugins: {
+                        trigger: new FormValidation.plugins.Trigger(),
+                        submitButton: new FormValidation.plugins.SubmitButton(),
+                        defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+                        bootstrap: new FormValidation.plugins.Bootstrap(),
+                        icon: new FormValidation.plugins.Icon({
+                            valid: 'fa fa-check',
+                            invalid: 'fa fa-times',
+                            validating: 'fa fa-refresh',
+                        }),
+                    }
+                }
+        )
+
+
+
+
+
+
+    })
+
+
+
+    function check_start_date(input){
+        if($("#end-date").val() != "" && input.value != ""){
+            var ed = moment($("#end-date").val())
+            var sd = moment(input.value)
+            if(ed >= sd) {
+                return true
+            } else {
+                return false
+            }
+        } else {
+            return true;
+        }
+    }
+
+    function check_end_date(input){
+        if($("#start-date").val() != "" && input.value != ""){
+            var ed = moment(input.value)
+            var sd = moment($("#start-date").val())
+
+            if(ed >= sd) {
+                return true
+            } else {
+                return false
+            }
+        } else {
+            return true;
+        }
+    }
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+{{end}}

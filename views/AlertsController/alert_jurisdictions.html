@@ -1,0 +1,133 @@
+{{define "head"}}
+<title></title>
+{{end}}
+{{define "body"}}
+
+
+        <style>
+
+            .alert-page-header {
+                font-size: 20pt;
+            }
+
+            .alert-page-header-description {
+                font-size: 12pt;
+                font-weight: 300;
+            }
+
+            .alert-target {
+                cursor: pointer;
+                font-size: 16pt;
+            }
+
+            .fa-square-o {
+                font-size: 18pt;
+            }
+
+            .fa-check-square-o {
+                font-size: 18pt;
+            }
+            
+            .selected {
+
+                background: #e9ecef;
+                /*background: #A12130;*/
+            }
+            
+
+        </style>
+
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col alert-page-header">
+                    {{ t .CurrentLocale "by_jurisdiction" "" }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col alert-page-header-description">
+                    {{ t .CurrentLocale "by_jurisdiction_description" "" }}
+                </div>
+            </div>
+        </div>
+
+
+        <div class="card" style="border-radius: 0px; margin-top: 10px;">
+            <div class="card-header">
+                <form method="post" action="/alert_jurisdictions" class="form">
+                    {{ .CSRFTemplateField}}
+                    <div class="form-group">
+                        <input name="search" type="text" class="form-control" placeholder="{{ t .CurrentLocale "search" "" }}" value="{{.ViewData.Search}}">
+                    </div>
+
+                    <div class="form-group">
+                        <button class="btn btn-safestop btn-block" id="search">{{ t .CurrentLocale "search" "" }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <ul class="list-group" style="margin-top: 10px;">
+        {{ range .ViewData.Jurisdictions }}
+                <li class="list-group-item alert-target" data-name="{{.Name}}" data-id="{{.Id}}">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 100%;">
+                            {{ .Name}}
+                            </td>
+                            <td>
+                                <i data-id="{{.Id}}" class='fa fa-square-o'></i>
+                            </td>
+                        </tr>
+                    </table>
+                </li>
+        {{ end }}
+        </ul>
+
+
+
+        <script type="text/javascript">
+
+            $(document).ready(function(){
+
+                $(document).on("click", ".alert-target", function (e){
+                    var li = $(this);
+                    var i = $(this).find("table tr td:eq(1) .fa");
+                    
+                    if($(i).hasClass("fa-check-square-o")) {
+                        $(i).removeClass("fa-check-square-o");
+                        $(i).addClass("fa-square-o");
+                        $(li).removeClass("selected");
+                    } else {
+                        $(i).removeClass("fa-square-o");
+                        $(i).addClass("fa-check-square-o");
+                        $(li).addClass("selected")
+                    }
+
+                    if ($('.fa-check-square-o').length > 0) {
+                        $("#send-alerts").show();
+                    } else {
+                        $("#send-alerts").hide();
+                    }
+
+
+                    $("#jurisdiction-ids").val($.map($('.selected'), function(obj){
+                        return $(obj).data("id");
+                    }).join(','));
+
+
+                    $("#jurisdiction-names").val($.map($('.selected'), function(obj){
+                        return $(obj).data("name");
+                    }).join(','));
+
+
+                })
+
+            })
+
+        </script>
+
+
+
+{{end}}

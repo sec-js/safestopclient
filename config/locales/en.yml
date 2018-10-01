@@ -448,4 +448,36 @@ en:
   account_not_active: "Account Not Active"
   account_not_active_description: "Your account is not yet linked to a school, district, or transportation system. Select “Activate Account” and complete the registration process to gain access to the SafeStop service."
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   not_available: "NOT AVAILABLE"
+  dashboard: "Dashboard"
+  select_audience: "Select the audience for a new alert"
+  by_jurisdiction: "Alert Jurisdiction(s)"
+  by_jurisdiction_description: "Send an alert to all users in a jurisdiction"
+  alert_jurisdiction: "Alert Jurisdiction"
+  alert_multiple_jurisdictions: "Alert Multiple Jurisdictions"
+  by_route_or_stop: "Alert Route(s)/Stop(s)"
+  by_route_or_stop_description: "Send an alert to all users watching a specific route or stop"
+  alert_route_or_stop: "Alert a Bus Stop / Single Route"
+  alert_multiple_routes: "Alert multiple routes"
+  by_bus: "Alert Bus(es)"
+  by_bus_description: "Send an alert to all users watching a specific route or stop associated with a specific bus"
+  alert_bus: "Alert Bus"
+  alert_multiple_buses: "Alert Multiple Buses"
+  how_to_use_alerts: "How to use Alerts"
+  search_available_jurisdictions: "Search available jurisdictions"
+  alert: "ALERT"
+  your_alert_will_be_sent_to_jurisdictions: "Your alert will be sent to the following jurisdiction(s)"

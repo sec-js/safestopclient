@@ -279,3 +279,48 @@ where not exists (
 		}
 	}
 }
+
+
+
+
+type AlertsJurisdiction struct {
+	Id int `db:"id"`
+	Name string `db:"name"`
+}
+
+
+func AlertsJurisdictionsForUser(user_id int, search string) *[]AlertsJurisdiction{
+
+	where_sql := " and $2 = $2"
+	if search != "" {
+		where_sql = " and lower(a.name) like '%' || lower($2) || '%'"
+	}
+
+	r := []AlertsJurisdiction{}
+
+	sql := `
+select a.id, a.name from jurisdictions a 
+join jurisdictional_restrictions b on a.id = b.jurisdiction_id
+where b.user_id = $1
+and a.active = true
+` + where_sql + `
+order by a.name
+`
+
+	rows, err := database.GetDB().Queryx(sql, user_id, search)
+	if err != nil {
+		log.Println(err.Error())
+		return &r
+	}
+
+	for i := 0; rows.Next(); i++ {
+		a := AlertsJurisdiction{}
+		err := rows.StructScan(&a)
+		if err != nil {
+			log.Println(err.Error())
+			return &r
+		}
+		r = append(r, a)
+	}
+	return &r
+}

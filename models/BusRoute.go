@@ -43,7 +43,7 @@ func BusRoutesForAdminAndSchoolAdminUser(page int, search string, address_1 stri
 	geo_condition := ""
 	if user_coordinates != nil {
 
-		coordinate_string := fmt.Sprintf("%s %s")
+		coordinate_string := fmt.Sprintf("%s %s", user_coordinates.Longitude, user_coordinates.Latitude)
 		parameters = append(parameters, coordinate_string)
 		param_index := indexOf(coordinate_string, parameters) + 1
 
