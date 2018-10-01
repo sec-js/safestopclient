@@ -138,17 +138,17 @@ where a.deleted = false
 and b.student_information_id = $1
 `
 
-	rows, err := database.GetDB().Queryx(query, student_id)
+	rows, err := database.GetDB().Query(query, student_id)
 	if err != nil {
-		log.Println(err.Error())
+		log.Println(fmt.Sprintf("StopIdsForStudentId 1 - %s", err))
 		return stop_ids
 	}
 
 	for rows.Next() {
 		si := 0
-		err = rows.StructScan(&si)
+		err = rows.Scan(&si)
 		if err != nil {
-			log.Println(err.Error())
+			log.Println(fmt.Sprintf("StopIdsForStudentId 2 - %s", err))
 			return stop_ids
 		}
 

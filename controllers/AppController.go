@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/schoolwheels/safestopclient/database"
 	"github.com/schoolwheels/safestopclient/models"
+	"log"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -267,6 +268,7 @@ func (c *AppController) ActivateAction(w http.ResponseWriter, r *http.Request) {
 			student_identifiers := r.Form["student_information[][sis_identifier]"]
 			subscription_created, err := models.ActivateStudentIdentifierSubscription(jurisdiction_id, product_id, user, student_identifiers)
 			if !subscription_created || err != nil {
+				log.Println(err)
 				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
 				http.Redirect(w, r, r.URL.Host+"/activate/" + strconv.Itoa(jurisdiction_id) + "?postal_code=" + postal_code, http.StatusFound)
 				return
@@ -277,6 +279,7 @@ func (c *AppController) ActivateAction(w http.ResponseWriter, r *http.Request) {
 			subscription_created, err := models.ActivateAccessCodeSubscription(jurisdiction_id, product_id, user)
 
 			if !subscription_created || err != nil {
+				log.Println(err)
 				setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
 				http.Redirect(w, r, r.URL.Host+"/activate/" + strconv.Itoa(jurisdiction_id) + "?postal_code=" + postal_code, http.StatusFound)
 				return
@@ -729,6 +732,7 @@ func (c *AppController) RemoveScanNotificationSubscriptionAction(w http.Response
 
 
 func (c *AppController) AddStudentAction(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
 
 	user_id := currentUserId(c.ControllerBase, r)
 	if(user_id == 0){

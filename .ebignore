@@ -3,6 +3,7 @@
 !config/locales/*
 !views/AuthController/*
 !views/AppController/*
+!views/AlertsController/*
 !views/layouts/*
 !views/mail/*
 !public/images/*

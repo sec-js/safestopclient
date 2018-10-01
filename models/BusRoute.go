@@ -43,18 +43,17 @@ func BusRoutesForAdminAndSchoolAdminUser(page int, search string, address_1 stri
 	geo_condition := ""
 	if user_coordinates != nil {
 
-		coordinate_string := fmt.Sprintf("%s %s", user_coordinates.Longitude, user_coordinates.Latitude)
-		parameters = append(parameters, coordinate_string)
-		param_index := indexOf(coordinate_string, parameters) + 1
-
+		coordinate_string := fmt.Sprintf("%f %f", user_coordinates.Longitude, user_coordinates.Latitude)
 
 		geo_condition = fmt.Sprintf( `
         AND (ST_Distance(
-                   ST_Transform(ST_GeomFromText('POINT($%d)',4326),900913),
+                   ST_Transform(ST_GeomFromText('POINT(%s)',4326),900913),
                    ST_Transform(ST_GeomFromText('POINT(' || CAST(case when e.adjusted_longitude is null then e.longitude else e.adjusted_longitude end as VARCHAR) || ' ' || CAST(case when e.adjusted_latitude is null then e.latitude else e.adjusted_latitude end as VARCHAR) || ')', 4326),900913)
                ) * 0.000621371) < b.search_radius
-`, param_index)
+`, coordinate_string)
 	}
+
+
 
 	search_condition := ""
 		parameters = append(parameters, strings.ToLower("%" + search + "%"))
@@ -181,7 +180,7 @@ func BusRoutesForRegularUsers(page int, address_1 string, postal_code string, u 
 		coordinate_string = fmt.Sprintf("%s %s", user_coordinates.Longitude, user_coordinates.Latitude)
 	}
 
-	total_sql := `
+	total_sql :=  fmt.Sprintf(`
 select count(distinct a.id)
 from bus_routes a
 join jurisdictions b
@@ -199,14 +198,14 @@ and e.deleted = false
 and b.id in (` + jurisdiction_ids + `)
 and d.status = 'live'
 and (ST_Distance(
-                   ST_Transform(ST_GeomFromText('POINT(' || $1 || ')',4326),900913),
+                   ST_Transform(ST_GeomFromText('POINT('%s')',4326),900913),
                    ST_Transform(ST_GeomFromText('POINT(' || CAST(case when e.adjusted_longitude is null then e.longitude else e.adjusted_longitude end as VARCHAR) || ' ' || CAST(case when e.adjusted_latitude is null then e.latitude else e.adjusted_latitude end as VARCHAR) || ')', 4326),900913)
                  ) * 0.000621371) < b.search_radius
-`
+`, coordinate_string)
 
 
 	total_routes := 0
-	row := database.GetDB().QueryRowx(total_sql, coordinate_string)
+	row := database.GetDB().QueryRowx(total_sql)
 
 	if row == nil {
 
@@ -242,16 +241,16 @@ and e.deleted = false
 and b.id in (` + jurisdiction_ids + `)
 and d.status = 'live'
 and (ST_Distance(
-                   ST_Transform(ST_GeomFromText('POINT(' || $1 || ')',4326),900913),
+                   ST_Transform(ST_GeomFromText('POINT(%s)',4326),900913),
                    ST_Transform(ST_GeomFromText('POINT(' || CAST(case when e.adjusted_longitude is null then e.longitude else e.adjusted_longitude end as VARCHAR) || ' ' || CAST(case when e.adjusted_latitude is null then e.latitude else e.adjusted_latitude end as VARCHAR) || ')', 4326),900913)
                  ) * 0.000621371) < b.search_radius
 group by a.id, a.display_name, a.start_time, b.id, b.name, b.search_radius
 order by jurisdiction_name, bus_route_name
 limit %d
 offset %d
-`, limit, offset)
+`, coordinate_string, limit, offset)
 
-	rows, err := database.GetDB().Queryx(sql, coordinate_string)
+	rows, err := database.GetDB().Queryx(sql)
 	if err != nil {
 		log.Println(err.Error())
 		return r

@@ -140,7 +140,6 @@ func ActivateStudentIdentifierSubscription(jurisdiction_id int, product_id int, 
 
 	previous_identifier := ""
 	for i := 0; i < len(student_identifiers); i++ {
-
 		if len(student_identifiers[i]) > 0 && student_identifiers[i] != previous_identifier {
 
 			tx, err := database.GetDB().Begin()
@@ -149,57 +148,55 @@ func ActivateStudentIdentifierSubscription(jurisdiction_id int, product_id int, 
 			}
 
 			student_id := 0
-			student_id_query := `
-			select id from student_informations where deleted = false and jurisdiction_id = $1 and sis_identifier = $2
-`
+			student_person_id := 0
+			student_id_query := `select id, person_id from student_informations where deleted = false and jurisdiction_id = $1 and sis_identifier = $2`
+
 			row := tx.QueryRow(student_id_query, jurisdiction_id, student_identifiers[i])
 			if row == nil {
 				tx.Rollback()
-				continue
 			} else {
-				err := row.Scan(&student_id)
+				err := row.Scan(&student_id, &student_person_id)
 				if err != nil {
 					tx.Rollback()
-					continue
 				}
 
 				relationship_query := `
 insert into personal_relationships (person_id, person_related_id, personal_relationship_type_id, created_at, updated_at) 
 values (
-(select person_id from users where id = $1 limit 1), 
+$1, 
 (select person_id from student_informations where id = $2 limit 1), 
 1, 
 now(), 
 now())
 `
-				_, err = tx.Query(relationship_query, user.PersonId, student_id)
+				_, err = tx.Exec(relationship_query, user.PersonId, student_id)
 				if err != nil {
+					log.Println(err)
 					tx.Rollback()
-					continue
 				}
 
 
 				user_stops_query := `
 insert into bus_route_stop_users (user_id, bus_route_stop_id, created_at, updated_at) (
-select $1, id, now(), now() from bus_route_stops a 
+select $1, a.id, now(), now() from bus_route_stops a 
 join bus_route_stops_student_informations b on a.id = b.bus_route_stop_id
 where b.student_information_id = $2
 and a.deleted = false
 and a.id not in (select bus_route_stop_id from bus_route_stop_users where user_id = $1)
 )
 `
-				_, err = tx.Query(user_stops_query, user.Id, student_id)
+				_, err = tx.Exec(user_stops_query, user.Id, student_id)
 				if err != nil {
+					log.Println(err)
 					tx.Rollback()
-					continue
 				}
 
 				tx.Commit()
 				one_student_successful = true
 
+
 			}
 		}
-
 	}
 
 	if one_student_successful == true {
@@ -207,10 +204,12 @@ and a.id not in (select bus_route_stop_id from bus_route_stop_users where user_i
 		subscription_query := `
 insert into subscriptions (start_date, end_date, user_id, product_id, active, created_at, updated_at) 
 values (
-(select postgresql_name from time_zones where id = (select time_zone_id from jurisdictions where id = $1)), 
+now() at time zone (select postgresql_name from time_zones where id = (select time_zone_id from jurisdictions where id = $1) limit 1),
 (select effective_end_date from products where id = $2), 
-$3, 
-now(), 
+$3,
+$2,
+true,
+now(),
 now()
 )`
 		_, err := database.GetDB().Query(subscription_query, jurisdiction_id, product_id, user.Id)
@@ -223,8 +222,6 @@ now()
 	} else {
 		return false, errors.New("No students assigned")
 	}
-
-
 }
 
 func ActivateAccessCodeSubscription(jurisdiction_id int, product_id int, user *User) (bool, error) {
@@ -631,16 +628,20 @@ func AddStudentStopsToUser(user_id int, stop_ids []int) bool {
 	for i := 0; i < len(stop_ids); i++ {
 
 		query := `
-insert into bus_route_stops_user (
+insert into bus_route_stop_users (
 user_id, 
-bus_route_stop_id
+bus_route_stop_id,
+created_at,
+updated_at
 ) values (
 $1,
-$2
+$2,
+now(),
+now()
 )`
-		_, err := database.GetDB().Exec(query, user_id, stop_ids)
+		_, err := database.GetDB().Exec(query, user_id, stop_ids[i])
 		if err != nil {
-			log.Println(err)
+			log.Println(fmt.Sprintf("AddStudentStopsToUser 1 - %s", err))
 			added_stops = false
 		}
 		added_stops = true
@@ -797,7 +798,7 @@ and b.user_id = %d`, u.Id)
 	} else {
 
 		sql = fmt.Sprintf(`
-select array_to_string(array_agg(distinct  z.id),',') as ids from (
+select array_to_string(array_agg(distinct  z.jurisdiction_id),',') as ids from (
 
 select b.jurisdiction_id 
 from subscriptions a
@@ -1011,6 +1012,8 @@ type MapViewStop struct {
 func UsersMyStops(u *User, pg *PermissionGroups) []MyStopsDbResult {
 
 	jurisdiction_ids := UsersClientJurisdictionIds(u, pg)
+
+	log.Println("USER: %d, STOPS: %")
 
 	dbr := []MyStopsDbResult{}
 

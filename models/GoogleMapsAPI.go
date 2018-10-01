@@ -34,8 +34,8 @@ type GoogleGeocodeResponse struct {
 }
 
 type Coordinate struct {
-	Latitude string `json:"latitude"`
-	Longitude string `json:"longitude"`
+	Latitude float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
 
 func GoogleServer() string {
@@ -72,8 +72,8 @@ func Geocode(address string, postal_code string) *Coordinate {
 		if len(gr.Result) > 0 {
 			if gr.Result[0].Geometry.LocationType == "ROOFTOP" || gr.Result[0].Geometry.LocationType == "RANGE_INTERPOLATED" {
 				return &Coordinate{
-					fmt.Sprintf("%f",gr.Result[0].Geometry.Location.Latitude),
-					fmt.Sprintf("%f",gr.Result[0].Geometry.Location.Longitude),
+					gr.Result[0].Geometry.Location.Latitude,
+					gr.Result[0].Geometry.Location.Longitude,
 				}
 			}
 		}
