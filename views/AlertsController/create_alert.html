@@ -36,6 +36,18 @@
 {{ end }}
 
 
+{{ if ne .ViewData.BusIds "" }}
+    <div class="alert-target-message">{{ t .CurrentLocale "your_alert_will_be_sent_to_buses" "" }}</div>
+    <ul>
+    {{ range .ViewData.BusNames}}
+        <li class="alert-target">
+        {{ . }}
+        </li>
+    {{ end }}
+    </ul>
+{{ end }}
+
+
     <div class="row">
         <div class="col">
             <form id="create-alert-form" class="form" role="form" method="post" action="/create_alert">

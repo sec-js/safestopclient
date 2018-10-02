@@ -324,3 +324,50 @@ order by a.name
 	}
 	return &r
 }
+
+
+type AlertsBus struct {
+	Id int `db:"id"`
+	Name string `db:"name"`
+	ConfigName string `db:"config_name"`
+}
+
+
+func AlertsBusesForUser(user_id int, search string) *[]AlertsBus{
+
+	where_sql := " and $2 = $2"
+	if search != "" {
+		where_sql = " and lower(d.name) like '%' || lower($2) || '%'"
+	}
+
+	r := []AlertsBus{}
+
+	sql := `
+select d.id, d.name, c.name as config_name
+from jurisdictional_restrictions a 
+join gps_configs_jurisdictions b on b.jurisdiction_id = a.jurisdiction_id
+join gps_configs c on c.id = b.gps_config_id
+join buses d on d.gps_config_id = c.id
+where a.user_id = $1
+and d.hide = false
+` + where_sql + `
+order by d.name
+`
+
+	rows, err := database.GetDB().Queryx(sql, user_id, search)
+	if err != nil {
+		log.Println(err.Error())
+		return &r
+	}
+
+	for i := 0; rows.Next(); i++ {
+		a := AlertsBus{}
+		err := rows.StructScan(&a)
+		if err != nil {
+			log.Println(err.Error())
+			return &r
+		}
+		r = append(r, a)
+	}
+	return &r
+}

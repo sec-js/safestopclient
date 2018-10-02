@@ -20,6 +20,9 @@
                 {{ if ne "" .ViewData.JurisdictionIds }}
                     <a href="/alert_jurisdictions"><i class="fa fa-chevron-left back" aria-hidden="true"></i></a>
                 {{ end }}
+                {{ if ne "" .ViewData.BusIds }}
+                    <a href="/alert_buses"><i class="fa fa-chevron-left back" aria-hidden="true"></i></a>
+                {{ end }}
             </td>
             <td align="center">
                 <i style="font-size: 10pt; " class="fa fa-user" aria-hidden="true"></i>

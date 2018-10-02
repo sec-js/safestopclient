@@ -17,17 +17,15 @@
         <tr>
             <td>
                 <a href="/alerts_dashboard"><i class="fa fa-chevron-left back" aria-hidden="true"></i></a>
-
             </td>
             <td align="center">
                 <i style="font-size: 10pt; " class="fa fa-user" aria-hidden="true"></i>
                 <span style="margin-left:4px;" class="signed-in-as">{{ .ViewData.Email }}</span>
             </td>
             <td>
-
+                <a href="/account"><i class="fa fa-times" aria-hidden="true"></i></a>
             </td>
         </tr>
-
         <tr>
             <td style="width:100%; border-bottom: 1px solid #ccc;" colspan="3">
                 <div style="background: #FFFFFF; padding: 10px; z-index:3; overflow-y: scroll !important; max-height: 500px; !important;" id="message-td" class="collapse">
@@ -50,19 +48,25 @@
 
 <div class="nav-bar-bottom">
 
-    <div id="ad" style="background-color: whitesmoke; text-align: center; display: none;">
-        <a id="ad-link" href="#" target="_blank" style="border: 0px;"><img id="ad-image" src=""></a>
-    </div>
-
     <div>
         <table>
+
             <tr>
                 <td align="center">
                     <i class="ss ss-logo"  style="font-size: 30pt; color: #A12130;" aria-hidden="true"></i>
                 </td>
-                <td align="center">
+                <td>
+                    <div align="center">
+                        <form method="post" action="/create_alert">
+                        {{ .CSRFTemplateField}}
 
-
+                            <input type="hidden" id="bus-ids" name="bus_ids">
+                            <input type="hidden" id="bus-names" name="bus_names">
+                            <button class="btn btn-safe-stop btn-block" id="send-alerts" style="display: none; max-width: 90%;">
+                            {{ t .CurrentLocale "alert" ""}}
+                            </button>
+                        </form>
+                    </div>
                 </td>
                 <td align="center">
                     <a href="/account"><i style="font-size: 30pt; color: #A12130;" class="ss ss-settings account" aria-hidden="true"></i></a>

@@ -6,125 +6,128 @@
 
 <style>
 
-    .alerts-dashboard-header{
-        background: #F0F0F0;
-        padding: 15px;
-        border: 1px solid #ccc;
-    }
-
-    .alerts-dashboard-header .header{
-        color: #AE0F32;
+    .alert-page-header {
         font-size: 20pt;
     }
 
-    .alerts-dashboard-header .sub-header {
+    .alert-page-header-description {
         font-size: 12pt;
         font-weight: 300;
     }
 
-    .alerts-target-li {
+    .alert-target {
         cursor: pointer;
-    }
-
-    .alerts-target {
         font-size: 16pt;
-        font-weight: 500;
     }
 
-    .alerts-target-description {
-        font-size: 12pt;
-        font-weight: 300;
+    .fa-square-o {
+        font-size: 18pt;
     }
 
-
-    .alert-target-link {
-        color: #AE0F32;
-        font-weight: 600;
+    .fa-check-square-o {
+        font-size: 18pt;
     }
 
-    .fa-chevron-right {
-        color: #AE0F32;
-        font-size: 20pt;
+    .selected {
+
+        background: #e9ecef;
+        /*background: #A12130;*/
     }
+
 
 </style>
 
 
-<div class="alerts-dashboard-header">
-    <div class="header">
-    {{ t .CurrentLocale "dashboard" "" }}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col alert-page-header">
+        {{ t .CurrentLocale "by_bus" "" }}
+        </div>
     </div>
-
-    <div class="sub-header">
-    {{ t .CurrentLocale "select_audience" "" }}
+    <div class="row">
+        <div class="col alert-page-header-description">
+        {{ t .CurrentLocale "by_bus_description" "" }}
+        </div>
     </div>
 </div>
 
 
+<div class="card" style="border-radius: 0px; margin-top: 10px;">
+    <div class="card-header">
+        <form method="post" action="/alert_buses" class="form">
+        {{ .CSRFTemplateField}}
+            <div class="form-group">
+                <input name="search" type="text" class="form-control" placeholder="{{ t .CurrentLocale "search" "" }}" value="{{.ViewData.Search}}">
+            </div>
 
-<ul class="list-group">
-    <li class="list-group-item alerts-target-li">
+            <div class="form-group">
+                <button class="btn btn-safestop btn-block" id="search">{{ t .CurrentLocale "search" "" }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<ul class="list-group" style="margin-top: 10px; overflow-y: scroll;">
+{{ range .ViewData.Buses }}
+    <li class="list-group-item alert-target" data-name="{{.Name}}" data-id="{{.Id}}">
         <table style="width: 100%;">
             <tr>
                 <td style="width: 100%;">
-                    <div class="alerts-target">
-                    {{ t .CurrentLocale "by_jurisdiction" "" }}
-                    </div>
-                    <div class="alerts-target-description">
-                    {{ t .CurrentLocale "by_jurisdiction_description" "" }}
-                    </div>
+                {{ .Name}}
                 </td>
-                <td style="vertical-align: middle;">
-                    <i class="fa fa-chevron-right"></i>
+                <td>
+                    <i data-id="{{.Id}}" class='fa fa-square-o'></i>
                 </td>
             </tr>
         </table>
     </li>
-
-    <li class="list-group-item alerts-target-li">
-        <table style="width: 100%;">
-            <tr>
-                <td style="width: 100%;">
-                    <div class="alerts-target">
-                    {{ t .CurrentLocale "by_route_or_stop" "" }}
-                    </div>
-                    <div class="alerts-target-description">
-                    {{ t .CurrentLocale "by_route_or_stop_description" "" }}
-                    </div>
-                </td>
-                <td style="vertical-align: middle;">
-                    <i class="fa fa-chevron-right"></i>
-                </td>
-            </tr>
-        </table>
-    </li>
-
-    <li class="list-group-item alerts-target-li">
-        <table style="width: 100%;">
-            <tr>
-                <td style="width: 100%;">
-                    <div class="alerts-target">
-                    {{ t .CurrentLocale "by_bus" "" }}
-                    </div>
-                    <div class="alerts-target-description">
-                    {{ t .CurrentLocale "by_bus_description" "" }}
-                    </div>
-                </td>
-                <td style="vertical-align: middle;">
-                    <i class="fa fa-chevron-right"></i>
-                </td>
-            </tr>
-        </table>
-    </li>
-
+{{ end }}
 </ul>
-
-
 
 
 
 <script type="text/javascript">
 
+    $(document).ready(function(){
+
+        $("ul").css('height', $(window).height() - $(".nav-bar-bottom").height() - $(".nav-bar-top").height() - 225 + 'px')
+
+
+        $(document).on("click", ".alert-target", function (e){
+            var li = $(this);
+            var i = $(this).find("table tr td:eq(1) .fa");
+
+            if($(i).hasClass("fa-check-square-o")) {
+                $(i).removeClass("fa-check-square-o");
+                $(i).addClass("fa-square-o");
+                $(li).removeClass("selected");
+            } else {
+                $(i).removeClass("fa-square-o");
+                $(i).addClass("fa-check-square-o");
+                $(li).addClass("selected")
+            }
+
+            if ($('.fa-check-square-o').length > 0) {
+                $("#send-alerts").show();
+            } else {
+                $("#send-alerts").hide();
+            }
+
+
+            $("#bus-ids").val($.map($('.selected'), function(obj){
+                return $(obj).data("id");
+            }).join(','));
+
+
+            $("#bus-names").val($.map($('.selected'), function(obj){
+                return $(obj).data("name");
+            }).join(','));
+
+
+        })
+
+    })
 
 </script>
 

@@ -33,7 +33,6 @@
                 background: #e9ecef;
                 /*background: #A12130;*/
             }
-            
 
         </style>
 
@@ -68,7 +67,7 @@
         </div>
 
 
-        <ul class="list-group" style="margin-top: 10px;">
+        <ul class="list-group" style="margin-top: 10px; overflow-y: scroll;">
         {{ range .ViewData.Jurisdictions }}
                 <li class="list-group-item alert-target" data-name="{{.Name}}" data-id="{{.Id}}">
                     <table style="width: 100%;">
@@ -91,6 +90,8 @@
 
             $(document).ready(function(){
 
+                $("ul").css('height', $(window).height() - $(".nav-bar-bottom").height() - $(".nav-bar-top").height() - 225 + 'px')
+
                 $(document).on("click", ".alert-target", function (e){
                     var li = $(this);
                     var i = $(this).find("table tr td:eq(1) .fa");
@@ -111,16 +112,13 @@
                         $("#send-alerts").hide();
                     }
 
-
                     $("#jurisdiction-ids").val($.map($('.selected'), function(obj){
                         return $(obj).data("id");
                     }).join(','));
 
-
                     $("#jurisdiction-names").val($.map($('.selected'), function(obj){
                         return $(obj).data("name");
                     }).join(','));
-
 
                 })
 

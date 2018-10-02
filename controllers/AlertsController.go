@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/schoolwheels/safestopclient/models"
 	"net/http"
 	"strings"
@@ -95,11 +94,14 @@ func (c *AlertsController) AlertBusesAction(w http.ResponseWriter, r *http.Reque
 
 	u := models.FindUser(uid)
 
-
 	data := struct {
 		Email string
+		Buses []models.AlertsBus
+		Search string
 	} {
 		u.Email,
+		*models.AlertsBusesForUser(u.Id, r.FormValue("search")),
+		r.FormValue("search"),
 	}
 
 	c.render(w, r, "alert_buses", data)
@@ -139,26 +141,29 @@ func (c *AlertsController) CreateAlertAction(w http.ResponseWriter, r *http.Requ
 
 	u := models.FindUser(uid)
 
-	fmt.Println(r.FormValue("jurisdiction_names"));
-
 
 	jurisdiction_names := strings.Split(r.FormValue("jurisdiction_names"), ",")
+	bus_names := strings.Split(r.FormValue("bus_names"), ",")
+
 
 	data := struct {
 		Email string
 		JurisdictionNames []string
 		BusIds string
+		BusNames []string
 		RouteIds string
 		StopIds string
 		JurisdictionIds string
 	} {
 		u.Email,
 		jurisdiction_names,
-		"",
+		r.FormValue("bus_ids"),
+		bus_names,
 		"",
 		"",
 		r.FormValue("jurisdiction_ids"),
 	}
 
 	c.render(w, r, "create_alert", data)
+
 }
