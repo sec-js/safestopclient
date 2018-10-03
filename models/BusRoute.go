@@ -177,7 +177,7 @@ func BusRoutesForRegularUsers(page int, address_1 string, postal_code string, u 
 
 	coordinate_string := "0 0"
 	if user_coordinates != nil {
-		coordinate_string = fmt.Sprintf("%s %s", user_coordinates.Longitude, user_coordinates.Latitude)
+		coordinate_string = fmt.Sprintf("%f %f", user_coordinates.Longitude, user_coordinates.Latitude)
 	}
 
 	total_sql :=  fmt.Sprintf(`
@@ -198,7 +198,7 @@ and e.deleted = false
 and b.id in (` + jurisdiction_ids + `)
 and d.status = 'live'
 and (ST_Distance(
-                   ST_Transform(ST_GeomFromText('POINT('%s')',4326),900913),
+                   ST_Transform(ST_GeomFromText('POINT(%s)',4326),900913),
                    ST_Transform(ST_GeomFromText('POINT(' || CAST(case when e.adjusted_longitude is null then e.longitude else e.adjusted_longitude end as VARCHAR) || ' ' || CAST(case when e.adjusted_latitude is null then e.latitude else e.adjusted_latitude end as VARCHAR) || ')', 4326),900913)
                  ) * 0.000621371) < b.search_radius
 `, coordinate_string)

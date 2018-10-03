@@ -584,10 +584,15 @@ func AuthenticateUser(email string, password string) *User {
 
 func UserHasAnyPermissionGroups(permission_groups []string, user_permission_groups string ) bool {
 	has_permission_group := false
+	upg := strings.Split(user_permission_groups, ",")
+
 	for i := 0; i < len(permission_groups); i++ {
-		if(strings.Contains(user_permission_groups, permission_groups[i])){
-			has_permission_group = true
-			i = len(permission_groups)
+		for j := 0; j < len(upg); j++ {
+			if upg[j] == permission_groups[i] {
+				has_permission_group = true
+				i = len(permission_groups)
+				j = len(upg)
+			}
 		}
 	}
 	return has_permission_group
@@ -774,7 +779,7 @@ func UsersClientJurisdictionIds(u *User, pg *PermissionGroups) string {
 
 	sql := ""
 
-	if((u.SuperAdmin == true) || UserHasAnyPermissionGroups([]string{ pg.Admin}, u.PermissionGroups)) {
+	if((u.SuperAdmin == true) || UserHasAnyPermissionGroups([]string{ pg.Admin }, u.PermissionGroups)) {
 
 		sql = `
 select array_to_string(array_agg(a.id),',') as ids
