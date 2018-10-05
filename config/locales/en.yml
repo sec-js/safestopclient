@@ -420,9 +420,6 @@ en:
   code_or_id_attempted_to_use: "Code or ID Attempted To Use"
 
 
-  student_rider_first_name: "Student/Rider's First Name"
-  student_rider_last_name: "Student/Rider's Last Name"
-  detailed_description: "Detailed Description"
   lost_date: "Date Item was Lost"
   route_name: "Route Name"
 
@@ -462,6 +459,7 @@ en:
 
 
 
+  expected_time_not_available: "--:-- --"
   not_available: "NOT AVAILABLE"
   dashboard: "Dashboard"
   select_audience: "Select the audience for a new alert"

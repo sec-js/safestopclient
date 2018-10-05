@@ -36,9 +36,6 @@ func (c *APIController) Register() {
 	c.addRouteWithPrefix("/next_ad", c.NextAdAction)
 	c.addRouteWithPrefix("/register_for_push_notifications", c.RegisterForPushNotificationsAction)
 
-
-
-
 }
 
 func (c *APIController) versionAction(w http.ResponseWriter, r *http.Request) {
@@ -154,7 +151,7 @@ func (c *APIController) AvailableBusRoutesAction(w http.ResponseWriter, r *http.
 		c.PermissionGroups.License_2,
 		c.PermissionGroups.License_3,
 		c.PermissionGroups.License_4,
-	}, u.PermissionGroups) {
+	}, u) {
 		c.renderJSON(models.BusRoutesForAdminAndSchoolAdminUser(page, r.FormValue("search"), r.FormValue("address_1"), r.FormValue("postal_code"), u, c.PermissionGroups), w)
 	} else {
 		c.renderJSON(models.BusRoutesForRegularUsers(page, r.FormValue("address_1"), r.FormValue("postal_code"), u, c.PermissionGroups), w)
@@ -187,7 +184,7 @@ func (c *APIController) AvailableBusRouteStopsAction(w http.ResponseWriter, r *h
 			c.PermissionGroups.License_2,
 			c.PermissionGroups.License_3,
 			c.PermissionGroups.License_4,
-			}, u.PermissionGroups) == false {
+			}, u) == false {
 		sl = *models.UsersStopLimits(uid)
 	}
 
@@ -236,7 +233,7 @@ func (c *APIController) AddUserStopAction(w http.ResponseWriter, r *http.Request
 			c.PermissionGroups.License_2,
 			c.PermissionGroups.License_3,
 			c.PermissionGroups.License_4,
-		}, u.PermissionGroups) == false {
+		}, u) == false {
 		models.AddStopToRegularUsers(bus_route_stop_id, u.Id)
 		c.renderJSON(*models.UsersStopLimits(uid), w)
 		return;
@@ -272,7 +269,7 @@ func (c *APIController) RemoveUserStopAction(w http.ResponseWriter, r *http.Requ
 			c.PermissionGroups.License_2,
 			c.PermissionGroups.License_3,
 			c.PermissionGroups.License_4,
-		}, u.PermissionGroups) == false {
+		}, u) == false {
 		c.renderJSON(*models.UsersStopLimits(uid), w)
 		return;
 	} else {
@@ -326,7 +323,7 @@ func (c *APIController) AlertsAction(w http.ResponseWriter, r *http.Request) {
 	unread_messages := 0
 
 
-	if u.SuperAdmin == true || models.UserHasAnyPermissionGroups([]string{c.PermissionGroups.Admin}, u.PermissionGroups) {
+	if u.SuperAdmin == true || models.UserHasAnyPermissionGroups([]string{c.PermissionGroups.Admin}, u) {
 		alerts = models.AlertsForAdminUser()
 	} else {
 		alerts = models.AlertsForSchoolAdminAndRegularUsers(u, c.PermissionGroups)
@@ -389,7 +386,7 @@ func (c *APIController) MyStopsAction(w http.ResponseWriter, r *http.Request) {
 
 	ms := []models.MyStopsJurisdiction{}
 	dbr := models.UsersMyStops(u, c.PermissionGroups)
-	predictions_always_on := u.SuperAdmin == true || models.UserHasAnyPermissionGroups([]string{c.PermissionGroups.Admin}, u.PermissionGroups)
+	predictions_always_on := u.SuperAdmin == true || models.UserHasAnyPermissionGroups([]string{c.PermissionGroups.Admin}, u)
 
 	if len(dbr) > 0 {
 		current_jurisdiction := models.MyStopsJurisdiction{}
@@ -467,7 +464,7 @@ func (c *APIController) MyStopsAction(w http.ResponseWriter, r *http.Request) {
 					} else if len(dbr[x].SkippedAt) > 0 {
 						current_stop.TimeClass = "not-available"
 						current_stop.TimeTitle = string(T(currentLocale(c.ControllerBase, r), "expected", ""))
-						current_stop.Time = string(T(currentLocale(c.ControllerBase, r), "not_available", ""))
+						current_stop.Time = string(T(currentLocale(c.ControllerBase, r), "expected_time_not_available", ""))
 						current_stop.AsOf = ""
 					} else {
 						current_stop.TimeTitle = string(T(currentLocale(c.ControllerBase, r),  "expected", ""))
@@ -507,7 +504,7 @@ func (c *APIController) MyStopsAction(w http.ResponseWriter, r *http.Request) {
 				if predictions_always_on == false && dbr[x].HidePredictions == true {
 					current_stop.TimeClass = "not-available"
 					current_stop.TimeTitle = string(T(currentLocale(c.ControllerBase, r), "expected", ""))
-					current_stop.Time = string(T(currentLocale(c.ControllerBase, r), "not_available", ""))
+					current_stop.Time = string(T(currentLocale(c.ControllerBase, r), "expected_time_not_available", ""))
 					current_stop.AsOf = ""
 				}
 			}
@@ -539,7 +536,7 @@ func (c *APIController) MapAction(w http.ResponseWriter, r *http.Request) {
 	u := models.FindUser(uid)
 
 	dbr := models.UsersMyStops(u, c.PermissionGroups)
-	predictions_always_on := u.SuperAdmin == true || models.UserHasAnyPermissionGroups([]string{c.PermissionGroups.Admin}, u.PermissionGroups)
+	predictions_always_on := u.SuperAdmin == true || models.UserHasAnyPermissionGroups([]string{c.PermissionGroups.Admin}, u)
 
 
 	if len(dbr) > 0 {
@@ -574,7 +571,7 @@ func (c *APIController) MapAction(w http.ResponseWriter, r *http.Request) {
 				} else if len(dbr[x].SkippedAt) > 0 {
 					s.TimeClass = "not-available"
 					s.TimeTitle = string(T(currentLocale(c.ControllerBase, r), "expected", ""))
-					s.Time = string(T(currentLocale(c.ControllerBase, r), "not_available", ""))
+					s.Time = string(T(currentLocale(c.ControllerBase, r), "expected_time_not_available", ""))
 					s.AsOf = ""
 				} else {
 
@@ -608,7 +605,7 @@ func (c *APIController) MapAction(w http.ResponseWriter, r *http.Request) {
 				if predictions_always_on == false && dbr[x].HidePredictions == true {
 					s.TimeClass = "not-available"
 					s.TimeTitle = string(T(currentLocale(c.ControllerBase, r), "expected", ""))
-					s.Time = string(T(currentLocale(c.ControllerBase, r), "not_available", ""))
+					s.Time = string(T(currentLocale(c.ControllerBase, r), "expected_time_not_available", ""))
 					s.AsOf = ""
 				}
 

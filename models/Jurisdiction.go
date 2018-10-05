@@ -145,7 +145,7 @@ func ClientJurisdictionForUser(u *User, pg *PermissionGroups) *ClientJurisdictio
 
 	query := ``
 
-	if((u.SuperAdmin == true) || UserHasAnyPermissionGroups([]string{ pg.Admin}, u.PermissionGroups)) {
+	if(UserHasAnyPermissionGroups([]string{ pg.Admin}, u)) {
 		query = `
 select a.id, 
 a.name, 
@@ -178,7 +178,7 @@ order by name;
 		return &client_jurisdictions
 
 
-	} else if (UserHasAnyPermissionGroups([]string{ pg.License_1, pg.License_2, pg.License_3, pg.License_4}, u.PermissionGroups)){
+	} else if (UserHasAnyPermissionGroups([]string{ pg.License_1, pg.License_2, pg.License_3, pg.License_4}, u)){
 		query = `
 select a.id, 
 a.name, 

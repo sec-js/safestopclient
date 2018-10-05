@@ -582,16 +582,17 @@ func AuthenticateUser(email string, password string) *User {
 
 
 
-func UserHasAnyPermissionGroups(permission_groups []string, user_permission_groups string ) bool {
-	has_permission_group := false
-	upg := strings.Split(user_permission_groups, ",")
-
-	for i := 0; i < len(permission_groups); i++ {
-		for j := 0; j < len(upg); j++ {
-			if upg[j] == permission_groups[i] {
-				has_permission_group = true
-				i = len(permission_groups)
-				j = len(upg)
+func UserHasAnyPermissionGroups(permission_groups []string, user *User) bool {
+	has_permission_group := user.SuperAdmin
+	if has_permission_group == false {
+		upg := strings.Split(user.PermissionGroups, ",")
+		for i := 0; i < len(permission_groups); i++ {
+			for j := 0; j < len(upg); j++ {
+				if upg[j] == permission_groups[i] {
+					has_permission_group = true
+					i = len(permission_groups)
+					j = len(upg)
+				}
 			}
 		}
 	}
@@ -602,7 +603,7 @@ func UserHasSubscriptionForJurisdiction(user *User, pg *PermissionGroups, jurisd
 
 	if user.SuperAdmin == true {
 		return true
-	} else if UserHasAnyPermissionGroups([]string{pg.License_1, pg.License_2, pg.License_3, pg.License_4, pg.Admin}, user.PermissionGroups) {
+	} else if UserHasAnyPermissionGroups([]string{pg.License_1, pg.License_2, pg.License_3, pg.License_4, pg.Admin}, user) {
 		return true
 	} else {
 
@@ -779,7 +780,7 @@ func UsersClientJurisdictionIds(u *User, pg *PermissionGroups) string {
 
 	sql := ""
 
-	if((u.SuperAdmin == true) || UserHasAnyPermissionGroups([]string{ pg.Admin }, u.PermissionGroups)) {
+	if((u.SuperAdmin == true) || UserHasAnyPermissionGroups([]string{ pg.Admin }, u)) {
 
 		sql = `
 select array_to_string(array_agg(a.id),',') as ids
@@ -789,7 +790,7 @@ where active = true
 and (b.status = 'internal testing' or b.status = 'testing' or b.status = 'live')
 `
 
-	} else if (UserHasAnyPermissionGroups([]string{ pg.License_1, pg.License_2, pg.License_3, pg.License_4}, u.PermissionGroups)){
+	} else if (UserHasAnyPermissionGroups([]string{ pg.License_1, pg.License_2, pg.License_3, pg.License_4}, u)){
 
 		sql = fmt.Sprintf(`
 select array_to_string(array_agg(a.id),',') as ids
@@ -857,7 +858,7 @@ func UsersClientJurisdictionCount(u *User, pg *PermissionGroups) int {
 
 	count := 0
 	sql := ""
-	if((u.SuperAdmin == true) || UserHasAnyPermissionGroups([]string{ pg.Admin}, u.PermissionGroups)) {
+	if((u.SuperAdmin == true) || UserHasAnyPermissionGroups([]string{ pg.Admin}, u)) {
 
 		sql = `
 select count(a.id) 
@@ -867,7 +868,7 @@ where active = true
 and (b.status = 'internal testing' or b.status = 'testing' or b.status = 'live')
 `
 
-	} else if (UserHasAnyPermissionGroups([]string{ pg.License_1, pg.License_2, pg.License_3, pg.License_4}, u.PermissionGroups)){
+	} else if (UserHasAnyPermissionGroups([]string{ pg.License_1, pg.License_2, pg.License_3, pg.License_4}, u)){
 
 		sql = fmt.Sprintf(`
 select count(a.id) 

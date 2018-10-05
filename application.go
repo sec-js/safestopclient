@@ -116,16 +116,11 @@ func main() {
 
 	http.Handle("/", r)
 	if viper.GetString("env") == "development" {
-		//log.Fatal(http.ListenAndServe(":5000", middleware.RequestLogger(r)))
 
+		log.Fatal(http.ListenAndServe(":8080", csrf.Protect([]byte("32-byte-long-auth-key"), csrf.Secure(false))(r)))
 
-		log.Fatal(http.ListenAndServe(":5000", csrf.Protect([]byte("32-byte-long-auth-key"), csrf.Secure(false))(r)))
-
-		//csrf.Protect([]byte("32-byte-long-auth-key"))(r)
 	} else {
 		// redirect every http request to https
-
-
 
 		//go func() {
 			if err := http.ListenAndServe(":5000", csrf.Protect([]byte("32-byte-long-auth-key"), csrf.Secure(true))(r) ); err != nil {
@@ -133,13 +128,8 @@ func main() {
 			}
 		//}()
 
-
-
 		//go http.ListenAndServe(":5000", middleware.RequestLogger(http.HandlerFunc(redirect)), )
-
-
 		//log.Fatal(http.ListenAndServe(":443", csrf.Protect([]byte("32-byte-long-auth-key"), csrf.Secure(true))(r)))
-
 		//log.Fatal(http.ListenAndServeTLS(":8443", "certs/safestopapp.com.pem", "certs/safestopapp.com-key.pem", middleware.RequestLogger(r)))
 	}
 }

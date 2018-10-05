@@ -115,7 +115,7 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 		c.PermissionGroups.Admin,
 		c.PermissionGroups.License_3,
 		c.PermissionGroups.License_4,
-	}, u.PermissionGroups)
+	}, u)
 
 	if u.SuperAdmin == true {
 		view_manage_notifications = true
@@ -123,7 +123,7 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 
 	view_manage_subscriptions := models.UserHasAnyPermissionGroups([]string{
 		c.PermissionGroups.License_5,
-	}, u.PermissionGroups)
+	}, u)
 
 	view_lost_item_reports := false
 	for i := 0; i < len(cj.Jurisdictions); i++ {
@@ -1073,7 +1073,7 @@ func (c *AppController) SetupAction(w http.ResponseWriter, r *http.Request) {
 		c.PermissionGroups.License_2,
 		c.PermissionGroups.License_3,
 		c.PermissionGroups.License_4,
-	}, u.PermissionGroups) == true || u.SuperAdmin == true)
+	}, u) == true || u.SuperAdmin == true)
 
 
 	is_regular_user := (models.UserHasAnyPermissionGroups([]string{
@@ -1082,7 +1082,7 @@ func (c *AppController) SetupAction(w http.ResponseWriter, r *http.Request) {
 		c.PermissionGroups.License_2,
 		c.PermissionGroups.License_3,
 		c.PermissionGroups.License_4,
-	}, u.PermissionGroups) == false && u.SuperAdmin == false)
+	}, u) == false && u.SuperAdmin == false)
 
 
 
