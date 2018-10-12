@@ -442,7 +442,6 @@ order by r.id, s.scheduled_time_offset
 		rdb = append(rdb, a)
 	}
 
-
 	current_route := AlertsRoute{}
 	current_stop := AlertsStop{}
 
@@ -474,7 +473,10 @@ order by r.id, s.scheduled_time_offset
 		current_route.Stops = append(current_route.Stops, current_stop)
 
 	}
-	r = append(r, current_route)
+
+	if current_route.RouteId > 0 {
+		r = append(r, current_route)
+	}
 
 	return &r
 }
