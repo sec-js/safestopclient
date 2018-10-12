@@ -480,3 +480,7 @@ en:
   alert: "ALERT"
   your_alert_will_be_sent_to_jurisdictions: "Your alert will be sent to the following jurisdiction(s)"
   your_alert_will_be_sent_to_buses: "Your alert will be sent to the following bus(es)"
+  alert_this_route: "ALERT THIS ROUTE"
+  your_alert_will_be_sent_to_routes: "Your alert will be sent to the following bus route(s)"
+  your_alert_will_be_sent_to_stops: "Your alert will be sent to the following bus stop(s)"
+  your_alert_has_been_submitted: "Your alert has been submitted"

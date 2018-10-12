@@ -141,6 +141,7 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 		ViewManageSubscriptions bool
 		ViewReportLostItem bool
 		Email string
+		UserCanSendAlerts bool
 	}{
 		len(cj.Jurisdictions),
 		has_jurisdictions,
@@ -149,6 +150,7 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 		view_manage_subscriptions,
 		view_lost_item_reports,
 		u.Email,
+		models.UserCanSendAlerts(u),
 	}
 
 	c.render(w, r, "account", data)

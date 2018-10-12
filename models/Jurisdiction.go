@@ -1,10 +1,10 @@
 package models
 
 import (
-	"github.com/schoolwheels/safestopclient/database"
 	"fmt"
+	"github.com/schoolwheels/safestopclient/database"
 	"log"
-	)
+)
 
 
 type Jurisdictions struct {
@@ -379,6 +379,47 @@ where id = $1
 
 }
 
+func JurisdictionIdsForRouteAndStopIds(route_id_string string, stop_id_string string) string {
+	r := "-1"
+
+	sql := `
+select coalesce(array_to_string(array_agg(distinct z.id), ','),'-1') from (
+select a.id 
+from jurisdictions a 
+join bus_routes b on a.id = b.jurisdiction_id 
+where a.active = true
+and b.id in (` + route_id_string + `)
+group by a.id
+
+union all 
+
+select a.id 
+from jurisdictions a 
+join bus_routes b on a.id = b.jurisdiction_id 
+join bus_route_stops c on c.bus_route_id = b.id
+where a.active = true
+and c.id in (` + stop_id_string + `)
+group by a.id
+) z
+`
+
+	rows, err := database.GetDB().Query(sql)
+	if err != nil {
+		return r
+	}
+
+	if rows != nil {
+		for rows.Next() {
+			d := ""
+			err = rows.Scan(&d)
+			if err != nil {
+				return r
+			}
+		}
+	}
+
+	return r
+}
 
 
 

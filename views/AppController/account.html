@@ -92,25 +92,24 @@
     </a>
     {{ end }}
 
+    {{ if eq .ViewData.UserCanSendAlerts true }}
+    <a href="/alerts_dashboard" class="list-group-item">
+        <table class="list-item-table">
+            <tr>
+                <td>
+                    <i class="fa fa-bell-o"></i>
+                </td>
+                <td>
+                    {{ t .CurrentLocale "send_alert" ""}}
+                </td>
+            </tr>
+        </table>
+    </a>
+    {{ end }}
 
 
 
 
-
-
-    {{/*CAN SEND ALERTS*/}}
-    {{/*<a href="//alerts.{{ .Domain }}/" class="list-group-item">*/}}
-        {{/*<table class="list-item-table">*/}}
-            {{/*<tr>*/}}
-                {{/*<td>*/}}
-                    {{/*<i class="fa fa-bell-o"></i>*/}}
-                {{/*</td>*/}}
-                {{/*<td>*/}}
-                {{/*{{ t .CurrentLocale "send_alert" "" }}*/}}
-                {{/*</td>*/}}
-            {{/*</tr>*/}}
-        {{/*</table>*/}}
-    {{/*</a>*/}}
 
 
 

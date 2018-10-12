@@ -53,7 +53,7 @@
 
         <div class="card" style="border-radius: 0px; margin-top: 10px;">
             <div class="card-header">
-                <form method="post" action="/alert_jurisdictions" class="form">
+                <form method="get" action="/alert_jurisdictions" class="form">
                     {{ .CSRFTemplateField}}
                     <div class="form-group">
                         <input name="search" type="text" class="form-control" placeholder="{{ t .CurrentLocale "search" "" }}" value="{{.ViewData.Search}}">

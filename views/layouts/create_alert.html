@@ -23,6 +23,9 @@
                 {{ if ne "" .ViewData.BusIds }}
                     <a href="/alert_buses"><i class="fa fa-chevron-left back" aria-hidden="true"></i></a>
                 {{ end }}
+                {{ if or (ne "" .ViewData.RouteIds) (ne "" .ViewData.StopIds) }}
+                    <a href="/alert_routes"><i class="fa fa-chevron-left back" aria-hidden="true"></i></a>
+                {{ end }}
             </td>
             <td align="center">
                 <i style="font-size: 10pt; " class="fa fa-user" aria-hidden="true"></i>
@@ -70,12 +73,12 @@
                 </td>
                 <td>
                     <div align="center">
-                        <form method="post" action="create_alert">
-                        {{ .CSRFTemplateField}}
+                        {{/*<form method="post" action="process_create_alert">*/}}
+                        {{/*{{ .CSRFTemplateField}}*/}}
                             <button class="btn btn-safe-stop btn-block" id="send-alerts" style="display: none; max-width: 90%;">
                             {{ t .CurrentLocale "send_alert" ""}}
                             </button>
-                        </form>
+                        {{/*</form>*/}}
                     </div>
                 </td>
                 <td align="center">

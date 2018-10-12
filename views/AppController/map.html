@@ -16,7 +16,7 @@
 
 
 <script id="run-data-template" type="text/html">
-    <div class="{|#run_data_collapsed|} collapse  {|/run_data_collapsed|}" align="center" style="padding-top: 20px; padding-bottom: 20px;" id="run-data">
+    <div align="center" style="padding-top: 20px; padding-bottom: 20px;" id="run-data">
         <span style="display: inline-block;" align="left">
 
             <div>
@@ -84,11 +84,15 @@
 
     var map;
     var run_data_template = $("#run-data-template").html();
+    Mustache.parse(run_data_template);
+
+
     var run_data_collapsed = true;
     var stop_to_remove;
 
 
     $(document).ready(function () {
+        $("#map-view-data").hide();
 
         start_progress_bar();
 
@@ -100,8 +104,14 @@
             $('.message-bubble').trigger('click');
         })
 
-        $("#bottom-bar-center-td").on('click', function(e){
+        $("#bottom-center-bar").on('click', function(e){
             run_data_collapsed = !run_data_collapsed;
+
+            if(run_data_collapsed == true) {
+                $("#map-view-data").hide()
+            } else {
+                $("#map-view-data").show();
+            }
         })
 
         $("#map").css('height', $(window).height() - $(".nav-bar-bottom").height() - $(".nav-bar-top").height() + 'px')
@@ -308,9 +318,6 @@
     function selected_stop_index(){
         var i = -1;
         for(var x = 0; x < map_data.length; x++){
-
-            console.log(map_data[x])
-
             if(map_data[x].sid.toString() == selected_stop.toString()){
                 i = x;
                 break;
@@ -322,7 +329,8 @@
 
     function refresh_map_view_info(){
         var i = selected_stop_index();
-        $("#map-view-info").empty();
+
+        $("#map-view-data").empty();
 
         $("#map-view-data").append(Mustache.render(run_data_template, {
             rn: map_data[i].rn,
@@ -350,13 +358,6 @@
                 $("#summary-time-title").text(map_data[i].tt);
                 $("#summary-as-of").text(map_data[i].ao);
             }
-        }
-
-        if(run_data_collapsed){
-            $("#run-data").removeClass('in');
-        }
-        else{
-            $("#run-data").addClass('in');
         }
 
     }

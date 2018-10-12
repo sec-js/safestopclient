@@ -300,10 +300,7 @@ func (c *APIController) RemoveUserStopAction(w http.ResponseWriter, r *http.Requ
 func (c *APIController) TestAction(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	//endpoint := models.CreateSNSEndpointWithLambda("iOS", "b")
-
-
-	c.renderJSON("", w)
+	//c.renderJSON(models.DevicesForBusIds([]int{1870,1876}), w)
 }
 
 

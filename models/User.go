@@ -1416,3 +1416,32 @@ func indexOf(element string, data []string) (int) {
 //	u.Id = int(id)
 //	return nil
 //}
+
+
+func UserCanSendAlerts(user *User) bool {
+	if user.SuperAdmin == true {
+		return true
+	}
+
+	ct := 0
+
+	sql := `
+select count(*) from permission_groups_users a
+join permission_groups b on b.id = a.permission_group_id
+join permission_groups_permissions c on c.permission_group_id = b.id
+join permissions d on d.id = c.permission_id
+where a.user_id = $1
+and d.name = 'Create SafeStop Messages'
+`
+	row := database.GetDB().QueryRowx(sql, user.Id)
+	if row == nil {
+		return false
+	} else {
+		err := row.Scan(&ct)
+		if err != nil {
+			return false
+		}
+		return (ct > 0)
+	}
+
+}

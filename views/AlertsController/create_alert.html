@@ -27,7 +27,7 @@
 {{ if ne .ViewData.JurisdictionIds "" }}
     <div class="alert-target-message">{{ t .CurrentLocale "your_alert_will_be_sent_to_jurisdictions" "" }}</div>
     <ul>
-    {{ range .ViewData.JurisdictionNames}}
+    {{ range .ViewData.JurisdictionNamesArray}}
         <li class="alert-target">
         {{ . }}
         </li>
@@ -39,7 +39,7 @@
 {{ if ne .ViewData.BusIds "" }}
     <div class="alert-target-message">{{ t .CurrentLocale "your_alert_will_be_sent_to_buses" "" }}</div>
     <ul>
-    {{ range .ViewData.BusNames}}
+    {{ range .ViewData.BusNamesArray}}
         <li class="alert-target">
         {{ . }}
         </li>
@@ -48,15 +48,46 @@
 {{ end }}
 
 
+{{ if ne .ViewData.RouteIds "" }}
+    <div class="alert-target-message">{{ t .CurrentLocale "your_alert_will_be_sent_to_routes" "" }}</div>
+    <ul>
+    {{ range .ViewData.RouteNamesArray}}
+        <li class="alert-target">
+        {{ . }}
+        </li>
+    {{ end }}
+    </ul>
+{{ end }}
+
+
+{{ if ne .ViewData.StopIds "" }}
+    <div class="alert-target-message">{{ t .CurrentLocale "your_alert_will_be_sent_to_stops" "" }}</div>
+    <ul>
+    {{ range .ViewData.StopNamesArray}}
+        <li class="alert-target">
+        {{ . }}
+        </li>
+    {{ end }}
+    </ul>
+{{ end }}
+
+
+
+
     <div class="row">
         <div class="col">
-            <form id="create-alert-form" class="form" role="form" method="post" action="/create_alert">
+            <form id="create-alert-form" class="form" role="form" method="post" action="/process_create_alert">
 
             {{ .CSRFTemplateField}}
                 <input name="bus_ids" type="hidden" value="{{.ViewData.BusIds}}">
+                <input name="bus_names" type="hidden" value="{{.ViewData.BusNames}}">
                 <input name="route_ids" type="hidden" value="{{.ViewData.RouteIds}}">
+                <input name="bus_names" type="hidden" value="{{.ViewData.RouteNames}}">
                 <input name="stop_ids" type="hidden" value="{{.ViewData.StopIds}}">
+                <input name="bus_names" type="hidden" value="{{.ViewData.StopNames}}">
                 <input name="jurisdiction_ids" type="hidden" value="{{.ViewData.JurisdictionIds}}">
+                <input name="bus_names" type="hidden" value="{{.ViewData.JurisdictionNames}}">
+
 
                 <div class="form-group">
                     <label for="start-date">Start</label>
@@ -90,21 +121,16 @@
 
                 <div class="form-group">
                     <label for="text">Body</label>
-                    <textarea style="height:80px;" class="form-control" id="text" name="text"></textarea>
+                    <textarea style="height:200px;" class="form-control" id="text" name="text"></textarea>
                 </div>
-
-
-            {{ if eq .Domain "safestopapp.com"}}
 
                 <div class="form-group">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" name="push_notification">Push Notification
+                            <input type="checkbox" name="push_notification"> Push Notification
                         </label>
                     </div>
                 </div>
-
-            {{ end }}
 
             </form>
         </div>
@@ -112,17 +138,15 @@
 </div>
 
 
-
-
-
-
-
-
 <script type="text/javascript">
 
     var fv;
 
     $(document).ready(function(){
+
+        $("#send-alerts").click(function(){
+            $("#create-alert-form").submit();
+        })
 
 
         $('#start-date').datepicker({
@@ -136,6 +160,7 @@
             if($("#end-date").val() != "") {
                 fv.revalidateField('end_date');
             }
+            show_send_alert_button()
         });
 
         $("#start-date-button").click(function(e){
@@ -153,12 +178,22 @@
             if($("#start-date").val() != "") {
                 fv.revalidateField('start_date');
             }
+            show_send_alert_button();
         });
 
         $("#end-date-button").click(function(e){
             e.preventDefault();
             $('#end-date').datepicker("show");
         })
+
+        $("#text").keyup(function(){
+            show_send_alert_button();
+        })
+
+        $("#priority").change(function(){
+            show_send_alert_button();
+        })
+
 
        fv = FormValidation.formValidation(
                 document.getElementById("create-alert-form"),
@@ -205,10 +240,6 @@
         )
 
 
-
-
-
-
     })
 
 
@@ -243,13 +274,25 @@
     }
 
 
+
+
+
+    function show_send_alert_button(){
+        var end_date = $("#end-date").val();
+        var start_date = $("#start-date").val();
+        var priority = $("#priority").val();
+        var text = $("#text").val();
+
+        if(start_date != "" && end_date != "" && priority != "" && text != "") {
+            $("#send-alerts").show();
+        } else {
+            $("#send-alerts").hide();
+        }
+    }
+
+
+
 </script>
-
-
-
-
-
-
 
 
 

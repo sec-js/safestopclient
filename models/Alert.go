@@ -371,3 +371,145 @@ order by d.name
 	}
 	return &r
 }
+
+type AlertsRouteDB struct {
+	RouteId int `db:"route_id"`
+	RouteName string `db:"route_name"`
+	StopId int `db:"stop_id"`
+	StopName string `db:"stop_name"`
+	StopScheduledTime string `db:"scheduled_time"`
+}
+
+type AlertsRoute struct {
+	RouteId int
+	RouteName string
+	Stops []AlertsStop
+}
+
+type AlertsStop struct {
+	StopId int
+	StopName string
+	StopScheduledTime string
+}
+
+
+
+
+func AlertsRoutesForUser(user_id int, search string) *[]AlertsRoute{
+	r := []AlertsRoute{}
+	rdb := []AlertsRouteDB{}
+
+	where_sql := " and $2 = $2"
+	if search != "" {
+		where_sql = " and (lower(r.name) like '%' || lower($2) || '%' or lower(s.name) like '%' || lower($2) || '%')"
+	}
+
+	sql := `
+select r.id as route_id,
+r.display_name as route_name,
+s.id as stop_id,
+s.display_name as stop_name,
+to_char(now()::date + (s.scheduled_time_offset + r.start_time) * interval '1 second', 'hh12:mi am') as scheduled_time
+from bus_routes r 
+join bus_route_stops s on s.bus_route_id = r.id
+join buses b on b.id = r.bus_id
+join gps_configs g on g.id = b.gps_config_id
+join jurisdictional_restrictions jr on jr.jurisdiction_id = r.jurisdiction_id
+where 1 = 1
+and jr.user_id = $1
+and r.active = true
+and r.deleted = false
+and s.active = true
+and r.deleted = false
+` + where_sql + `
+order by r.id, s.scheduled_time_offset
+`
+	rows, err := database.GetDB().Queryx(sql, user_id, search)
+	if err != nil {
+		log.Println(err.Error())
+		return &r
+	}
+	for i := 0; rows.Next(); i++ {
+		a := AlertsRouteDB{}
+		err := rows.StructScan(&a)
+		if err != nil {
+			log.Println(err.Error())
+			return &r
+		}
+		rdb = append(rdb, a)
+	}
+
+
+	current_route := AlertsRoute{}
+	current_stop := AlertsStop{}
+
+	for i := 0; i < len(rdb); i++ {
+
+
+		if current_route.RouteName == "" {
+
+			current_route.RouteId = rdb[i].RouteId
+			current_route.RouteName = rdb[i].RouteName
+			current_route.Stops = []AlertsStop{}
+
+		} else if current_route.RouteName != rdb[i].RouteName {
+
+			r = append(r, current_route)
+			current_route = AlertsRoute{}
+			current_route.RouteId = rdb[i].RouteId
+			current_route.RouteName = rdb[i].RouteName
+			current_route.Stops = []AlertsStop{}
+
+		}
+
+		current_stop = AlertsStop{}
+		current_stop.StopId = rdb[i].StopId
+		current_stop.StopName = rdb[i].StopName
+		current_stop.StopScheduledTime = rdb[i].StopScheduledTime
+		current_route.Stops = append(current_route.Stops, current_stop)
+
+	}
+	r = append(r, current_route)
+
+	return &r
+}
+
+
+func InsertAlerts(user *User, ids string, priority string, start_date string, end_date string, text string, alert_for string) bool {
+
+	r := false
+
+	if len(priority) == 0 || len(text) == 0 || len(start_date) == 0 || len(end_date) == 0 {
+		return r
+	}
+
+	id_array := strings.Split(ids, ",")
+	for i := 0; i < len(id_array); i++ {
+
+		id, err := strconv.Atoi(id_array[i])
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		sql := `
+insert into safe_stop_broadcast_messages (` + alert_for + `_id,user_id,start_date,end_date,priority,text,created_at,updated_at) 
+values ($1,$2,$3,$4,$5,$6,now(),now())
+`
+		_, err = database.GetDB().Exec(
+			sql,
+			id,
+			user.Id,
+			start_date,
+			end_date,
+			priority,
+			text)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		r = true
+	}
+	return r
+}
+

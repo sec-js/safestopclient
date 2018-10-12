@@ -64,6 +64,21 @@
                 </td>
                 <td align="center">
 
+                    <div align="center">
+                        <form method="post" action="/create_alert">
+                        {{ .CSRFTemplateField}}
+
+                            <input type="hidden" id="route-ids" name="route_ids">
+                            <input type="hidden" id="route-names" name="route_names">
+
+                            <input type="hidden" id="stop-ids" name="stop_ids">
+                            <input type="hidden" id="stop-names" name="stop_names">
+
+                            <button class="btn btn-safe-stop btn-block" id="send-alerts" style="display: none; max-width: 90%;">
+                            {{ t .CurrentLocale "alert" ""}}
+                            </button>
+                        </form>
+                    </div>
 
                 </td>
                 <td align="center">

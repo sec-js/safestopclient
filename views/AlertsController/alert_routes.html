@@ -6,125 +6,271 @@
 
 <style>
 
-    .alerts-dashboard-header{
-        background: #F0F0F0;
-        padding: 15px;
-        border: 1px solid #ccc;
-    }
-
-    .alerts-dashboard-header .header{
-        color: #AE0F32;
+    .alert-page-header {
         font-size: 20pt;
     }
 
-    .alerts-dashboard-header .sub-header {
+    .alert-page-header-description {
         font-size: 12pt;
         font-weight: 300;
     }
 
-    .alerts-target-li {
+    .alert-target {
+        cursor: pointer;
+        font-size: 16pt;
+    }
+
+    .target-stop {
+        font-size: 12pt !important;
+    }
+
+    .fa-square-o {
+        font-size: 18pt;
+    }
+
+    .fa-check-square-o {
+        font-size: 18pt;
+    }
+
+    .selected {
+        background: #e9ecef;
+    }
+
+    .alert-this-route-title {
+        font-weight: bold;
+        font-style: italic;
+        font-size: 12pt;
+        color: #A12130;
+    }
+
+    .alert-stop-title {
+        font-size: 12pt;
+        font-weight: 400;
+    }
+
+    .alert-route-title {
+        font-size: 16pt;
+    }
+
+    .list-group-item {
         cursor: pointer;
     }
 
-    .alerts-target {
-        font-size: 16pt;
-        font-weight: 500;
+    .disable-stops {
+        font-weight: 200;
+        font-color: #ccc;
     }
 
-    .alerts-target-description {
-        font-size: 12pt;
-        font-weight: 300;
+    .stop-disabled {
+        font-weight: 200;
+        color: #ccc;
     }
 
-
-    .alert-target-link {
-        color: #AE0F32;
-        font-weight: 600;
-    }
-
-    .fa-chevron-right {
-        color: #AE0F32;
-        font-size: 20pt;
-    }
 
 </style>
 
 
-<div class="alerts-dashboard-header">
-    <div class="header">
-    {{ t .CurrentLocale "dashboard" "" }}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col alert-page-header">
+        {{ t .CurrentLocale "by_route_or_stop" "" }}
+        </div>
     </div>
-
-    <div class="sub-header">
-    {{ t .CurrentLocale "select_audience" "" }}
+    <div class="row">
+        <div class="col alert-page-header-description">
+        {{ t .CurrentLocale "by_route_or_stop_description" "" }}
+        </div>
     </div>
 </div>
 
 
+<div class="card" style="border-radius: 0px; margin-top: 10px;">
+    <div class="card-header">
+        <form method="get" action="/alert_routes" class="form">
+        {{ .CSRFTemplateField}}
+            <div class="form-group">
+                <input name="search" type="text" class="form-control" placeholder="{{ t .CurrentLocale "search" "" }}" value="{{.ViewData.Search}}">
+            </div>
 
-<ul class="list-group">
-    <li class="list-group-item alerts-target-li">
-        <table style="width: 100%;">
+            <div class="form-group">
+                <button class="btn btn-safestop btn-block" id="search">{{ t .CurrentLocale "search" "" }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<ul class="list-group" style="margin-top: 10px; overflow-y: scroll;">
+
+{{ range .ViewData.Routes }}
+
+    <li class="list-group-item">
+
+        <table class="alert-route-table" style="width: 100%;" data-name="{{.RouteName}}" data-id="{{.RouteId}}" >
             <tr>
-                <td style="width: 100%;">
-                    <div class="alerts-target">
-                    {{ t .CurrentLocale "by_jurisdiction" "" }}
-                    </div>
-                    <div class="alerts-target-description">
-                    {{ t .CurrentLocale "by_jurisdiction_description" "" }}
-                    </div>
+                <td style="width: 100%;" class="alert-route-title">
+                {{ .RouteName}}
                 </td>
-                <td style="vertical-align: middle;">
-                    <i class="fa fa-chevron-right"></i>
+                <td>
+                    <i data-id="{{.RouteId}}" class='fa fa-chevron-right'></i>
                 </td>
             </tr>
         </table>
-    </li>
 
-    <li class="list-group-item alerts-target-li">
-        <table style="width: 100%;">
+        <div style="margin-top: 5px; padding-top: 5px; padding-bottom: 5px; border-top: 1px solid #ccc; display: none;" class="route-detail-{{ .RouteId }}">
+
+        <table style="width: 100%" class="alert-target target-route" data-name="{{.RouteName}}" data-id="{{.RouteId}}" data-target_type="route">
             <tr>
-                <td style="width: 100%;">
-                    <div class="alerts-target">
-                    {{ t .CurrentLocale "by_route_or_stop" "" }}
-                    </div>
-                    <div class="alerts-target-description">
-                    {{ t .CurrentLocale "by_route_or_stop_description" "" }}
-                    </div>
+                <td style="width: 100%;" class="alert-this-route-title">
+                {{ t $.CurrentLocale "alert_this_route" "" }}
                 </td>
-                <td style="vertical-align: middle;">
-                    <i class="fa fa-chevron-right"></i>
+                <td>
+                    <i data-id="{{.RouteId}}" data-name="{{.RouteName}}" data-target_type="route" class='fa fa-square-o'></i>
                 </td>
             </tr>
         </table>
+
+        {{ range .Stops }}
+                <table style="width: 100%; margin-top: 5px;" class="alert-target target-stop" data-name="{{.StopName}}" data-id="{{.StopId}}" data-target_type="stop">
+                    <tr>
+                        <td style="width: 100%;" class="alert-stop-title">
+                                    <span style="font-style:italic; font-weight: 300; font-size: 10pt;">
+                                    {{ .StopScheduledTime }}
+                                    </span> - {{ .StopName}}
+                        </td>
+                        <td>
+                            <i data-id="{{.StopId}}" data-name="{{.StopName}}" data-target_type="stop" class='fa fa-square-o'></i>
+                        </td>
+                    </tr>
+                </table>
+        {{ end }}
+
+
+
+    </div>
+
+
+
+
+
+
+
+
     </li>
 
-    <li class="list-group-item alerts-target-li">
-        <table style="width: 100%;">
-            <tr>
-                <td style="width: 100%;">
-                    <div class="alerts-target">
-                    {{ t .CurrentLocale "by_bus" "" }}
-                    </div>
-                    <div class="alerts-target-description">
-                    {{ t .CurrentLocale "by_bus_description" "" }}
-                    </div>
-                </td>
-                <td style="vertical-align: middle;">
-                    <i class="fa fa-chevron-right"></i>
-                </td>
-            </tr>
-        </table>
-    </li>
 
+
+{{ end }}
 </ul>
-
-
 
 
 
 <script type="text/javascript">
 
+    $(document).ready(function(){
+
+        $("ul").css('height', $(window).height() - $(".nav-bar-bottom").height() - $(".nav-bar-top").height() - 225 + 'px')
+
+
+        $(document).on("click", ".alert-route-table", function (e){
+            var route_id = $(this).data("id");
+            var i = $(this).find("tr td:eq(1) .fa");
+            if($(".route-detail-" + route_id).css("display") == "none") {
+                $(i).removeClass("fa-chevron-right");
+                $(i).addClass("fa-chevron-down")
+                $(".route-detail-" + route_id).show();
+            } else {
+                $(i).addClass("fa-chevron-right");
+                $(i).removeClass("fa-chevron-down")
+                $(".route-detail-" + route_id).hide();
+            }
+        });
+
+
+
+
+
+
+        $(document).on("click", ".alert-target", function (e){
+            var i = $(this).find("tr td:eq(1) .fa");
+            var table = $(this);
+            var target_type = $(this).data("target_type");
+
+            if($(i).hasClass("fa-check-square-o")) {
+                $(i).removeClass("fa-check-square-o");
+                $(i).addClass("fa-square-o");
+                $(table).removeClass("selected");
+
+
+                if(target_type == "route") {
+
+                    $(table).parent().find(".target-stop")
+                            .removeClass("stop-disabled")
+                            .addClass("alert-target");
+
+                    $(table).parent().find(".target-stop").find("i")
+                            .removeClass("fa-check-square-o")
+                            .removeClass("fa-square-o")
+                            .addClass("fa-square-o");
+                }
+
+            } else {
+                $(i).removeClass("fa-square-o");
+                $(i).addClass("fa-check-square-o");
+                $(table).addClass("selected")
+
+
+                $(".stops-" + $(table).data("id")).addClass("disable-stops");
+
+
+                if(target_type == "route") {
+
+                    $(table).parent().find(".target-stop")
+                            .addClass("stop-disabled")
+                            .removeClass("selected")
+                            .removeClass("alert-target");
+
+                    $(table).parent().find(".target-stop").find("i")
+                            .removeClass("fa-check-square-o")
+                            .removeClass("fa-square-o")
+                            .removeClass("selected")
+                            .addClass("fa-square-o");
+                }
+            }
+
+
+            var route_ids = [];
+            var route_names = [];
+            var stop_ids = [];
+            var stop_names = [];
+
+            if ($('.fa-check-square-o').length > 0) {
+                $("#send-alerts").show();
+
+                $(".fa-check-square-o").each(function(i,obj){
+
+                    if($(obj).data("target_type") == "route") {
+                        route_ids.push($(obj).data("id"));
+                        route_names.push($(obj).data("name"));
+                    }
+                    else if ($(obj).data("target_type") == "stop") {
+                        stop_ids.push($(obj).data("id"));
+                        stop_names.push($(obj).data("name"));
+                    }
+                })
+
+            } else {
+                $("#send-alerts").hide();
+            }
+
+            $("#route-ids").val(route_ids.join(","));
+            $("#route-names").val(route_names.join(","));
+            $("#stop-ids").val(stop_ids.join(","));
+            $("#stop-names").val(stop_names.join(","));
+
+        })
+
+    })
 
 </script>
 

@@ -14,6 +14,8 @@ import (
 
 func CreateSNSEndpoint(device_platform string, device_token string) string {
 
+	defer AppError("CreateSNSEndpoint")
+
 	platform_arn := ""
 	if device_platform == "Android" {
 		platform_arn = viper.GetString("SNS_ANDROID_ARN")
@@ -58,6 +60,8 @@ func CreateSNSEndpoint(device_platform string, device_token string) string {
 
 
 func CreateSNSEndpointWithLambda(device_platform string, device_token string) string {
+
+	defer AppError("CreateSNSEndpointWithLambda")
 
 	platform_arn := ""
 	if device_platform == "Android" {
@@ -111,3 +115,47 @@ func CreateSNSEndpointWithLambda(device_platform string, device_token string) st
 
 	return end_point_arn
 }
+
+
+func SendPushNotification(devices []string, text string) bool {
+
+	defer AppError("SendPushNotification")
+
+	if len(devices) == 0 {
+		return false
+	}
+
+	for i := 0; i < len(devices); i++ {
+
+		aws_config := aws.Config{
+			Credentials: credentials.NewEnvCredentials(),
+			Region:      aws.String(viper.GetString("SNS_REGION")),
+		}
+
+		sess, err := session.NewSession(&aws_config)
+		if err != nil {
+			return false
+		}
+
+		if sess == nil {
+			return false
+		}
+
+		sns_client := sns.New(sess, &aws_config)
+		if sns_client == nil {
+			return false
+		}
+
+		p := sns.PublishInput{
+			TargetArn: aws.String(devices[i]),
+			Message: aws.String(text),
+		}
+
+		sns_client.Publish(&p)
+		return true
+
+	}
+
+	return false
+}
+
