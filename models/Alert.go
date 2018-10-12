@@ -378,11 +378,13 @@ type AlertsRouteDB struct {
 	StopId int `db:"stop_id"`
 	StopName string `db:"stop_name"`
 	StopScheduledTime string `db:"scheduled_time"`
+	Bus string `db:"bus"`
 }
 
 type AlertsRoute struct {
 	RouteId int
 	RouteName string
+	Bus string
 	Stops []AlertsStop
 }
 
@@ -401,7 +403,7 @@ func AlertsRoutesForUser(user_id int, search string) *[]AlertsRoute{
 
 	where_sql := " and $2 = $2"
 	if search != "" {
-		where_sql = " and (lower(r.name) like '%' || lower($2) || '%' or lower(s.name) like '%' || lower($2) || '%')"
+		where_sql = " and (lower(r.name) like '%' || lower($2) || '%' or lower(b.name) like '%' || lower($2) || '%')"
 	}
 
 	sql := `
@@ -409,7 +411,8 @@ select r.id as route_id,
 r.display_name as route_name,
 s.id as stop_id,
 s.display_name as stop_name,
-to_char(now()::date + (s.scheduled_time_offset + r.start_time) * interval '1 second', 'hh12:mi am') as scheduled_time
+to_char(now()::date + (s.scheduled_time_offset + r.start_time) * interval '1 second', 'hh12:mi am') as scheduled_time,
+b.name as bus
 from bus_routes r 
 join bus_route_stops s on s.bus_route_id = r.id
 join buses b on b.id = r.bus_id
@@ -450,6 +453,7 @@ order by r.id, s.scheduled_time_offset
 
 			current_route.RouteId = rdb[i].RouteId
 			current_route.RouteName = rdb[i].RouteName
+			current_route.Bus = rdb[i].Bus
 			current_route.Stops = []AlertsStop{}
 
 		} else if current_route.RouteName != rdb[i].RouteName {
@@ -457,6 +461,7 @@ order by r.id, s.scheduled_time_offset
 			r = append(r, current_route)
 			current_route = AlertsRoute{}
 			current_route.RouteId = rdb[i].RouteId
+			current_route.Bus = rdb[i].Bus
 			current_route.RouteName = rdb[i].RouteName
 			current_route.Stops = []AlertsStop{}
 
@@ -493,8 +498,8 @@ func InsertAlerts(user *User, ids string, priority string, start_date string, en
 		}
 
 		sql := `
-insert into safe_stop_broadcast_messages (` + alert_for + `_id,user_id,start_date,end_date,priority,text,created_at,updated_at) 
-values ($1,$2,$3,$4,$5,$6,now(),now())
+insert into safe_stop_broadcast_messages (` + alert_for + `_id,user_id,start_date,end_date,priority,text,created_at,updated_at, active) 
+values ($1,$2,$3,$4,$5,$6,now(),now(),true)
 `
 		_, err = database.GetDB().Exec(
 			sql,

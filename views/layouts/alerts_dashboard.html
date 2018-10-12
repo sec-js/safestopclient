@@ -77,6 +77,21 @@
 </body>
 </html>
 
+
+<script type="text/javascript">
+
+    $(document).ready(function(){
+
+        $(document).on("click", ".alert", function(e){
+            e.stopPropagation();
+            $(this).remove();
+        })
+    })
+
+</script>
+
+
+
 {{end}}
 
 

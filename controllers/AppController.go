@@ -125,6 +125,11 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 		c.PermissionGroups.License_5,
 	}, u)
 
+	if u.SuperAdmin == true {
+		view_manage_subscriptions = false
+	}
+
+
 	view_lost_item_reports := false
 	for i := 0; i < len(cj.Jurisdictions); i++ {
 		if cj.Jurisdictions[i].HasLostItemReports == true {
