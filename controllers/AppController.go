@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/schoolwheels/safestopclient/database"
 	"github.com/schoolwheels/safestopclient/models"
@@ -441,6 +442,11 @@ func (c *AppController) FailedRegistrationAttemptAction(w http.ResponseWriter, r
 
 					//TODO SEND FAILED REGISTRATION ATTEMPT EMAIL
 
+					a := c.SendEmail(r, []string{"swaller@safestopapp.com"}, "SafeStop - Failed Registration Attempt", "failed_registration_attempt", data)
+
+					c.SendEmail(r, []string{"swaller@safestopapp.com"}, "SafeStop - Failed Registration Attempt", "failed_registration_attempt", data)
+
+					fmt.Println(a)
 					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
 					http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
 					return
