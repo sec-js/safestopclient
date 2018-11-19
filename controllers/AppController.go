@@ -263,6 +263,9 @@ func (c *AppController) ActivateAction(w http.ResponseWriter, r *http.Request) {
 
 		registration_type := r.FormValue("registration_type")
 
+		jurisdiction := models.FindJurisdiction(jurisdiction_id)
+		jurisdiction_name := jurisdiction.Name
+
 		product_id := models.ActiveProductIdForJurisdiction(jurisdiction_id)
 		if product_id == 0 {
 			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "jurisdiction_has_no_products", "")), c.BootstrapAlertClass.Danger)
@@ -294,7 +297,7 @@ func (c *AppController) ActivateAction(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "you_have_successfully_registered_for", "")), c.BootstrapAlertClass.Info)
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "you_have_successfully_registered_for", ""))+ " " + jurisdiction_name, c.BootstrapAlertClass.Info)
 		http.Redirect(w, r, r.URL.Host+ "/", http.StatusFound)
 		return
 
