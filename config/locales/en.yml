@@ -467,7 +467,7 @@ en:
   by_jurisdiction_description: "Send an alert to all users in a jurisdiction"
   alert_jurisdiction: "Alert Jurisdiction"
   alert_multiple_jurisdictions: "Alert Multiple Jurisdictions"
-  by_route_or_stop: "Alert Route(s)/Stop(s)"
+  by_route_or_stop: "Alert Specific Routes or Bus Stops"
   by_route_or_stop_description: "Send an alert to all users watching a specific route or stop"
   alert_route_or_stop: "Alert a Bus Stop / Single Route"
   alert_multiple_routes: "Alert multiple routes"

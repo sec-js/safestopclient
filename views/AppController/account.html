@@ -239,7 +239,7 @@
                         <i style="color:#555;" class="ss ss-call"></i>
                     </td>
                     <td>
-                        <a href='{{ .Phone }}'>{{ .Phone }}</a>
+                        <a href='tel://{{ .Phone }}'>{{ .Phone }}</a>
                     </td>
                 </tr>
             </table>
@@ -259,7 +259,7 @@
     {{ t .CurrentLocale "connect_with_terminal" "" }}
     </li>
 
-    <a href="/report_an_app_issue" class="list-group-item account-li" id="report-lost-item">
+    <a href="/report_an_app_issue" class="list-group-item account-li" id="report-app-issue">
         <table class="list-item-table">
             <tr>
                 <td class="icon-font">
