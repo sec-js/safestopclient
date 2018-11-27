@@ -1,0 +1,142 @@
+<form id="get-safe-stop-form" action="/process_get_safe_stop_request" method="post" style="margin-bottom:20px;">
+  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-12 h3" align="center" style="color: #A12130;">
+        <%= t('ss_get_safe_stop_parents_4', locale: current_locale) %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12" style="padding-top: 10px;">
+        <div class="form-group">
+          <input class="form-control" id="first_name" name="firstname" placeholder="<%= t('first_name', locale: current_locale) %>">
+        </div>
+
+        <div class="form-group">
+          <input class="form-control" id="last_name" name="lastname" placeholder="<%= t('last_name', locale: current_locale) %>">
+        </div>
+
+        <div class="form-group">
+          <input class="form-control" id="email" name="email" placeholder="<%= t('email', locale: current_locale) %>">
+        </div>
+
+        <div class="form-group">
+          <input class="form-control" id="school_or_district" name="school_or_district" placeholder="<%= t('school_or_district', locale: current_locale) %>">
+        </div>
+
+        <div class="form-group">
+
+          <%= t('are_you_a_school_or_district_employee', locale: current_locale) %>
+
+          <div class="radio">
+            <label><input type="radio" name="school_or_district_employee" value="1">Yes</label>
+            <label><input type="radio" name="school_or_district_employee" value="0">No</label>
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <input class="form-control" id="city" name="city" placeholder="<%= t('city', locale: current_locale) %>">
+        </div>
+
+        <div class="form-group">
+          <select class="form-control" id="state" name="state">
+            <option value=""><%= t('state_or_province', locale: current_locale) %></option>
+            <% State.all.order(:name).each do |s| %>
+                <option value="<%= s.abbreviation %>"><%= s.name %></option>
+            <% end %>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <table style="width: 100%;">
+            <tr>
+              <td style="width: 50%;">
+                <a href="/check_availability?postal_code=<%= @postal_code %>" class="btn btn-default btn-block no-right-radius"><%= t('cancel', locale: current_locale) %></a>
+              </td>
+              <td style="width: 50%;">
+                <button class="btn btn-safestop btn-block no-left-radius" type="submit"><%= t('submit', locale: current_locale) %></button>
+              </td>
+            </tr>
+          </table>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+</form>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('#get-safe-stop-form').formValidation({
+            framework: 'bootstrap',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                firstname: {validators: {notEmpty: {message: '<%= t('required', locale: current_locale) %>'}}},
+                lastname: {validators: {notEmpty: {message: '<%= t('required', locale: current_locale) %>'}}},
+                email: {
+                    validators: {
+                        regexp: {
+                            regexp: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                            message: "<%= t('invalid_email_format', locale: current_locale) %>"
+                        },
+                        notEmpty: {message: '<%= t('required', locale: current_locale) %>'},
+                    }
+                },
+                schooldistrict: {
+                    validators: {
+                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
+                    }
+                },
+                city: {
+                    validators: {
+                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
+                    }
+                },
+                state: {
+                    validators: {
+                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
+                    }
+                },
+                school_or_district: {
+                    validators: {
+                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"}
+                    }
+                },
+                zipcode: {
+                    validators: {
+                        notEmpty: {message: "<%= t('required', locale: current_locale) %>"},
+                    }
+                }
+            }
+        });
+
+        $(".zipcode").focusout(function () {
+            $.post("/safe_stop/find_city_state_for_postal_code", {postal_code: $(this).val()},
+                function (response) {
+                    if (response != null) {
+                        $("#city").val(response.city);
+                        $("#state").val(response.state_code);
+                    }
+                    else {
+                        $("#city").val('');
+                        $("#state").val(-1);
+                    }
+                    $('#get-safe-stop-form').data('bootstrapValidator').validateField('city');
+                    $('#get-safe-stop-form').data('bootstrapValidator').validateField('state');
+                })
+        });
+
+    })
+
+</script>
