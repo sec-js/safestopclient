@@ -420,19 +420,20 @@ password_digest,
 locked,
 super_admin,
 coalesce(
-
 (select array_to_string(array_agg(a.name), ',')
 from permission_groups a 
 join permission_groups_users b on b.permission_group_id = a.id 
 and b.user_id = id 
-and a.security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1))
-from users 
+and a.security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1)), '') as permission_groups
+from users
 where lower(email) = $1
 and (security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1)
 or super_admin = true)
 limit 1
 `
+
 	row := database.GetDB().QueryRowx(query, email)
+	
 	if row == nil {
 		return nil
 	} else {
