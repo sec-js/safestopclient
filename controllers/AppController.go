@@ -34,6 +34,7 @@ func (c *AppController) Register() {
 	c.addTemplate("lost_item_report", "lost_item_report.html", "default.html")
 	c.addTemplate( "setup", "setup.html", "setup.html")
 	c.addTemplate( "map", "map.html", "map.html")
+	c.addTemplate("get_safe_stop_request", "get_safe_stop_request.html", "default.html")
 
 
 
@@ -60,6 +61,7 @@ func (c *AppController) Register() {
 	c.addRouteWithPrefix("/lost_item_report", c.LostItemReportAction)
 	c.addRouteWithPrefix("/setup", c.SetupAction)
 	c.addRouteWithPrefix("/map", c.MapAction)
+	c.addRouteWithPrefix("/get_safe_stop_in_your_school/{postal_code}", c.GetSafeStopRequestAction)
 
 }
 
@@ -209,14 +211,6 @@ func (c *AppController) CheckAvailabilityAction(w http.ResponseWriter, r *http.R
 
 }
 
-
-
-
-
-
-
-
-
 func (c *AppController) ActivateAction(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
@@ -317,7 +311,6 @@ func (c *AppController) ChangeLocaleAction(w http.ResponseWriter, r *http.Reques
 	http.Redirect(w, r,"/language", http.StatusFound)
 }
 
-
 func (c *AppController) LanguageAction(w http.ResponseWriter, r *http.Request) {
 
 	uid := currentUserId(c.ControllerBase, r)
@@ -336,7 +329,6 @@ func (c *AppController) LanguageAction(w http.ResponseWriter, r *http.Request) {
 
 	c.render(w, r, "language", data)
 }
-
 
 func (c *AppController) MapAction(w http.ResponseWriter, r *http.Request) {
 
@@ -405,8 +397,6 @@ func (c *AppController) FaqAction(w http.ResponseWriter, r *http.Request) {
 	c.render(w, r, "faq", data)
 }
 
-
-
 func (c *AppController) FailedRegistrationAttemptAction(w http.ResponseWriter, r *http.Request) {
 
 	user_id := currentUserId(c.ControllerBase, r)
@@ -466,7 +456,6 @@ func (c *AppController) FailedRegistrationAttemptAction(w http.ResponseWriter, r
 	}
 }
 
-
 func (c *AppController) AppIssueAction(w http.ResponseWriter, r *http.Request) {
 
 	user_id := currentUserId(c.ControllerBase, r)
@@ -522,11 +511,6 @@ func (c *AppController) AppIssueAction(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-
-
-
-
 func (c *AppController) RemoveAllStopsAction(w http.ResponseWriter, r *http.Request) {
 
 	user_id := currentUserId(c.ControllerBase, r)
@@ -545,8 +529,6 @@ func (c *AppController) RemoveAllStopsAction(w http.ResponseWriter, r *http.Requ
 
 	http.Redirect(w, r, r.URL.Host+"/", http.StatusFound)
 }
-
-
 
 func (c *AppController) ManageNotificationsAction(w http.ResponseWriter, r *http.Request) {
 
@@ -582,10 +564,6 @@ func (c *AppController) ManageNotificationsAction(w http.ResponseWriter, r *http
 	c.render(w, r, "manage_notifications", data)
 }
 
-
-
-
-
 func (c *AppController) ManageSubscriptionsAction(w http.ResponseWriter, r *http.Request) {
 
 	user_id := currentUserId(c.ControllerBase, r)
@@ -612,7 +590,6 @@ func (c *AppController) ManageSubscriptionsAction(w http.ResponseWriter, r *http
 
 	c.render(w, r, "manage_subscriptions", data)
 }
-
 
 func (c *AppController) SubscriptionDetailsAction(w http.ResponseWriter, r *http.Request) {
 
@@ -671,15 +648,6 @@ func (c *AppController) SubscriptionDetailsAction(w http.ResponseWriter, r *http
 
 	c.render(w, r, "subscription_details", data)
 }
-
-
-
-
-
-
-
-
-
 
 func (c *AppController) AddScanNotificationSubscriptionAction(w http.ResponseWriter, r *http.Request) {
 
@@ -743,10 +711,6 @@ func (c *AppController) RemoveScanNotificationSubscriptionAction(w http.Response
 	http.Redirect(w, r, r.URL.Host+ r.FormValue("out_action"), http.StatusFound)
 }
 
-
-
-
-
 func (c *AppController) AddStudentAction(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
@@ -777,19 +741,6 @@ func (c *AppController) AddStudentAction(w http.ResponseWriter, r *http.Request)
 	http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 func (c *AppController) RemoveStudentAction(w http.ResponseWriter, r *http.Request) {
 
 	user_id := currentUserId(c.ControllerBase, r)
@@ -818,11 +769,6 @@ func (c *AppController) RemoveStudentAction(w http.ResponseWriter, r *http.Reque
 
 	http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
 }
-
-
-
-
-
 
 func (c *AppController) AddSubAccountUserAction(w http.ResponseWriter, r *http.Request) {
 
@@ -905,9 +851,6 @@ func (c *AppController) AddSubAccountUserAction(w http.ResponseWriter, r *http.R
 	http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
 }
 
-
-
-
 func (c *AppController) RemoveSubAccountUserAction(w http.ResponseWriter, r *http.Request) {
 
 	user_id := currentUserId(c.ControllerBase, r)
@@ -956,122 +899,6 @@ func (c *AppController) RemoveSubAccountUserAction(w http.ResponseWriter, r *htt
 	http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-func (c *AppController) LostItemReportAction(w http.ResponseWriter, r *http.Request) {
-
-	user_id := currentUserId(c.ControllerBase, r)
-
-	if user_id == 0 {
-		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
-		return
-	}
-
-	u := models.FindUser(user_id)
-	cj := models.ClientJurisdictionForUser(u, c.PermissionGroups)
-	if cj == nil {
-		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
-		return
-	}
-
-	jurisdiction_id := 0
-	jurisdiction_name := ""
-	for i := 0; i < len(cj.Jurisdictions); i++ {
-		if cj.Jurisdictions[i].HasLostItemReports == true {
-			jurisdiction_id = cj.Jurisdictions[i].Id
-			jurisdiction_name = cj.Jurisdictions[i].Name
-			break
-		}
-	}
-	if jurisdiction_id == 0 {
-		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
-		return
-	}
-
-
-
-	if r.Method == "GET" {
-		data := models.LostItemReport{}
-		data.Email = u.Email
-		data.JurisdictionId = jurisdiction_id
-		c.render(w, r, "lost_item_report", data)
-		return
-
-	} else {
-
-		data := models.LostItemReport{
-			JurisdictionId: jurisdiction_id,
-			JurisdictionName: jurisdiction_name,
-			FirstName: r.FormValue("first_name"),
-			LastName: r.FormValue("last_name"),
-			Email: u.Email,
-			Summary: r.FormValue("summary"),
-			Phone: r.FormValue("phone"),
-			RouteIdentifier: r.FormValue("route_identifier"),
-			DateLost: r.FormValue("date_lost"),
-			Description: r.FormValue("description"),
-		}
-		success := models.InsertLostItemReport(&data)
-		if success == true {
-			//TODO SEND LOST ITEM REPORT EMAIL
-
-
-			c.SendEmail(r,[]string{
-				"acook@ridesta.com"},
-			"SafeStop Lost Item Report Received",
-			"lost_item_report",
-			data,
-			)
-
-			c.SendEmail(r,[]string{
-				"acook@ridesta.com"},
-				"SafeStop Lost Item Report Received",
-				"lost_item_report_autoreply",
-				data,
-			)
-
-			//m := models.NewMailRequest([]string{"acook@ridesta.com"},"SafeStop Lost Item Report Received", "")
-			//err := c.ParseMailTemplate(m,"lost_item_report", r, data)
-			//if err == nil {
-			//	ok, _ := m.SendEmail()
-			//	fmt.Println(ok)
-			//}
-			//
-			//arm := models.NewMailRequest([]string{u.Email},"SafeStop Lost Item Report Received", "")
-			//err = c.ParseMailTemplate(arm,"lost_item_report_autoreply", r, data)
-			//if err == nil {
-			//	ok, _ := arm.SendEmail()
-			//	fmt.Println(ok)
-			//}
-
-
-			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
-			http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
-			return
-		} else {
-			c.render(w, r, "lost_item_report", data)
-			return
-		}
-
-	}
-
-}
-
-
-
-
 func (c *AppController) SetupAction(w http.ResponseWriter, r *http.Request) {
 
 	user_id := currentUserId(c.ControllerBase, r)
@@ -1119,6 +946,144 @@ func (c *AppController) SetupAction(w http.ResponseWriter, r *http.Request) {
 
 
 	c.render(w, r, "setup", data)
+}
+
+func (c *AppController) LostItemReportAction(w http.ResponseWriter, r *http.Request) {
+
+	user_id := currentUserId(c.ControllerBase, r)
+
+	if user_id == 0 {
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	u := models.FindUser(user_id)
+	cj := models.ClientJurisdictionForUser(u, c.PermissionGroups)
+	if cj == nil {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	jurisdiction_id := 0
+	jurisdiction_name := ""
+	for i := 0; i < len(cj.Jurisdictions); i++ {
+		if cj.Jurisdictions[i].HasLostItemReports == true {
+			jurisdiction_id = cj.Jurisdictions[i].Id
+			jurisdiction_name = cj.Jurisdictions[i].Name
+			break
+		}
+	}
+	if jurisdiction_id == 0 {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	if r.Method == "GET" {
+		data := models.LostItemReport{}
+		data.Email = u.Email
+		data.JurisdictionId = jurisdiction_id
+		c.render(w, r, "lost_item_report", data)
+		return
+
+	} else {
+
+		data := models.LostItemReport{
+			JurisdictionId: jurisdiction_id,
+			JurisdictionName: jurisdiction_name,
+			FirstName: r.FormValue("first_name"),
+			LastName: r.FormValue("last_name"),
+			Email: u.Email,
+			Summary: r.FormValue("summary"),
+			Phone: r.FormValue("phone"),
+			RouteIdentifier: r.FormValue("route_identifier"),
+			DateLost: r.FormValue("date_lost"),
+			Description: r.FormValue("description"),
+		}
+		success := models.InsertLostItemReport(&data)
+		if success == true {
+			//TODO SEND LOST ITEM REPORT EMAIL
+
+
+			c.SendEmail(r,[]string{
+				"acook@ridesta.com"},
+				"SafeStop Lost Item Report Received",
+				"lost_item_report",
+				data,
+			)
+
+			c.SendEmail(r,[]string{
+				"acook@ridesta.com"},
+				"SafeStop Lost Item Report Received",
+				"lost_item_report_autoreply",
+				data,
+			)
+
+			//m := models.NewMailRequest([]string{"acook@ridesta.com"},"SafeStop Lost Item Report Received", "")
+			//err := c.ParseMailTemplate(m,"lost_item_report", r, data)
+			//if err == nil {
+			//	ok, _ := m.SendEmail()
+			//	fmt.Println(ok)
+			//}
+			//
+			//arm := models.NewMailRequest([]string{u.Email},"SafeStop Lost Item Report Received", "")
+			//err = c.ParseMailTemplate(arm,"lost_item_report_autoreply", r, data)
+			//if err == nil {
+			//	ok, _ := arm.SendEmail()
+			//	fmt.Println(ok)
+			//}
+
+
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
+			http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+			return
+		} else {
+			c.render(w, r, "lost_item_report", data)
+			return
+		}
+
+	}
+
+}
+
+func (c *AppController) GetSafeStopRequestAction(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		data := models.SafeStopInquiry{}
+		c.render(w, r, "get_safe_stop_request", data)
+		return
+
+	} else {
+
+		log.Println(r.FormValue("SchoolOrDistrictEmployee"))
+
+		data := models.SafeStopInquiry{
+			FirstName: r.FormValue("first_name"),
+			LastName: r.FormValue("last_name"),
+			Email: r.FormValue("email"),
+			City: r.FormValue("city"),
+			State: r.FormValue("state"),
+			//SchoolOrDistrictEmployee: r.FormValue("SchoolOrDistrictEmployee"),
+			SchoolOrDistrict: r.FormValue("SchoolOrDistrict")}
+
+		success := models.InsertSafeStopInquiry(&data)
+		if success == true {
+
+			c.SendEmail(r,[]string{
+				"swaller@safestopapp.com"},
+				"SafeStop Request Received",
+				"get_safe_stop_request",
+				data,
+			)
+
+
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
+			http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+			return
+		} else {
+			c.render(w, r, "get_safe_stop_request", data)
+			return
+		}
+
+	}
 }
 
 
