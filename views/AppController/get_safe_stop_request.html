@@ -3,11 +3,10 @@
 {{end}}
 {{define "body"}}
 
-<form id="get-safe-stop-form" action="/process_get_safe_stop_request" method="post" style="margin-bottom:20px;">
+<form id="get-safe-stop-form" action="/get_safe_stop_in_your_school/{{ .ViewData.PostalCode }}" method="post" style="margin-bottom:20px;">
 
 {{ .CSRFTemplateField}}
 
-    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12 h3" align="center" style="color: #A12130;">
@@ -17,11 +16,11 @@
         <div class="row">
             <div class="col-sm-12" style="padding-top: 10px;">
                 <div class="form-group">
-                    <input class="form-control" id="first_name" name="firstname" placeholder="{{ t .CurrentLocale "first_name" "" }}">
+                    <input class="form-control" id="first_name" name="first_name" placeholder="{{ t .CurrentLocale "first_name" "" }}">
                 </div>
 
                 <div class="form-group">
-                    <input class="form-control" id="last_name" name="lastname" placeholder="{{ t .CurrentLocale "last_name" "" }}">
+                    <input class="form-control" id="last_name" name="last_name" placeholder="{{ t .CurrentLocale "last_name" "" }}">
                 </div>
 
                 <div class="form-group">
@@ -37,8 +36,14 @@
                     {{ t .CurrentLocale "are_you_a_school_or_district_employee" "" }}
 
                     <div class="radio">
-                        <label><input type="radio" name="school_or_district_employee" value="1">Yes</label>
-                        <label><input type="radio" name="school_or_district_employee" value="0">No</label>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" value="yes" name="school_or_district_employee">
+                            <label class="form-check-label">Yes</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" value="no" name="school_or_district_employee">
+                            <label class="form-check-label">No</label>
+                        </div>
                     </div>
 
                 </div>
@@ -48,11 +53,7 @@
                 </div>
 
                 <div class="form-group">
-                    <select class="form-control" id="state" name="state">
-                        <option value="">{{ t .CurrentLocale "state_or_province" "" }}</option>
-                        <option value="##iterate through all states and provinces in go"></option>
-                        <% end %>
-                    </select>
+                    <input class="form-control" id="state" name="state" placeholder="{{ t .CurrentLocale "state_or_province" "" }}">
                 </div>
 
                 <div class="form-group">
@@ -126,22 +127,6 @@
                     }
                 }
             }
-        });
-
-        $(".zipcode").focusout(function () {
-            $.post("/safe_stop/find_city_state_for_postal_code", {postal_code: $(this).val()},
-                    function (response) {
-                        if (response != null) {
-                            $("#city").val(response.city);
-                            $("#state").val(response.state_code);
-                        }
-                        else {
-                            $("#city").val('');
-                            $("#state").val(-1);
-                        }
-                        $('#get-safe-stop-form').data('bootstrapValidator').validateField('city');
-                        $('#get-safe-stop-form').data('bootstrapValidator').validateField('state');
-                    })
         });
 
     })

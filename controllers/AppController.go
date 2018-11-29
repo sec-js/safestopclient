@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/schoolwheels/safestopclient/database"
 	"github.com/schoolwheels/safestopclient/models"
@@ -255,7 +254,6 @@ func (c *AppController) ActivateAction(w http.ResponseWriter, r *http.Request) {
 
 		r.ParseForm()
 
-
 		registration_type := r.FormValue("registration_type")
 
 		jurisdiction := models.FindJurisdiction(jurisdiction_id)
@@ -433,13 +431,8 @@ func (c *AppController) FailedRegistrationAttemptAction(w http.ResponseWriter, r
 				success := models.InsertFailedRegistrationAttempt(&data)
 				if success == true {
 
-					//TODO SEND FAILED REGISTRATION ATTEMPT EMAIL
-
-					a := c.SendEmail(r, []string{"swaller@safestopapp.com"}, "SafeStop - Failed Registration Attempt", "failed_registration_attempt", data)
-
 					c.SendEmail(r, []string{"swaller@safestopapp.com"}, "SafeStop - Failed Registration Attempt", "failed_registration_attempt", data)
 
-					fmt.Println(a)
 					setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
 					http.Redirect(w, r, r.URL.Host+"/check_availability?postal_code=" + postal_code, http.StatusFound)
 					return
@@ -1046,14 +1039,17 @@ func (c *AppController) LostItemReportAction(w http.ResponseWriter, r *http.Requ
 }
 
 func (c *AppController) GetSafeStopRequestAction(w http.ResponseWriter, r *http.Request) {
+
 	if r.Method == "GET" {
-		data := models.SafeStopInquiry{}
+		vars := mux.Vars(r)
+		data := models.SafeStopInquiry{PostalCode: vars["postal_code"]}
+		log.Println(data)
 		c.render(w, r, "get_safe_stop_request", data)
 		return
 
 	} else {
 
-		log.Println(r.FormValue("SchoolOrDistrictEmployee"))
+		r.ParseForm()
 
 		data := models.SafeStopInquiry{
 			FirstName: r.FormValue("first_name"),
@@ -1061,28 +1057,27 @@ func (c *AppController) GetSafeStopRequestAction(w http.ResponseWriter, r *http.
 			Email: r.FormValue("email"),
 			City: r.FormValue("city"),
 			State: r.FormValue("state"),
-			//SchoolOrDistrictEmployee: r.FormValue("SchoolOrDistrictEmployee"),
-			SchoolOrDistrict: r.FormValue("SchoolOrDistrict")}
+			SchoolOrDistrictEmployee: r.FormValue("school_or_district_employee"),
+			SchoolOrDistrict: r.FormValue("school_or_district")}
 
 		success := models.InsertSafeStopInquiry(&data)
+
 		if success == true {
 
-			c.SendEmail(r,[]string{
-				"swaller@safestopapp.com"},
-				"SafeStop Request Received",
-				"get_safe_stop_request",
-				data,
-			)
-
+			c.SendEmail(r, []string{"swaller@safestopapp.com"}, "SafeStop - Request Received", "get_safe_stop_request", data)
 
 			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
 			http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
-			return
-		} else {
-			c.render(w, r, "get_safe_stop_request", data)
-			return
-		}
 
+			return
+
+		} else {
+
+			c.render(w, r, "get_safe_stop_request", data)
+
+			return
+
+		}
 	}
 }
 

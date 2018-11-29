@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h3>Safe Stop Requested from Jurisdiction</h3>
+<table>
+    <tr>
+        <td>School or District:</td>
+        <td>{{.ViewData.SchoolOrDistrict}}</td>
+    </tr>
+    <tr>
+        <td>Name:</td>
+        <td>{{.ViewData.FirstName}} {{.ViewData.LastName}}</td>
+    </tr>
+    <tr>
+        <td>City/State:</td>
+        <td>{{.ViewData.City}} {{.ViewData.State}}</td>
+    </tr>
+    <tr>
+        <td>Email:</td>
+        <td>{{ .ViewData.Email }}</td>
+    </tr>
+    <tr>
+        <td>School Or District Employee?:</td>
+        <td>{{ .ViewData.SchoolOrDistrictEmployee }}</td>
+    </tr>
+</table>
+
+</body>
+</html>

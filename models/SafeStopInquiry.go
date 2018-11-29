@@ -1,6 +1,8 @@
 package models
 
-import "github.com/schoolwheels/safestopclient/database"
+import (
+	"github.com/schoolwheels/safestopclient/database"
+)
 
 type SafeStopInquiry struct {
 	Id int
@@ -15,10 +17,11 @@ type SafeStopInquiry struct {
 	InterestedAsA string
 	HowDidYouHearAboutUs string
 	CommentsQuestions string
-	SchoolOrDistrictEmployee bool
+	SchoolOrDistrictEmployee string
 }
 
 func InsertSafeStopInquiry(ssi *SafeStopInquiry) bool {
+
 	query := `
 insert into safe_stop_inquiries
 (
@@ -40,9 +43,10 @@ $5,
 $6,
 now(),
 now(),
-$7,
+$7
 )
 `
+
 	_, err := database.GetDB().Exec(
 		query,
 		ssi.FirstName,
