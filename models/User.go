@@ -306,7 +306,7 @@ coalesce(
 (select array_to_string(array_agg(a.name), ',')
 from permission_groups a 
 join permission_groups_users b on b.permission_group_id = a.id 
-and b.user_id = 1
+and b.user_id = $1
 and a.security_segment_id = (select id from security_segments where name = 'SafeStop' limit 1)), '') as permission_groups,
 coalesce(b.first_name, '') as first_name,
 coalesce(b.last_name, '') as last_name
