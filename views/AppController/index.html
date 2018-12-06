@@ -207,11 +207,7 @@ $(document).ready(function () {
         gcm_callback(gcm_token);
     }
 
-    // $(".message-bubble").click(function (e) {
-    //     set_viewed_alerts();
-    // });
-
-    $(document).on('click touchstart', '.message-bubble', function() {
+    $(".message-bubble").click(function (e) {
         set_viewed_alerts();
     });
 
