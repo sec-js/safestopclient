@@ -99,7 +99,8 @@
         initialize_map();
 
 
-        $(document).on('click touchstart', '.message-bubble', function() {
+        $(document).on('click touchstart', '.message-bubble', function(e) {
+            e.stopPropagation();
             $('.message-bubble').trigger('click');
         });
 
