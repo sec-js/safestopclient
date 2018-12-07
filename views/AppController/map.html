@@ -100,7 +100,7 @@
 
 
         $(document).on('click touchstart', '.message-bubble', function() {
-            alert('ok');
+            $('.message-bubble').trigger('click');
         });
 
         // $(document).on('click', '.fa-clock-o', function(e){
