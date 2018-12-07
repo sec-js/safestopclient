@@ -664,7 +664,19 @@ func (c *APIController) NextAdAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	u := models.FindUser(uid)
-	c.renderJSON(models.NextAd(u, c.PermissionGroups), w)
+
+	if u.SuperAdmin == true || models.UserHasAnyPermissionGroups([]string{
+		c.PermissionGroups.License_1,
+		c.PermissionGroups.License_2,
+		c.PermissionGroups.License_3,
+		c.PermissionGroups.License_4,
+		c.PermissionGroups.License_5,
+	}, u) {
+		c.renderJSON(models.NextAd(u, c.PermissionGroups), w)
+	} else {
+		return
+	}
+
 }
 
 
