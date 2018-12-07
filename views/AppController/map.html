@@ -99,10 +99,14 @@
         initialize_map();
 
 
-        $(document).on('click', '.fa-clock-o', function(e){
-            e.stopPropagation();
-            $('.message-bubble').trigger('click');
-        })
+        $(document).on('click touchstart', '.message-bubble', function() {
+            alert('ok');
+        });
+
+        // $(document).on('click', '.fa-clock-o', function(e){
+        //     e.stopPropagation();
+        //     $('.message-bubble').trigger('click');
+        // })
 
         $("#bottom-center-bar").on('click', function(e){
             run_data_collapsed = !run_data_collapsed;
