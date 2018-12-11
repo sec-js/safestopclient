@@ -177,6 +177,59 @@ func RemoveStudentFromSubscription(subscription_id int, student_id int) bool {
 	return true
 }
 
+func RemovedStudentStopsToBeDeleted(person_id int) []int{
+
+	r := []int{}
+
+	query := `
+select a.bus_route_stop_id
+from bus_route_stops_student_informations a
+join student_informations b
+on a.student_information_id = b.id
+where b.person_id = $1
+`
+
+	rows, err := database.GetDB().Queryx(query, person_id)
+	if rows == nil {
+		return r
+	}
+
+	for rows.Next() {
+		pid := 0
+		err = rows.Scan(&pid)
+		if err != nil {
+			log.Println(err.Error())
+			return r
+		}
+		r = append(r, pid)
+	}
+
+	return r
+
+}
+
+func DeleteStopsFromUser(student_information_id int, user_id int) bool {
+
+	query := `
+delete
+from bus_route_stop_users brsu
+where brsu.user_id = $1
+and brsu.bus_route_stop_id in (select bus_route_stop_id from bus_route_stops_student_informations where student_information_id = $2)
+
+
+`
+	log.Println(query)
+
+	_, err := database.GetDB().Exec(query, user_id, student_information_id)
+
+	if err != nil {
+		return false
+	}
+
+	return true
+
+}
+
 
 func AddSubAccountUserToSubscription(subscription *Subscription, sub_account_user_id int) bool {
 

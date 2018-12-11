@@ -754,6 +754,12 @@ func (c *AppController) RemoveStudentAction(w http.ResponseWriter, r *http.Reque
 		http.Redirect(w, r, r.URL.Host + "/subscription_details/" + r.FormValue("subscription_id") , http.StatusFound)
 	}
 
+	deleted_stops_from_user := models.DeleteStopsFromUser(student_id, user_id)
+
+	if deleted_stops_from_user == false {
+		setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "error_while_processing_request", "")), c.BootstrapAlertClass.Danger)
+	}
+
 	deleted_student := models.RemoveStudentFromSubscription(subscription_id, student_id)
 
 	if deleted_student == false {
