@@ -142,6 +142,14 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	view_service_issues_reports := false
+	for i := 0; i < len(cj.Jurisdictions); i++ {
+		if cj.Jurisdictions[i].HasServiceIssueReports == true {
+			view_service_issues_reports = true
+			break
+		}
+	}
+
 	data := struct {
 		JurisdictionCount int
 		HasJurisdictions bool
@@ -149,6 +157,7 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 		ViewManageNotifications bool
 		ViewManageSubscriptions bool
 		ViewReportLostItem bool
+		ViewReportServiceIssue bool
 		Email string
 		UserCanSendAlerts bool
 	}{
@@ -158,6 +167,7 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 		view_manage_notifications,
 		view_manage_subscriptions,
 		view_lost_item_reports,
+		view_service_issues_reports,
 		u.Email,
 		models.UserCanSendAlerts(u),
 	}

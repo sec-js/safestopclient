@@ -271,17 +271,19 @@
         </table>
     </a>
 
-    <a href="/report_a_service_issue" class="list-group-item account-li" id="report-lost-item">
-        <table class="list-item-table">
-            <tr>
-                <td class="icon-font">
-                    <i style="color:#555;" class="ss ss-lost-item"></i>
-                <td class="text">
-                    {{ t .CurrentLocale "report_a_service_issue" "" }}
-                </td>
-            </tr>
-        </table>
-    </a>
+    {{ if eq .ViewData.ViewReportServiceIssue true }}
+        <a href="/report_a_service_issue" class="list-group-item account-li" id="report-lost-item">
+            <table class="list-item-table">
+                <tr>
+                    <td class="icon-font">
+                        <i style="color:#555;" class="ss ss-lost-item"></i>
+                    <td class="text">
+                        {{ t .CurrentLocale "report_a_service_issue" "" }}
+                    </td>
+                </tr>
+            </table>
+        </a>
+    {{ end }}
 
     {{ if eq .ViewData.ViewReportLostItem true }}
         <a href="/lost_item_report" class="list-group-item account-li" id="report-lost-item">

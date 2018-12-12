@@ -17,6 +17,7 @@ type Jurisdiction struct {
 	Name string `json:"name" db:"name"`
 	Phone string `json:"phone" db:"phone"`
 	HasLostItemReports bool `json:"has_lost_item_reports" db:"has_lost_item_reports"`
+	HasServiceIssueReports bool `json:"has_service_issue_reports" db:"has_service_issue_reports"`
 	HasIncidentReports bool `json:"has_incident_reports" db:"has_incident_reports"`
 	Active bool `json:"active" db:"active"`
 	StudentScanning bool `json:"student_scanning" db:"student_scanning"`
@@ -34,6 +35,7 @@ select a.id,
 coalesce(a.name, '') as name,
 coalesce(a.phone, '') as phone ,
 coalesce(a.safe_stop_lost_item_reports_active, false) as has_lost_item_reports,
+coalesce(a.safe_stop_service_issue_reports_active, false) as has_service_issue_reports,
 coalesce(a.safe_stop_bullying_reports_active, false) as has_incident_reports,
 coalesce(a.active, false) as active,
 coalesce(a.student_scanning, false) as student_scanning,
@@ -122,6 +124,7 @@ type ClientJurisdiction struct {
 	Name string `json:"name" db:"name"`
 	Phone string `json:"phone" db:"phone"`
 	HasLostItemReports bool `json:"has_lost_item_reports" db:"has_lost_item_reports"`
+	HasServiceIssueReports bool `json:"has_service_issue_reports" db:"has_service_issue_reports"`
 	HasIncidentReports bool `json:"has_incident_reports" db:"has_incident_reports"`
 	Active bool `json:"active" db:"active"`
 	StudentScanning bool `json:"student_scanning" db:"student_scanning"`
@@ -151,6 +154,7 @@ select a.id,
 a.name, 
 coalesce(a.phone, '') as phone, 
 coalesce(safe_stop_bullying_reports_active, false) as has_incident_reports,
+coalesce(safe_stop_service_issue_reports_active, false) as has_service_issue_reports,
 coalesce(safe_stop_lost_item_reports_active, false) as has_lost_item_reports,
 coalesce(active, false) as active,
 coalesce(a.student_scanning, false) as student_scanning
@@ -184,6 +188,7 @@ select a.id,
 a.name, 
 coalesce(a.phone, '') as phone,
 coalesce(safe_stop_bullying_reports_active, false) as has_incident_reports,
+coalesce(safe_stop_service_issue_reports_active, false) as has_service_issue_reports,
 coalesce(safe_stop_lost_item_reports_active, false) as has_lost_item_reports,
 coalesce(active, false) as active,
 coalesce(a.student_scanning, false) as student_scanning
@@ -198,6 +203,7 @@ select distinct id,
 name, 
 coalesce(phone, '') as phone,
 coalesce(safe_stop_bullying_reports_active, false) as has_incident_reports,
+coalesce(safe_stop_service_issue_reports_active, false) as has_service_issue_reports,
 coalesce(safe_stop_lost_item_reports_active, false) as has_lost_item_reports,
 coalesce(active, false) as active,
 coalesce(student_scanning, false) as student_scanning
@@ -206,6 +212,7 @@ select a.id,
 a.name, 
 a.phone, 
 a.safe_stop_lost_item_reports_active, 
+a.safe_stop_service_issue_reports_active,
 a.safe_stop_bullying_reports_active,
 a.active,
 a.student_scanning
@@ -227,6 +234,7 @@ select a.id,
 a.name, 
 a.phone, 
 a.safe_stop_lost_item_reports_active, 
+a.safe_stop_service_issue_reports_active,
 a.safe_stop_bullying_reports_active,
 a.active,
 a.student_scanning
