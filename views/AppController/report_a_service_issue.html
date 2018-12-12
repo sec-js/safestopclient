@@ -11,7 +11,7 @@
 
         <div class="row">
             <div class="col-sm-12 h3" align="center" style="color: #A12130;">
-                Report A Service Issue
+            {{ t .CurrentLocale "report_a_service_issue" "" }}
             </div>
         </div>
 
@@ -22,9 +22,9 @@
 
                 <div class="form-group">
                     <select class="form-control" name="issue_type">
-                        <option value="Driver" selected>Driver</option>
-                        <option value="Vehicle">Vehicle</option>
-                        <option value="Schedule">Schedule</option>
+                        <option value="Driver" selected>{{ t .CurrentLocale "driver" "" }}</option>
+                        <option value="Vehicle">{{ t .CurrentLocale "vehicle" "" }}</option>
+                        <option value="Schedule">{{ t .CurrentLocale "schedule" "" }}</option>
                         <option value="Other">{{ t .CurrentLocale "other" "" }}</option>
                     </select>
                 </div>
