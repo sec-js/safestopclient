@@ -3,7 +3,7 @@
 {{end}}
 {{define "body"}}
 
-<form id="app-issue-form" action="/report_a_service_issue" method="post" style="margin-bottom:20px;">
+<form id="app-service-issue-form" action="/report_a_service_issue" method="post" style="margin-bottom:20px;">
 
 {{ .CSRFTemplateField }}
 
@@ -61,7 +61,7 @@
 
 
         FormValidation.formValidation(
-                document.getElementById("app-issue-form"),
+                document.getElementById("app-service-issue-form"),
                 {
                     fields: {
                         'issue_type': {
