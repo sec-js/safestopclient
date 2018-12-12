@@ -27,6 +27,7 @@ func (c *AppController) Register() {
 	c.addTemplate("faq", "faq.html", "faq.html")
 	c.addTemplate("failed_registration_attempt", "failed_registration_attempt.html", "default.html")
 	c.addTemplate("report_an_app_issue", "report_an_app_issue.html", "default.html")
+	c.addTemplate("report_a_service_issue", "report_a_service_issue.html", "default.html")
 	c.addTemplate( "manage_notifications", "manage_notifications.html", "manage_notifications.html")
 	c.addTemplate( "manage_subscriptions", "manage_subscriptions.html", "manage_subscriptions.html")
 	c.addTemplate( "subscription_details", "subscription_details.html", "subscription_details.html")
@@ -47,6 +48,7 @@ func (c *AppController) Register() {
 	c.addRouteWithPrefix("/faq", c.FaqAction)
 	c.addRouteWithPrefix("/failed_registration_attempt", c.FailedRegistrationAttemptAction)
 	c.addRouteWithPrefix("/report_an_app_issue", c.AppIssueAction)
+	c.addRouteWithPrefix("/report_a_service_issue", c.ServiceIssueAction)
 	c.addRouteWithPrefix( "/remove_all_stops", c.RemoveAllStopsAction)
 	c.addRouteWithPrefix( "/manage_notifications", c.ManageNotificationsAction)
 	c.addRouteWithPrefix( "/manage_subscriptions", c.ManageSubscriptionsAction)
@@ -499,6 +501,61 @@ func (c *AppController) AppIssueAction(w http.ResponseWriter, r *http.Request) {
 			return
 		} else {
 			c.render(w, r, "report_an_app_issue", data)
+			return
+		}
+	}
+}
+
+func (c *AppController) ServiceIssueAction(w http.ResponseWriter, r *http.Request) {
+
+	user_id := currentUserId(c.ControllerBase, r)
+
+	if user_id == 0 {
+		http.Redirect(w, r, r.URL.Host+"/login", http.StatusFound)
+		return
+	}
+
+	u := models.FindUser(user_id)
+	cj := models.ClientJurisdictionForUser(u, c.ControllerBase.PermissionGroups)
+	jurisdiction_id := 0
+
+	if cj == nil || len(cj.Jurisdictions) == 0 || cj.Jurisdictions[0].Id == 0 {
+		http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+		return
+	}
+
+	jurisdiction_id = cj.Jurisdictions[0].Id
+	jurisdiction_name := cj.Jurisdictions[0].Name
+
+	if r.Method == "GET" {
+		data := models.ServiceIssue{
+			JurisdictionId: jurisdiction_id,
+			UserId: user_id,
+		}
+		c.render(w, r, "report_a_service_issue", data)
+		return
+	} else {
+		data := models.ServiceIssue{
+			JurisdictionId: jurisdiction_id,
+			JurisdictionName: jurisdiction_name,
+			UserId: user_id,
+			Email: u.Email,
+			Date: time.Now().Format("01-02-2006"),
+			IssueType: r.FormValue("issue_type"),
+			Description: r.FormValue("description"),
+		}
+		success := models.InsertServiceIssue(&data)
+		if success == true {
+
+			c.SendEmail(r, []string{"swaller@safestopapp.com"}, "SafeStop - Service Issue Report", "service_issue", data)
+
+
+
+			setFlash(c.ControllerBase, r, w, string(T(currentLocale(c.ControllerBase, r),  "request_has_been_submitted", "")), c.BootstrapAlertClass.Info)
+			http.Redirect(w, r, r.URL.Host+"/account", http.StatusFound)
+			return
+		} else {
+			c.render(w, r, "report_a_service_issue", data)
 			return
 		}
 	}
