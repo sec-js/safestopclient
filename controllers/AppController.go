@@ -1071,14 +1071,14 @@ func (c *AppController) LostItemReportAction(w http.ResponseWriter, r *http.Requ
 
 
 			c.SendEmail(r,[]string{
-				"acook@ridesta.com"},
+				"swaller@safestopapp.com"},
 				"SafeStop Lost Item Report Received",
 				"lost_item_report",
 				data,
 			)
 
 			c.SendEmail(r,[]string{
-				"acook@ridesta.com"},
+				"swaller@safestopapp.com"},
 				"SafeStop Lost Item Report Received",
 				"lost_item_report_autoreply",
 				data,
