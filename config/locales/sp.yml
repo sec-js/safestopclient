@@ -1,0 +1,492 @@
+# Files in the config/locales directory are used for internationalization
+# and are automatically loaded by Rails. If you want to use locales other
+# than English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t 'hello'
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t('hello') %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# To learn more, please read the Rails Internationalization guide
+# available at http://guides.rubyonrails.org/i18n.html.
+
+sp:
+
+  english: "Ingles"
+  french: "Frances"
+  spanish: "Español"
+
+  #Prompt Messages
+  are_you_sure: "Are you sure?"
+
+  #Validation error/success Messages
+  error: "Error"
+  oops: "Oops..."
+  required: "Required"
+  invalid_email_format: "Invalid email format"
+  invalid_phone_number: "Invalid phone number"
+  invalid_email_or_password: "Invalid email or password"
+  invalid_zip_code: "Invalid postal code"
+  email_address_already_in_use: "Email address already in use"
+  invalid_password_format: "Password must contain 1 capital letter and 1 number"
+  passwords_do_not_match: "Passwords do not match"
+  invalid_student_identifier: "Invalid student identifier"
+  must_agree_to_terms_and_policy: "Must agree to the terms and policy"
+  error_while_removing_sub_account: "There was an error while trying to remove the sub account"
+  error_while_creating_sub_account: "There was an error creating your sub account"
+  sub_account_limit_reached: "You have reached the maximum number of sub accounts"
+  you_have_successfully_registered_for: "You have successfully registered for"
+  error_while_processing_request: "There was an error while processing your request"
+  successful_support_request: "Thank you for submitting your request for support. A member of the SafeStop team will review your request shortly."
+  error_while_creating_account: "There was an error while creating your account"
+  jurisdiction_has_no_products: "There are no available SafeStop products for this jurisdiction"
+  jurisdiction_not_available: "This jurisdiction is currently not available"
+  already_have_subscription: "You already have a SafeStop subscription for"
+  request_has_been_submitted: "Your request has been submitted"
+  error_while_adding_student: "There was an error adding your student"
+  error_while_removing_student: "There was an error removing your student"
+  account_locked: "Your account has been locked"
+  error_while_adding_student_scan_code: "There was an error while adding your student scan code"
+
+  #Fields
+  email: "Email Address"
+  password: "Password"
+  password_case_sensitive: "Password (case sensitive)"
+  confirm_password: "Confirm Password"
+  first_name: "First Name"
+  last_name: "Last Name"
+  your_first_name: "Your First Name"
+  your_last_name: "Your Last Name"
+  student_first_name: "Student First Name"
+  student_last_name: "Student Last Name"
+  phone: "Phone Number"
+  address: "Address"
+  street_address: "Street Address"
+  city: "City"
+  state: "State"
+  zip_code: "Codigo Postal"
+  jurisdiction: "Jurisdiction"
+  school_or_district: "School or District"
+  hear_about: "How did you hear about us?"
+  comments_or_questions: "Comments or Questions"
+  interested_in_safe_stop: "I am interested in SafeStop as a"
+  student_name: "Student Name"
+  scan_code: "Scan Code"
+  student_identifier: "Student Identifier"
+  access_code: "Access Code"
+  subject: "Subject"
+  body: "Body"
+  district: "District"
+  school_code: "School Code"
+  credit_card: "Credit Card Number"
+  cvv: "CVV"
+  mm: "MM"
+  yy: "YY"
+  bus_run: "Bus Run"
+  bus_name_number: "Bus Name/Number"
+  route_name_number: "Route Name/Number"
+  your_stop: "Your Stop Name"
+  date_incident_occurred: "Date the Incident Occurred"
+  detailed_description_of_incident: "Detailed Description of Incident"
+  detailed_description: "Detailed Description"
+  date_item_was_lost: "Date Item Was Lost"
+  route: "Ruta"
+  route_u: "RUTA"
+  stop: "Parada"
+  stop_u: "PARADA"
+  arrived: "LLEGÓ"
+  expected: "ESPERADO A LLEGAR"
+  scheduled: "PREVISTA"
+  as_of: "DESDE"
+
+  #Buttons
+  register: "REGISTER"
+  sign_in: "SIGN IN"
+  sign_out: "SALIR"
+  submit: "ENVIAR"
+  search: "SEARCH"
+  email_my_reset_link: "EMAIL MY RESET LINK"
+  cancel: "CANCELAR"
+  okay: "OK"
+  get_safe_stop_now: "GET SAFESTOP NOW"
+  remove: "REMOVE"
+  add_a_bus_stop: "AÑADIR UNA PARADA"
+  check_availability: "CHEQUEAR DISPONIBILIDAD"
+  contact_support: "CONTACT SUPPORT"
+  contact_information: "Contact Information"
+
+  grade: "Grade"
+  kindergarten: "Kindergarten"
+  1st_grade: "1st Grade"
+  2nd_grade: "2nd Grade"
+  3rd_grade: "3rd Grade"
+  4th_grade: "4th Grade"
+  5th_grade: "5th Grade"
+  6th_grade: "6th Grade"
+  7th_grade: "7th Grade"
+  8th_grade: "8th Grade"
+  9th_grade: "9th Grade"
+  10th_grade: "10th Grade"
+  11th grade: "11th Grade"
+  12th_grade: "12th Grade"
+  other: "Other"
+  choose_a_district: "Choose a District"
+
+  signed_in_as: "Signed in as:"
+  forgot_password: "Forgot Password"
+  reset_password: "Reset Password"
+
+  student_scan: "Student Scan"
+  was_scanned_at: "was scanned at"
+  no_stop_recorded: "No Stop Recorded"
+
+  how_it_works: "HOW IT WORKS"
+  features: "FEATURES"
+  newsroom: "NEWSROOM"
+  blog: "BLOG"
+  faq: "FAQ"
+  user_guide: "USER GUIDE"
+  login: "LOGIN"
+
+  ss_index_hero_1: "SafeStop is the industry-leading school bus tracking app that is making life easier for parents, one bus ride at a time"
+  ss_index_hero_2: "With neighborhood maps and Expected Arrival Times in the palm of their hand, parents no longer need to call the school to ask “Where’s the bus?”"
+  ss_index_hero_3: "SafeStop works with any GPS provider, any routing software, and any transportation system, making our app compatible with any fleet configuration"
+  ss_index_question_1: "Is SafeStop available at your school?"
+  ss_index_option_1: "Sign Up or Renew Your Subscription Now"
+  ss_index_question_2: "Want to bring SafeStop to your school?"
+  ss_index_option_2: "Talk To Our Sales Team"
+  ss_index_get_started_1: "How to Get Started"
+  ss_index_get_started_2: "Our school bus tracking app is just four steps away!"
+  ss_index_get_started_3: "1. Check Availability"
+  ss_index_get_started_4: "Search by postal code to find out if SafeStop is in your school or district, or request to get SafeStop by clicking “Talk To Our Sales Team” above."
+  ss_index_get_started_5: "2. Sign Up"
+  ss_index_get_started_6: "Create a SafeStop account with your email, a password, and your child’s School Code or Student ID Number."
+  ss_index_get_started_7: "3. Download the App"
+  ss_index_get_started_8: "SafeStop is available for download through the Apple App Store and Google Play. You can also access SafeStop through a web browser like Google Chrome."
+  ss_index_get_started_9: "4. Start Tracking"
+  ss_index_get_started_10: "Once you’ve registered and downloaded the SafeStop app, log in to your account to start tracking the school bus."
+  ss_index_features_1: "Helpful Features for Parents and Schools"
+  ss_index_features_2: "SafeStop makes it easier than ever to know where your children are and when they'll be home."
+  ss_index_features_3: "REAL-TIME SCHOOL BUS UPDATES"
+  ss_index_features_4: "Our LiveView school bus locator shows parents and school administrators where the school bus is along its route, while the Expected Arrival Times are displayed for each bus stop. Transportation staff also has the ability to send real-time service notifications to parents through the Alerts & Messaging Center."
+  ss_index_features_5: "SAFESTOP ANALYTICS"
+  ss_index_features_6: "Administrators and transportation staff get access to key data and analytics that can identify underused bus stops, monitor on-time performance, and additional vehicle information that can create a safer, more reliable, and cost-efficient school transportation system."
+  ss_index_features_7: "A TRULY SECURE PLATFORM"
+  ss_index_features_8: "Your family’s safety is our number one priority. That’s why we work directly with your school or district to create a secure registration process that allows only the parents and legal guardians of our passengers to register for SafeStop. We ensure the quality and security of any data we collect, and we will never sell, distribute, or otherwise share any of the private passenger or vehicle information gathered by the SafeStop system."
+  ss_index_features_9: "COMPATIBLE WITH ANY FLEET"
+  ss_index_features_10_html: "SafeStop works with <b><i>any</i></b> GPS provider, <b><i>any</i></b> routing software, and <b><i>any</i></b> transportation system. If your fleet is already gathering GPS data, you are SafeStop Ready! If you need GPS units, SafeStop can help you get started by arranging the purchase for your entire fleet at industry pricing."
+  ss_index_footer_1: "Using the SafeStop App"
+  ss_index_footer_2: "After you have completed your registration, download SafeStop from the Apple App Store or Google Play, or log in to your account through the web. You're now ready to start tracking your child's school bus!"
+  ss_index_footer_3: "Stay Connected"
+  ss_index_footer_4: "Need help signing up or logging into your account? Want to learn more about SafeStop and the benefits of school bus tracking? Follow us on social media or give our team a call. We will be happy to help you!"
+  ss_index_footer_4_ca_html: "Need help signing up or logging into your account? Want to learn more about SafeStop and the benefits of school bus tracking? Email our team at <a style='color: white' href='mailto:support@SafeStopApp.ca' >support@SafeStopApp.ca</a>. We will be happy to help you!"
+  ss_index_footer_6: "Copyright 2016 SafeStop, Inc."
+  ss_index_footer_7: "Privacy Policy"
+  ss_index_footer_8: "Terms & Conditions"
+
+  ss_check_availability_1: "Can't find your school?"
+  ss_check_availability_2: "GET SAFESTOP™ IN YOUR SCHOOL"
+  ss_check_availability_3: "SIGN UP, GET PEACE OF MIND"
+  ss_check_availability_4: "SafeStop is a school bus tracking app that provides parents with valuable information about their child’s school bus, giving you peace of mind knowing that your kids are safely traveling to and from school. Using GPS tracking, SafeStop combines security, safety, and communication into one easy-to-use school bus tracking app."
+  ss_check_availability_5: "SafeStop is available at schools in your area!"
+  ss_check_availability_6: "No schools in your area are currently using SafeStop™"
+
+  ss_check_availability_partial_2: "Entregar su codigo postal para ver si SafeStop esta disponible en su escuela o distrito."
+
+  ss_get_safe_stop_parents_1: "Not sure if SafeStop is available at your child's school?"
+  ss_get_safe_stop_parents_2: "Call us at"
+  ss_get_safe_stop_parents_3: "and let us help you!"
+  ss_get_safe_stop_parents_4: "Get SafeStop at your school!"
+  ss_get_safe_stop_parents_please_select: "Please select..."
+  ss_get_safe_stop_parents_parent: "Parent"
+  ss_get_safe_stop_parents_school_official: "School Official"
+  ss_get_safe_stop_parents_student: "Student"
+  ss_get_safe_stop_parents_other: "Other"
+  ss_get_safe_stop_parents_news_article: "News Article"
+  ss_get_safe_stop_parents_trade_show: "Trade Show/Exhibit"
+  ss_get_safe_stop_parents_friend_family: "Friend, Family, Coworker"
+  ss_get_safe_stop_parents_facebook: "Facebook"
+  ss_get_safe_stop_parents_twitter: "Twitter"
+
+  ss_activate_1: "Returning Customer? Sign in below to renew your subscription"
+  ss_activate_9: "OR"
+  ss_activate_10: "New to SafeStop? Create your account below"
+  ss_activate_eula_privacy_policy: "I agree to the <a href='/safe_stop/eula' target='_blank'>EULA</a> and <a href='/safe_stop/privacy'>privacy policy</a>"
+
+  ss_register_1: "Get SafeStop today for free!"
+  ss_register_2: "Get SafeStop today for only:"
+  ss_register_3: "/ month"
+  ss_register_4: "1 payment of"
+  ss_register_5: "SECURITY INFORMATION"
+  ss_register_6: "BILLING INFORMATION"
+  ss_register_student_1: "Student ID Number 1 (Provided by your school. Typically a 6-9 digit number.)"
+  ss_register_student_2: "Student ID Number 2 (Optional)"
+  ss_register_student_3: "Student ID Number 3 (Optional)"
+  ss_register_student_4: "Student ID Number 4 (Optional)"
+  ss_register_agree_to_payment_terms: "I agree to the <a href='/safe_stop/payment_terms' target='_blank'>payment terms</a>"
+
+  ss_support_request_1: "Request For SafeStop Support"
+
+  ss_client_login_5: "Need help? Call"
+  ss_client_login_6: "or email"
+  ss_client_login_6_ca: "Email"
+  ss_client_login_7: "Add to home screen for best experience!"
+
+  remove_all_stops: "QUITAR TODAS PARADAS"
+  manage_notifications: "MANEJAR NOTIFICACIONES"
+  manage_subscriptions: "MANAGE SUBSCRIPTIONS"
+  connect_with_safe_stop: "CONNECTARSE CON SAFESTOP"
+  facebook: "FACEBOOK"
+  twitter: "TWITTER"
+  connect_with_terminal: "CONNECTARSE CON TERMINAL"
+  report_lost_item: "INFORMAR ALGO PERDIDO"
+  report_incident: "REPORT INCIDENT"
+
+  ss_client_account_language: "IDIOMA"
+  ss_client_account_js_4: "QUITAR TODAS PARADAS?"
+  ss_client_account_js_5: "Ya no estarás rastreando ningún autobús."
+
+  ss_client_my_stops_2: "Map View"
+  ss_client_my_stops_3: "You have no selected stops, click below to add one"
+  ss_client_my_stops_js_1: "Your school’s SafeStop service is not yet live. Thank You For Your Patience! You Will Be Notified When Routes Are Available."
+  ss_client_my_stops_js_4: "MIN AGO"
+  ss_client_my_stops_js_6: "LO PREVISTO"
+
+  ss_client_live_view_js_3: "This stop will be removed from your my stops"
+  ss_client_live_view_js_4: "Remove it!"
+  ss_client_live_view_js_8: "MIN AGO"
+
+  ss_client_add_sub_account_2: "There are currently no SafeStop accounts for this email address. Please fill in the information below to create a new user account."
+
+  ss_client_setup_1: "Find routes by name"
+  ss_client_setup_2: "Search for stops near my address"
+  ss_client_setup_4: "Unable To Find Routes"
+
+  ss_client_setup_js_2: "Address 1 and valid postal code are required when searching by address"
+  ss_client_setup_js_3: "Stop Limit Reached"
+  ss_client_setup_js_4: "You may only monitor "
+  ss_client_setup_js_5: " stops at once in this jurisdiction. Contact support at 1-800-843-8936 with any questions"
+  ss_client_setup_js_5_ca: " stops at once in this jurisdiction. Contact support@SafeStopApp.ca with any questions"
+
+  ss_client_setup_js_6: "The location of this address could not be determined. This can happen when an address is invalid (not a real address) or the address is too new."
+  ss_client_setup_js_7: "Displaying routes within "
+  ss_client_setup_js_8: " miles"
+  ss_client_setup_js_9: "You have "
+  ss_client_setup_js_10: " out of "
+  ss_client_setup_js_11: " stops selected"
+
+  ss_client_subscription_details_1: "SUB ACCOUNTS"
+  ss_client_subscription_details_2: "STUDENTS"
+  ss_client_subscription_details_3: "STUDENT SCANNING"
+  ss_client_subscription_details_js_2: "Remove sub account user "
+  ss_client_subscription_details_js_3: "Remove student "
+
+  ss_client_lost_item_1: "Report Lost Item"
+  ss_client_lost_item_2: "Please provide a detailed description, including brand, color, size and any distinguishing features, of your lost item left on board the bus."
+
+  ss_client_report_bullying_1: "Report Incident"
+
+  ss_welcome_mailer_1: "Welcome to SafeStop!"
+  ss_welcome_mailer_2: "Thanks for signing up for our service. Now let’s get started!"
+  ss_welcome_mailer_3: "The SafeStop app is currently available for download through the Apple App Store and Google Play store! You can also access SafeStop on the web at www.SafeStopApp.com/web."
+  ss_welcome_mailer_3_ca: "The SafeStop app is currently available for download through the Apple App Store and Google Play store! You can also access SafeStop on the web at www.SafeStopApp.ca/web."
+  ss_welcome_mailer_4: "To start using SafeStop, login with the email and password used to create your account during the registration process. From there, you can select the routes and stops you would like to add to your account by choosing “Add A Bus Stop” and searching by your address."
+  ss_welcome_mailer_5: "<b>Please Note:</b> If your school or district is new to using SafeStop, only the Map View bus locator and the Alerts & Messaging feature will be available until routes have been validated in our system. At that time Estimated Arrival Times will be available in addition to the scheduled stop times."
+  ss_welcome_mailer_6_html: "If you have any questions on how to download the app, set up your account, or use the SafeStop service, please email us at <a href='mailto:support@SafeStopApp.com'>support@SafeStopApp.com</a> or call (800) 843-8936. We hope you enjoy your service!"
+  ss_welcome_mailer_6_ca_html: "If you have any questions on how to download the app, set up your account, or use the SafeStop service, please email us at <a href='mailto:support@SafeStopApp.ca'>support@SafeStopApp.ca</a>. We hope you enjoy your service!"
+  ss_welcome_mailer_7: "Safe Travels,"
+  ss_welcome_mailer_8: "The SafeStop Team"
+
+  ss_pw_reset_email_subject: "Password Reset"
+  ss_pw_reset_email_1: "Click"
+  ss_pw_reset_email_2: "to reset your password."
+  ss_pw_reset_email_flash_1: "Check your email for your password reset link"
+  ss_pw_reset_email_flash_2: "Sorry, can't find that email"
+
+  #safe_stop_api
+  reregister: "You need to re-enter your Student ID or current year School Code. If you need help, contact our support or your school staff!"
+
+  ss_register_student_request_form_1: "Register Student Request Form"
+  ss_register_student_request_form_2: "Student Information"
+
+  ss_newsroom_1: "Articles"
+  ss_newsroom_2: "SafeStop is changing the waiting game for busy parents and children at the bus stop. With our real-time bus locator and neighborhood maps, families can now see where the school bus is and when it will arrive at their stop. But don't just take our word for it - see what our customers and the media are saying about us!"
+  ss_newsroom_3: "Case Studies"
+
+
+
+
+  ss_eula_1_html: "SAFESTOP END USER LICENSE AGREEMENT CANADA AND US"
+  ss_eula_2_html: 'The products and services described herein are provided by SafeStop, Inc. located at 885 Island Park Drive, Ste 200, Daniel Island, South Carolina 29492 USA (“<b>SSI</b>”).  By downloading, installing, and/or using the SafeStop software and/or App, accessing or using the SafeStop service (together, the "<b>Products</b>" or "<b>Services</b>"), or accessing or using any of the content available within the Products, you are agreeing to be bound by all of the terms contained herein.  Review carefully as these terms form a binding agreement between you and SSI regarding your use of the Products or Services.'
+  ss_eula_3_html: "1.  Your SSI Account"
+  ss_eula_4_html: "You will need a SSI Account in order to use our Services. To protect your SSI Account, keep your password confidential. You are responsible for the activity that happens on or through your SSI Account. SSI suggests you use a unique password that you do not currently use for any other device or account and SSI suggests you not use it on any future device or account."
+  ss_eula_5_html: "2.  About Software in our Services"
+  ss_eula_6_html: "SSI’s software may update automatically on your device once a new version or feature is available. Some Services may let you adjust your automatic update settings."
+  ss_eula_7_html: "3. Use of the Products"
+  ss_eula_8_html: "SSI grants you a non-exclusive, non-transferable license to access the SafeStop service, to download and use the SafeStop software and service, and to access the Content (as defined below) within the Products and strictly according to the terms herein."
+  ss_eula_9_html: "4. Restrictions on Use"
+  ss_eula_10_html: "Unless you have received prior written authorization from SSI, you agree not to: (a) modify, translate, copy or make derivative works of the Content or any part thereof; (b) redistribute, sublicense, rent, publish, sell, assign, lease, market, transfer, or otherwise make the Products or Content available to third parties; (c) reverse engineer, decompile or otherwise attempt to extract the source code of the Service or any part thereof, unless this is expressly permitted or required by applicable law; (d) delete, obscure, or in any manner alter any warning or link that appears in the Products or the Content, or (e) use our Services in a way that distracts you and prevents you from obeying traffic or safety laws while operating a motor vehicle."
+  ss_eula_11_html: "You Agree not to access SSI Services using a method other than the interface and the instructions that SSI provides. You may use SSI’s Services only as permitted by law, and SSI may suspend or stop providing its Services to you if you do not comply with SSI’s terms or policies or if SSI is investigating suspected misconduct."
+  ss_eula_12_html: 'COPYRIGHT: Copyright and other intellectual, industrial and/or proprietary rights to the SSI Products and Services are owned solely by SSI. SSI permits you to use the Software only in accordance with the terms of this EULA. All rights not specifically granted in this EULA are reserved by SSI. The content, organization, graphics, design, compilation, magnetic translation, digital conversion and other matters related to the SSI Products and Services are protected under applicable copyrights, patents, trademarks and other proprietary and/or intellectual property rights. The copying, redistribution, use or publication by you of any such matters or any part of the Products and Services, is strictly prohibited. SSI (and its suppliers and licensors) expressly reserve all intellectual property rights in all text, programs, products, processes, technology, content and other materials relating to the Products and Services. Any and all logos, emblems, company names, product names and service names ("Trademarks") referenced in or by the Products and Services or accessible within any application of the Products and Services are Trademarks of their respective owners. You do not acquire permission to use any Trademark owned by SSI or any third party Trademark referenced on in or by the Products and Services, without express permission from the owner of the Trademark.'
+  ss_eula_13_html: "5. Appropriate Conduct; Compliance with Law and SSI Policies."
+  ss_eula_14_html: "You agree that you are responsible for your own conduct and content while using the Products, and for any consequences thereof. You agree to use the Products only for purposes that are proper and in accordance with the Terms and any applicable policies or guidelines SSI may make available. By way of example, and not as a limitation, you agree that when using the Products or the Content, you will not (a) impersonate another person or entity, (b) create user accounts by automated means or under false or fraudulent pretenses; or (c) transmit any viruses, worms, defects, Trojan horses, or any items of a destructive nature."
+  ss_eula_15_html: "6. Content in the Products"
+  ss_eula_16_html: 'SSI and SafeStop allow you to access and view a variety of content, including but not limited to photographic imagery, map and terrain data, traffic, and other related information provided by SSI and its licensors (the "<b>Content</b>"). You understand and agree to the following: (a) Map data, traffic, directions, and related Content are provided for planning purposes only. You may find that weather conditions, construction projects, closures, or other events may cause road conditions or directions to differ from the map results. You should exercise judgment in your reliance on this Content. (b) Certain Content is provided under license from third parties and is subject to copyright and other intellectual property rights owned by or licensed to such third parties. You may be held liable for any unauthorized copying or disclosure of this Content. Your use of such third party content, including but not limited to printing or use in marketing or promotional materials, is subject to additional restrictions located in the Legal Notices Page.'
+  ss_eula_17_html: "7.  SSI Warranty Disclaimers, Limitation on Damages, and Indemnification Provisions"
+  ss_eula_18_html: "SSI provides its Services using a commercially reasonable level of skill and care. But there are certain things SSI does not promise about its Services."
+  ss_eula_19_html: "OTHER THAN AS EXPRESSLY SET OUT IN THESE TERMS OR ADDITIONAL TERMS, SSI DOES NOT MAKE ANY SPECIFIC PROMISES ABOUT THE SERVICES OR ITS APP. FOR EXAMPLE, SSI DOES NOT MAKE ANY COMMITMENTS ABOUT THE CONTENT WITHIN THE SERVICES OR APP, THE SPECIFIC FUNCTIONS OF THE SERVICES OR APP, OR THEIR RELIABILITY, AVAILABILITY, OR ABILITY TO MEET YOUR NEEDS. WE PROVIDE THE SERVICES “AS IS” AND WITH ALL FAULTS."
+  ss_eula_20_html: "NOTHING IN THESE TERMS WILL EXCLUDE OR LIMIT SAFESTOP’S WARRANTY OR LIABILITY FOR LOSSES THAT MAY NOT BE LAWFULLY EXCLUDED OR LIMITED BY APPLICABLE LAW. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF CERTAIN WARRANTIES OR CONDITIONS OR THE LIMITATION OR EXCLUSION OF LIABILITY FOR CERTAIN TYPES OF LOSS OR DAMAGES. ACCORDINGLY, ONLY THE LIMITATIONS THAT ARE LAWFUL IN YOUR JURISDICTION WILL APPLY TO YOU, AND SAFESTOP’S LIABILITY WILL BE LIMITED TO THE MAXIMUM EXTENT PERMITTED BY LAW. <b>TO THE EXTENT PERMITTED BY LAW, SSI EXPRESSLY DISCLAIMS ALL WARRANTIES AND CONDITIONS OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES AND CONDITIONS OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT.</b>"
+  ss_eula_21_html: 'YOU EXPRESSLY UNDERSTAND AND AGREE THAT YOUR USE OF THE SERVICE AND THE CONTENT IS AT YOUR SOLE RISK AND THAT THE SERVICE AND THE SSI APP ARE PROVIDED "AS IS" AND "AS AVAILABLE." IN PARTICULAR, SAFESTOP, ITS SUBSIDIARIES, PARENT AND AFFILIATES, AND ITS LICENSORS AND THEIR SUPPLIERS, DO NOT REPRESENT OR WARRANT TO YOU THAT:'
+  ss_eula_22_html: "(a) YOUR USE OF THE SERVICE OR APP WILL MEET YOUR REQUIREMENTS;"
+  ss_eula_23_html: "(b) YOUR USE OF THE SERVICE OR APP WILL BE UNINTERRUPTED, TIMELY, SECURE OR FREE FROM ERROR;"
+  ss_eula_24_html: "(c) THE INFORMATION OBTAINED BY YOU AS A RESULT OF YOUR USE OF THE SERVICE WILL BE ACCURATE OR RELIABLE; OR "
+  ss_eula_25_html: "(d) DEFECTS IN THE OPERATION OR FUNCTIONALITY OF ANY SOFTWARE PROVIDED TO YOU AS PART OF THE SERVICE WILL BE CORRECTED."
+  ss_eula_26_html: "ANY USAGE OF THE SSI APP IS DONE AT YOUR OWN DISCRETION AND RISK AND YOU WILL BE SOLELY RESPONSIBLE FOR ANY  DAMAGE OR INJURY THAT RESULTS FROM THE DOWNLOAD OR USE OF ANY SUCH CONTENT."
+  ss_eula_27_html: "YOU AGREE THAT NO ADVICE OR INFORMATION, WHETHER ORAL OR WRITTEN, OBTAINED BY YOU FROM SSI, OR THROUGH OR FROM THE SERVICE OR CONTENT, WILL CREATE ANY WARRANTY NOT EXPRESSLY STATED IN THE TERMS."
+  ss_eula_28_html: "YOU EXPRESSLY UNDERSTAND AND AGREE THAT, TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, SSI, ITS PARENT,  ITS SUBSIDIARIES, AND AFFILIATES, AND SSI’S LICENSORS AND THEIR SUPPLIERS, WILL NOT BE LIABLE TO YOU FOR:"
+  ss_eula_29_html: "(a) ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR EXEMPLARY DAMAGES THAT MAY BE INCURRED BY YOU, HOWEVER CAUSED AND UNDER ANY THEORY OF LIABILITY (INCLUDING, BUT NOT BE LIMITED TO: CONTRACT, TORT, COMMON LAW, OR STATUTORY DAMAGES; ANY LOSS OF PROFIT (WHETHER INCURRED DIRECTLY OR INDIRECTLY), ANY LOSS OF GOODWILL OR BUSINESS REPUTATION, ANY LOSS OF DATA, COST OF PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, OR OTHER INTANGIBLE LOSS); OR"
+  ss_eula_30_html: "(b) ANY LOSS OR DAMAGE AS A RESULT OF:
+                     (i) ANY RELIANCE PLACED BY YOU ON THE SSI APP,
+                     (ii) ANY CHANGES THAT SSI MAY MAKE TO THE SERVICE, OR ANY PERMANENT OR TEMPORARY CESSATION IN THE PROVISION OF THE SERVICE (OR ANY FEATURES WITHIN THE SERVICE);
+                     (iii) THE DELETION OF, CORRUPTION OF, OR FAILURE TO STORE, ANY CONTENT AND OTHER COMMUNICATIONS DATA MAINTAINED OR TRANSMITTED BY OR THROUGH YOUR USE OF THE SERVICE;
+                     (iv) YOUR FAILURE TO PROVIDE SSI WITH ACCURATE ACCOUNT INFORMATION; OR
+                     (v) YOUR FAILURE TO KEEP YOUR PASSWORD OR ACCOUNT DETAILS SECURE AND CONFIDENTIAL."
+  ss_eula_31_html: "TO THE EXTENT PERMITTED BY LAW, THE TOTAL LIABILITY OF SSI, AND ITS SUPPLIERS AND DISTRIBUTORS, FOR ANY CLAIMS UNDER THESE TERMS, INCLUDING FOR ANY IMPLIED WARRANTIES, TO THE EXTENT THE APPLICABLE STATE LAW DOES NOT ALLOW FOR THE DISCLAIMER OF THE SAME, IS LIMITED TO THE AMOUNT YOU PAID US TO USE THE SERVICES.  "
+  ss_eula_32_html: "THE LIMITATIONS ON SSI’S LIABILITY TO YOU SET FORTH HEREIN WILL APPLY WHETHER OR NOT SSI, ITS SUBSIDIARIES, PARENT, AFFILIATES, LICENSORS OR THEIR SUPPLIERS HAVE BEEN ADVISED OF OR SHOULD HAVE BEEN AWARE OF THE POSSIBILITY OF ANY SUCH LOSSES OR DAMAGES."
+  ss_eula_33_html: "Defense and Indemnification"
+  ss_eula_34_html: 'You hereby agree to defend, indemnify, and hold SSI, its parent, officers, directors, agents, affiliates, strategic partners, licensors and their suppliers ("the Indemnified Parties") harmless from and against any third party claim or liability arising out of:
+                     (a) your use of the SSI App; and
+                     (b) any use by users of your downloaded SSI App'
+  ss_eula_35_html: "You agree to cooperate as fully as reasonably required in the defense of any claim. SSI reserves the right, at its own expense, to assume the exclusive defense and control of any matter subject to indemnification by you. You acknowledge that damages for improper use of the SSI App may be irreparable; therefore, you agree that SSI is entitled to seek and obtain equitable relief, including but not limited to preliminary injunction and injunction, in addition to all other remedies."
+  ss_eula_36_html: "8.  Additional Terms"
+  ss_eula_37_html: "SSI may modify these terms or any additional terms that apply to a Service to, for example, reflect changes to the law or changes to SSI’s Services. Changes will not apply retroactively and will become effective no sooner than fourteen days after they are posted. However, changes addressing new functions for a Service or changes made for legal reasons will be effective immediately. If you do not agree to the modified terms for a Service, you should discontinue your use of SSI’s Service."
+  ss_eula_38_html: "All of the Terms herein control the relationship between SSI and you. They do not create any third party beneficiary rights. If you do not comply with these terms, and SSI does not take action right away, SSI does not waive any rights that it may have (such as taking action in the future).  If it turns out that a particular term is not enforceable, this will not affect any other terms herein."
+  ss_eula_39_html: "TRANSLATIONS: The English version of this EULA is the controlling version. Any translations are provided for convenience only.  If there is any conflict between such translation and the English language version, the English version of this Agreement shall govern, to the extent not expressly prohibited by the law in your jurisdiction.  The parties have agreed that this Agreement be drafted in the English language. Les parties ont convenu que cette Convention soit rédigée en langue anglaise.  "
+  ss_eula_40_html: "GOVERNING LAW: This EULA and any disputes related to this EULA or to the use of SSI Software and/or Hardware or otherwise are subject to South Carolina law, without giving effect to any principles that may provide for application of the law of another jurisdiction. The United Nations Convention on Contracts for the International Sales of Goods is hereby excluded from application to this EULA. All disputes arising out of this EULA shall be settled in the federal or state courts located in Charleston, South Carolina, which will have exclusive jurisdiction in respect of any such disputes. "
+  ss_eula_41_html: "You agree to comply with all applicable international and national laws that may apply to the SSI Products and Services, including the Canadian and U.S. export regulations, as well as end user, end-use, and destination restrictions issued by Canadian, U.S. and other governments. You may not use, acquire, ship, transport, export, or re-export the SSI Products and Services, except as authorized by SSI and as permitted by applicable law. The Products and Services may not be acquired, shipped, transported, exported, or re-exported (i) into any U.S. embargoed country, (ii) to a national or resident of any U.S. embargoed country, or (iii) to anyone on the U.S. Treasury Department's list of Specially Designated Nationals or the U.S. Department of Commerce's Table of Denial Orders. By using the Products and Services, You represent and warrant that you are not located in, under the control of, or a national or resident of any such country or on any such list.  You hereby agree to indemnify, defend and hold harmless SSI from and against all claims, losses, damages, liabilities, costs and expenses, including reasonable attorneys’ fees, to the extent such claims arise out of any breach by You of the provisions of this Paragraph."
+
+  ss_privacy_1_html: "SAFESTOP PRIVACY POLICY"
+  ss_privacy_2_html: "SSI takes the protection and proper use of your personal information seriously and is committed to protecting your personal information in its possession and complying with all State, Provincial and Federal laws respecting the same. SSI wants you to understand what personal information it may collect from you and how SSI uses such information.  By using SSI’s Products and Services, you agree that SSI can use such data in accordance with its privacy policies contained herein."
+  ss_privacy_3_html: 'In this policy, "personal information" means any information by which you can be identified or contacted, such as your name (first and last), address (city, state, postal code), email address, telephone number, etc.  SSI collects personal information when communicating or interacting with you through its App or website as well as via telephone. Examples include when you register for an account, or when you contact SSI with a comment, question or complaint.'
+  ss_privacy_4_html: "When you visit SSI’s website SSI may also gather certain information automatically and store it in log files. This information may include Internet Protocol (IP) addresses or other device identifiers, browser information, Internet Service Provider (ISP), operating system, location, date/time stamp and clickstream data."
+  ss_privacy_5_html: "<b>How SSI Uses Your Information</b>"
+  ss_privacy_6_html: "SSI uses the personal information that it collects to conduct its business and to provide you with the best possible services and experience. SSI does not share with any third party any user (student/parent/guardian) information that would identify the specific user in any manner, with the exception that SSI may, in certain instances, disclose your personal information when demanded by an order of court.  SSI may collect, use and provide to trusted third parties solely anonymous data (statistics and quantitative data) such as overall usage of SSI’s App in a specific geographical location, length of use of the App by an individual in a given session (without identifying the individual), and average daily, weekly and monthly access to the app by unidentified users. We may also use, but not share with third parties, your information to notify you of safety issues, respond to your comments, questions or complaints, and to personalize your experience.  SSI also uses your personal information internally for its everyday business purposes such as security, payment processing, analytics, operations, fraud detection and prevention, reporting, making back-ups and legal compliance."
+  ss_privacy_7_html: "Service providers, third parties who perform services on SSI’s behalf, will be contractually restricted from using any anonymous information provided by SSI in any manner other than in helping SSI to provide you with quality services. "
+  ss_privacy_8_html: "Specifically, you may be assured that SSI will:"
+  ss_privacy_9_html: "Not sell student information;"
+  ss_privacy_10_html: "Not build a personal profile of a student other than for supporting authorized educational/school purposes or as authorized by the parent/student;"
+  ss_privacy_11_html: "Not behaviorally target advertising;"
+  ss_privacy_12_html: "Use data for authorized education purposes only;"
+  ss_privacy_13_html: "Not knowingly retain student personal information beyond the time period required to support the authorized educational/school purposes, or as authorized by the parent/student;"
+  ss_privacy_14_html: "Support parental access to, and correction of errors in, their children’s information;"
+  ss_privacy_15_html: "Maintain a comprehensive security program that is reasonably designed to protect the security, privacy, confidentiality, and integrity of student personal information against risks – such as unauthorized access or use, or unintended or inappropriate disclosure – through the use of administrative, technological and physical safeguards appropriate to the sensitivity of the information; and"
+  ss_privacy_16_html: "Be transparent about collection and use of data."
+  ss_privacy_17_html: "<b>Cookies</b>"
+  ss_privacy_18_html: 'SSI’s website may use "cookie" and "web beacon" technology. SSI uses cookies and web beacons to identify your device, provide website user authentication, conduct fraud prevention and management services, distinguish you from other visitors, record your IP address and understand your use of our site, and identify the name of the Web site from which you linked to SSI. This information is used solely internally for fulfilling contracts with SSI’s business partners, and to help SSI serve you better by improving SSI’s website design and App. SSI does not otherwise track any information about your use of other websites. Information obtained through cookies and web will not be shared with third parties subject to the exceptions set forth herein.'
+  ss_privacy_19_html: "<b>Compliance with Privacy Laws</b>"
+  ss_privacy_20_html: "With respect to the use of personal information contemplated herein, SSI complies with all applicable federal and state privacy laws in the United States and the Personal Information Protection and Electronic Documents Act and other applicable laws in Canada.  If any provision of this Privacy Policy conflicts with specific aspects of the aforementioned laws, such aforementioned laws shall prevail."
+  ss_privacy_21_html: "<b>Revisions</b>"
+  ss_privacy_22_html: "From time to time, SSI may choose to update its End User License Agreement (EULA) and this Privacy Policy.  When it chooses to do so, you will be notified of the same and directed to the EULA and Privacy Policy for review, understanding, and affirmative acceptance or rejection.  SSI will not change its privacy policies as it relates to you without such notice and choice."
+
+
+
+  student_id_description: "Your student's ID is provided by your school"
+  student_1_description: "Student ID Number 1 (Required)"
+  create_an_account: "CREATE AN ACCOUNT"
+  account_creation: "Account Creation"
+  add_school_or_district: "AÑADIR UNA ESCUELA O DISTRITO"
+  add_student: "AÑADIR ESTUDIANTE"
+  add_scan_code: "ADD SCAN CODE"
+  add_sub_account: "AÑADIR SUB-CUENTA"
+  confirm_email: "Confirm Email"
+  email_addresses_do_not_match: "Email addresses do not match"
+
+  scan_code_not_found_for_identifier: "Scan code not found for this identifier"
+
+  add_my_students: "ADD MY STUDENTS"
+  are_you_a_school_or_district_employee: "Are you a school or district employee?"
+
+  student_id_or_school_code_not_valid: "Student ID or School Code Not Valid"
+  student_rider_first_name: "Student/Rider First Name"
+  student_rider_last_name: "Student/Rider Last Name"
+  code_or_id_attempted_to_use: "Code or ID Attempted To Use"
+
+
+  lost_date: "Date Item was Lost"
+  route_name: "Route Name"
+
+  lost_item_report_has_been_submitted: "Your lost item report has been submitted"
+  report_a_problem: "Report a Problem"
+
+  lost_item_report: "Lost Item Report"
+  incident_report: "Incident Report"
+
+  my_bus_does_not_appear_to_be_updating: "My bus doesn't appear to be moving/updating"
+  my_routing_information_is_wrong: "My scheduled route or stop information is wrong"
+  my_eta_is_inaccurate: "The ETA for my bus stop is inaccurate"
+  report_an_app_issue: "INFORMAR UNA PROBLEMA"
+
+  manage_student_scanning: "MANEJAR EL ESCANEO DE ESTUDIANTES"
+  manage_sub_accounts: "MANEJAR SUB-CUENTAS"
+  add_student_id: "AÑADIR ESTUDIANTE ID"
+  activate_account: "ACTIVAR SU CUENTA"
+  state_or_province: "State or Province"
+  manage_account: "MANEJAR CUENTAS"
+  send_alert: "ENVIAR ALERTA"
+
+  account_not_active: "Cuenta No Activada"
+  account_not_active_description: "Su cuenta aún no está vinculada a una escuela, distrito o sistema de transporte. Seleccione 'Activar cuenta' y complete el proceso de registro para obtener acceso al servicio de SafeStop."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  expected_time_not_available: "--:-- --"
+  not_available: "NOT AVAILABLE"
+  dashboard: "Dashboard"
+  select_audience: "Select the audience for a new alert"
+  by_jurisdiction: "Alert Jurisdiction(s)"
+  by_jurisdiction_description: "Send an alert to all users in a jurisdiction"
+  alert_jurisdiction: "Alert Jurisdiction"
+  alert_multiple_jurisdictions: "Alert Multiple Jurisdictions"
+  by_route_or_stop: "Alert Specific Routes or Bus Stops"
+  by_route_or_stop_description: "Send an alert to all users watching a specific route or stop"
+  alert_route_or_stop: "Alert a Bus Stop / Single Route"
+  alert_multiple_routes: "Alert multiple routes"
+  by_bus: "Alert Bus(es)"
+  by_bus_description: "Send an alert to all users watching a specific route or stop associated with a specific bus"
+  alert_bus: "Alert Bus"
+  alert_multiple_buses: "Alert Multiple Buses"
+  how_to_use_alerts: "How to use Alerts"
+  search_available_jurisdictions: "Search available jurisdictions"
+  alert: "ALERT"
+  your_alert_will_be_sent_to_jurisdictions: "Your alert will be sent to the following jurisdiction(s)"
+  your_alert_will_be_sent_to_buses: "Your alert will be sent to the following bus(es)"
+  alert_this_route: "ALERT THIS ROUTE"
+  your_alert_will_be_sent_to_routes: "Your alert will be sent to the following bus route(s)"
+  your_alert_will_be_sent_to_stops: "Your alert will be sent to the following bus stop(s)"
+  your_alert_has_been_submitted: "Your alert has been submitted"
+  report_a_service_issue: "REPORT A SERVICE ISSUE"
+  driver: "Driver"
+  vehicle: "Vehicle"
+  schedule: "Schedule"
+
