@@ -557,7 +557,7 @@ func (c *AppController) ServiceIssueAction(w http.ResponseWriter, r *http.Reques
 		success := models.InsertServiceIssue(&data)
 		if success == true {
 
-			c.SendEmail(r, []string{"swaller@safestopapp.com"}, "SafeStop - Service Issue Report", "service_issue", data)
+			c.SendEmail(r, []string{"dispatch@transpar.com"}, "SafeStop - Service Issue Report", "service_issue", data)
 
 
 
