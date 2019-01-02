@@ -20,7 +20,7 @@
       <env name="SSC_DB_PORT" value="5432" />
       <env name="SSC_DB_USERNAME" value="safestopapp" />
       <env name="SSC_DB_PASSWORD" value="safestopapp" />
-      <env name="SSC_DB_NAME" value="hermes_dev" />
+      <env name="SSC_DB_NAME" value="hermes_dev_new" />
     </envs>
     <kind value="FILE" />
     <filePath value="$PROJECT_DIR$/application.go" />
