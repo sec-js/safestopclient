@@ -138,7 +138,7 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 	for i := 0; i < len(cj.Jurisdictions); i++ {
 		if cj.Jurisdictions[i].HasLostItemReports == true {
 			view_lost_item_reports = true
-			break
+			i = len(cj.Jurisdictions)
 		}
 	}
 
@@ -146,7 +146,7 @@ func (c *AppController) AccountAction(w http.ResponseWriter, r *http.Request) {
 	for i := 0; i < len(cj.Jurisdictions); i++ {
 		if cj.Jurisdictions[i].HasServiceIssueReports == true {
 			view_service_issues_reports = true
-			break
+			i = len(cj.Jurisdictions)
 		}
 	}
 
