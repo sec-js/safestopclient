@@ -11,7 +11,7 @@
                     {{ t .CurrentLocale "english" ""}}
                 </td>
                 <td>
-                    {{ if eq .CurrentLocale "fr"}}
+                    {{ if or (eq .CurrentLocale "fr") (eq .CurrentLocale "sp") }}
                     <i class="fa fa-square-o" aria-hidden="true" style="margin-right: 5px;"></i>
                     {{ else }}
                     <i class="fa fa-check-square-o" aria-hidden="true"> </i>
@@ -27,11 +27,27 @@
                 {{ t .CurrentLocale "french" ""}}
                 </td>
                 <td>
-                    {{ if eq .CurrentLocale "en"}}
+                    {{ if or (eq .CurrentLocale "en") (eq .CurrentLocale "sp") }}
                     <i class="fa fa-square-o" aria-hidden="true" style="margin-right: 5px;"></i>
                     {{ else }}
                     <i class="fa fa-check-square-o" aria-hidden="true"> </i>
                     {{ end }}
+                </td>
+            </tr>
+        </table>
+    </a>
+    <a href="/change_locale/sp" class="list-group-item" id="spanish">
+        <table class="list-sub-item-table">
+            <tr>
+                <td>
+                {{ t .CurrentLocale "spanish" ""}}
+                </td>
+                <td>
+                {{ if or (eq .CurrentLocale "fr") (eq .CurrentLocale "en") }}
+                    <i class="fa fa-square-o" aria-hidden="true" style="margin-right: 5px;"></i>
+                {{ else }}
+                    <i class="fa fa-check-square-o" aria-hidden="true"> </i>
+                {{ end }}
                 </td>
             </tr>
         </table>
