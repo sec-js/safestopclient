@@ -22,3 +22,4 @@ safestopclient_linux
 !.elasticbeanstalk/*.global.yml
 
 
+application
