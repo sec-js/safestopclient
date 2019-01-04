@@ -124,6 +124,7 @@ sp:
   contact_support: "CONTACT SUPPORT"
   contact_information: "Contact Information"
 
+  expected_time_not_available: "--:-- --"
   grade: "Grade"
   kindergarten: "Kindergarten"
   1st_grade: "1st Grade"
