@@ -420,6 +420,8 @@ fr:
   driver: "Chauffeur"
   vehicle: "Véhicule"
   schedule: "Calendrier"
+  start_time: "Commence:"
+  scheduled_time: "Heure Prévue:"
 
 
 

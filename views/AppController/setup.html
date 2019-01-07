@@ -40,7 +40,7 @@
                             <td style='font-size: 14pt; color:#A12130; font-weight: 500'>{|bus_route_name|}</td>
                         </tr>
                         <tr>
-                            <td style="font-size: 9pt;">Start Time: {|bus_route_start_time |}</td>
+                            <td style="font-size: 9pt;">{{ t .CurrentLocale "start_time" "" }} {|bus_route_start_time |}</td>
                         </tr>
                     </table>
                 </td>
@@ -81,7 +81,7 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="2" style="font-size: 9pt;">Scheduled Time: {|scheduledtime|}</td>
+                <td colspan="2" style="font-size: 9pt;">{{ t .CurrentLocale "scheduled_time" "" }} {|scheduledtime|}</td>
             </tr>
         </table>
     </li>

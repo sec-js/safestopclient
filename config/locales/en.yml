@@ -489,4 +489,6 @@ en:
   driver: "Driver"
   vehicle: "Vehicle"
   schedule: "Schedule"
+  start_time: "Start Time:"
+  scheduled_time: "Scheduled Time: "
 

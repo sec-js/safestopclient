@@ -279,8 +279,8 @@ sp:
   ss_client_setup_js_5_ca: " stops at once in this jurisdiction. Contact support@SafeStopApp.ca with any questions"
 
   ss_client_setup_js_6: "The location of this address could not be determined. This can happen when an address is invalid (not a real address) or the address is too new."
-  ss_client_setup_js_7: "Displaying routes within "
-  ss_client_setup_js_8: " miles"
+  ss_client_setup_js_7: "Mostrando rutas dentro de "
+  ss_client_setup_js_8: " milas"
   ss_client_setup_js_9: "You have "
   ss_client_setup_js_10: " out of "
   ss_client_setup_js_11: " stops selected"
@@ -490,4 +490,6 @@ sp:
   driver: "Driver"
   vehicle: "Vehicle"
   schedule: "Schedule"
+  start_time: "Comenzando: "
+  scheduled_time: "Hora Programada: "
 
